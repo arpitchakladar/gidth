@@ -4,6 +4,8 @@ pub struct Integer {
 	pub(crate) digits: Vec<u64>,
 }
 
+pub const INTEGER_BASE: u128 = u64::MAX as u128 + 1;
+
 impl Integer {
 	pub fn new<T>(value: T) -> Self
 	where
@@ -114,15 +116,14 @@ impl From<String> for Integer {
 			.rev()
 			.filter_map(|chunk| std::str::from_utf8(chunk).ok()?.parse().ok())
 			.collect();
-		const BASE: u128 = u64::MAX as u128 + 1;
 		const CHUNK_SIZE: u128 = 1_000_000_000_000_000_000u128;
 
 		while temp_digits.iter().any(|&x| x != 0) {
 			let mut carry = 0u64;
 			for byte in temp_digits.iter_mut() {
 				let current = (carry as u128) * CHUNK_SIZE + *byte as u128;
-				*byte = (current / BASE) as u64;
-				carry = (current % BASE) as u64;
+				*byte = (current / INTEGER_BASE) as u64;
+				carry = (current % INTEGER_BASE) as u64;
 			}
 			digits.push(carry);
 		}

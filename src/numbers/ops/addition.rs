@@ -9,7 +9,7 @@ impl std::ops::Add for &Integer {
 		} else {
 			(other, self)
 		};
-		let mut digits = Vec::with_capacity(lint.digits.len());
+		let mut digits = Vec::with_capacity(lint.digits.len() + 1);
 		let mut reg: u128;
 		let mut rem: u64 = 0;
 		for i in 0..sint.digits.len() {
