@@ -10,7 +10,7 @@ impl std::ops::Add for &Integer {
 			(other, self)
 		};
 		let mut digits = Vec::with_capacity(lint.digits.len());
-		let mut reg: u16 = 0;
+		let mut reg: u16;
 		let mut rem: u8 = 0;
 		for i in 0..sint.digits.len() {
 			reg = lint.digits[i] as u16 + sint.digits[i] as u16 + rem as u16;
@@ -18,7 +18,7 @@ impl std::ops::Add for &Integer {
 			digits.push(reg as u8);
 		}
 
-		let mut j = 0;
+		let mut j = lint.digits.len();
 
 		for i in sint.digits.len()..lint.digits.len() {
 			reg = lint.digits[i] as u16 + rem as u16;
@@ -42,5 +42,14 @@ impl std::ops::Add for &Integer {
 			positive: true,
 			digits,
 		}
+	}
+}
+
+impl std::ops::Add for Integer {
+	type Output = Integer;
+
+
+	fn add(self, other: Self) -> Self::Output {
+		&self + &other
 	}
 }

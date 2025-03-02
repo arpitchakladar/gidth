@@ -15,7 +15,24 @@ impl Integer {
 
 impl std::fmt::Display for Integer {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		write!(f, "{:?}", self.digits)
+		let mut result = String::new();
+		let mut temp_digits = self.digits.clone();
+		while temp_digits.iter().any(|&x| x != 0) {
+			let mut carry = 0u8;
+			for byte in temp_digits.iter_mut().rev() {
+				let current = ((carry as u16) << 8) + *byte as u16; // Combine carry and byte
+				*byte = (current / 10) as u8; // Quotient back into the byte
+				carry = (current % 10) as u8; // New carry is the remainder
+			}
+
+			result.push((b'0' + carry) as char);
+		}
+
+		if result.is_empty() {
+			result.push('0');
+		}
+
+		write!(f, "{}", result.chars().rev().collect::<String>())
 	}
 }
 
@@ -79,3 +96,12 @@ macro_rules! impl_from_int {
 }
 
 impl_from_int!(u8, u16, u32, u64, u128; i8, i16, i32, i64, i128);
+
+impl From<Vec<u8>> for Integer {
+	fn from(digits: Vec<u8>) -> Self {
+		Integer {
+			positive: true,
+			digits,
+		}
+	}
+}
