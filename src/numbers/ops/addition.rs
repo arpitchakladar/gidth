@@ -10,20 +10,20 @@ impl std::ops::Add for &Integer {
 			(other, self)
 		};
 		let mut digits = Vec::with_capacity(lint.digits.len());
-		let mut reg: u16;
-		let mut rem: u8 = 0;
+		let mut reg: u128;
+		let mut rem: u64 = 0;
 		for i in 0..sint.digits.len() {
-			reg = lint.digits[i] as u16 + sint.digits[i] as u16 + rem as u16;
-			rem = (reg >> 8) as u8;
-			digits.push(reg as u8);
+			reg = lint.digits[i] as u128 + sint.digits[i] as u128 + rem as u128;
+			rem = (reg >> 64) as u64;
+			digits.push(reg as u64);
 		}
 
 		let mut j = lint.digits.len();
 
 		for i in sint.digits.len()..lint.digits.len() {
-			reg = lint.digits[i] as u16 + rem as u16;
-			rem = (reg >> 8) as u8;
-			digits.push(reg as u8);
+			reg = lint.digits[i] as u128 + rem as u128;
+			rem = (reg >> 64) as u64;
+			digits.push(reg as u64);
 			if rem == 0 {
 				j = i + 1;
 				break;

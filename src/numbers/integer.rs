@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct Integer {
 	pub(crate) positive: bool,
-	pub(crate) digits: Vec<u8>,
+	pub(crate) digits: Vec<u64>,
 }
 
 impl Integer {
@@ -18,14 +18,14 @@ impl std::fmt::Display for Integer {
 		let mut result = String::new();
 		let mut temp_digits = self.digits.clone();
 		while temp_digits.iter().any(|&x| x != 0) {
-			let mut carry = 0u8;
+			let mut carry = 0u64;
 			for byte in temp_digits.iter_mut().rev() {
-				let current = ((carry as u16) << 8) + *byte as u16; // Combine carry and byte
-				*byte = (current / 10) as u8; // Quotient back into the byte
-				carry = (current % 10) as u8; // New carry is the remainder
+				let current = ((carry as u128) << 64) + *byte as u128; // Combine carry and byte
+				*byte = (current / 10) as u64; // Quotient back into the byte
+				carry = (current % 10) as u64; // New carry is the remainder
 			}
 
-			result.push((b'0' + carry) as char);
+			result.push((b'0' + carry as u8) as char);
 		}
 
 		if result.is_empty() {
@@ -56,10 +56,10 @@ macro_rules! impl_from_int {
 		impl From<$t> for Integer {
 			fn from(n: $t) -> Self {
 				let mut digits = Vec::new();
-				let mut num = n as u64;
+				let mut num = n as u128;
 				while num > 0 {
-					digits.push(num as u8);
-					num = num >> 8;
+					digits.push(num as u64);
+					num = num >> 64;
 				}
 				if digits.is_empty() {
 					digits.push(0);
@@ -79,8 +79,8 @@ macro_rules! impl_from_int {
 				let mut digits = Vec::new();
 				let mut num = to_positive(n);
 				while num > 0 {
-					digits.push(num as u8);
-					num = num >> 8;
+					digits.push(num as u64);
+					num = num >> 64;
 				}
 				if digits.is_empty() {
 					digits.push(0);
@@ -97,8 +97,8 @@ macro_rules! impl_from_int {
 
 impl_from_int!(u8, u16, u32, u64, u128; i8, i16, i32, i64, i128);
 
-impl From<Vec<u8>> for Integer {
-	fn from(digits: Vec<u8>) -> Self {
+impl From<Vec<u64>> for Integer {
+	fn from(digits: Vec<u64>) -> Self {
 		Integer {
 			positive: true,
 			digits,
