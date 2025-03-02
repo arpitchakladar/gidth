@@ -111,6 +111,7 @@ impl From<Vec<u64>> for Integer {
 impl From<String> for Integer {
 	fn from(s: String) -> Self {
 		let mut digits = Vec::new();
+		let positive = !s.starts_with('-');
 		let mut temp_digits: Vec<u64> = s.as_bytes()
 			.rchunks(18)
 			.rev()
@@ -133,7 +134,7 @@ impl From<String> for Integer {
 		}
 
 		Integer {
-			positive: true,
+			positive,
 			digits,
 		}
 	}

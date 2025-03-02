@@ -1,7 +1,5 @@
-mod addition;
-mod substraction;
+mod additive;
 mod comparison;
 
-pub use addition::*;
+pub(crate) use additive::*;
 pub use comparison::*;
-pub use substraction::*;
