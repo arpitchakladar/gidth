@@ -1,3 +1,5 @@
 mod integer;
+mod ops;
 
-pub use integer::Integer;
+pub use integer::*;
+pub use ops::*;

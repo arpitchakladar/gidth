@@ -1,6 +1,7 @@
+#[derive(Debug)]
 pub struct Integer {
-	positive: bool,
-	digits: Vec<u8>,
+	pub(crate) positive: bool,
+	pub(crate) digits: Vec<u8>,
 }
 
 impl Integer {
@@ -9,6 +10,25 @@ impl Integer {
 		T: Into<Integer>,
 	{
 		value.into()
+	}
+}
+
+impl std::fmt::Display for Integer {
+	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		write!(f, "{:?}", self.digits)
+	}
+}
+
+fn to_positive<T>(n: T) -> u128
+where
+	T: PartialOrd + std::ops::Neg<Output = T> + Copy + Default,
+	i128: From<T>,
+{
+	let n: i128 = n.into();
+	if n >= 0 {
+		n as u128
+	} else {
+		(-n) as u128
 	}
 }
 
@@ -40,7 +60,7 @@ macro_rules! impl_from_int {
 		impl From<$s> for Integer {
 			fn from(n: $s) -> Self {
 				let mut digits = Vec::new();
-				let mut num = n.abs() as u64;
+				let mut num = to_positive(n);
 				while num > 0 {
 					digits.push(num as u8);
 					num = num >> 8;
@@ -58,4 +78,4 @@ macro_rules! impl_from_int {
 	};
 }
 
-impl_from_int!(u8, u16, u32, u64, usize; i8, i16, i32, i64, isize);
+impl_from_int!(u8, u16, u32, u64, u128; i8, i16, i32, i64, i128);
