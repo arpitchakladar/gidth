@@ -1,0 +1,2 @@
+# Gidth
+A math library.
