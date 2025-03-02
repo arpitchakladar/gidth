@@ -1,2 +1,2 @@
 # Gidth
-A math library.
+A math library for rust.
