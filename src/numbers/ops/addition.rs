@@ -53,3 +53,21 @@ impl std::ops::Add for Integer {
 		&self + &other
 	}
 }
+
+impl std::ops::Add<&Integer> for Integer {
+	type Output = Integer;
+
+
+	fn add(self, other: &Self) -> Self::Output {
+		&self + other
+	}
+}
+
+impl std::ops::Add<Integer> for &Integer {
+	type Output = Integer;
+
+
+	fn add(self, other: Integer) -> Self::Output {
+		self + &other
+	}
+}
