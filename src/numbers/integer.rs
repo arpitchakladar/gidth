@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Integer {
 	pub(crate) positive: bool,
 	pub(crate) digits: Vec<u32>,

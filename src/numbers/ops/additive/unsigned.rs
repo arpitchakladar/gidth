@@ -1,7 +1,7 @@
 use crate::numbers::{
 	Integer,
 	INTEGER_BASE,
-	unsigned_greater_than_equal,
+	unsigned_greater_than,
 };
 
 pub(crate) fn unsigned_integer_add(lhs: &Integer, rhs: &Integer) -> Integer {
@@ -46,7 +46,7 @@ pub(crate) fn unsigned_integer_add(lhs: &Integer, rhs: &Integer) -> Integer {
 }
 
 pub(crate) fn unsigned_integer_sub(lhs: &Integer, rhs: &Integer) -> Integer {
-	let (lint, sint, positive) = if unsigned_greater_than_equal(&lhs, &rhs) {
+	let (lint, sint, positive) = if unsigned_greater_than(&lhs, &rhs) {
 		(lhs, rhs, true)
 	} else {
 		(rhs, lhs, false)
@@ -81,6 +81,10 @@ pub(crate) fn unsigned_integer_sub(lhs: &Integer, rhs: &Integer) -> Integer {
 
 	for j in i..lint.digits.len() {
 		digits.push(lint.digits[j]);
+	}
+
+	if digits[digits.len() - 1] == 0 {
+		digits.pop();
 	}
 
 	Integer {
