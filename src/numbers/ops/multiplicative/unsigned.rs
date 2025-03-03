@@ -8,7 +8,7 @@ pub(crate) fn unsigned_integer_mul(lhs: &Integer, rhs: &Integer) -> Integer {
 			digits.push(0);
 		}
 		let mut rem = 0u64;
-		for (j, d2) in lhs.digits.iter().enumerate() {
+		for d2 in lhs.digits.iter() {
 			let reg = *d2 as u128 * *d1 as u128 + rem as u128;
 			rem = (reg >> 64) as u64;
 			digits.push(reg as u64);
