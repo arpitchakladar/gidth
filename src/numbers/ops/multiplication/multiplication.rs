@@ -10,7 +10,7 @@ impl Mul for &Integer {
 
 	fn mul(self, other: Self) -> Self::Output {
 		let mut result = unsigned_integer_mul(self, other);
-		result.positive = (self.positive && other.positive) || !(self.positive || other.positive);
+		result.positive = self.positive == other.positive;
 
 		result
 	}

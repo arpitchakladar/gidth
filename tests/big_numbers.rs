@@ -1,5 +1,6 @@
 use gidth::numbers::{
 	Integer,
+	divmod,
 };
 
 #[test]
@@ -21,9 +22,8 @@ fn big_int_multiply() {
 
 #[test]
 fn big_int_divide() {
-	let x = 8324324u128;
 	let int_y = Integer::new("233422342343243242334234233");
-	let int_x = Integer::new(x);
-	let z = int_y / int_x;
-	println!("{}", z);
+	let int_x = Integer::new(8324324u128);
+	let z = divmod(&int_y, &int_x);
+	println!("{} * {} + {} = {}", z.0, int_x, z.1, int_y);
 }

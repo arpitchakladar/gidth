@@ -66,7 +66,7 @@ pub fn unsigned_integer_divmod(lhs: &Integer, rhs: &Integer) -> (Integer, Intege
 	let l_lhs = lhs.digits.len();
 	let l_rhs = rhs.digits.len();
 
-	let mut quotient = Vec::new();
+	let mut quotient = Vec::with_capacity(l_lhs - l_rhs + 1);
 	let sig_rhs = rhs.digits[l_rhs - 1] as u64;
 	let mut digits = lhs.digits.clone();
 	let mut start = l_lhs - l_rhs;
@@ -100,7 +100,11 @@ pub fn unsigned_integer_divmod(lhs: &Integer, rhs: &Integer) -> (Integer, Intege
 		}
 	}
 
+	while digits.last() == Some(&0) {
+		digits.pop();
+	}
+
 	let quotient = Integer::new(quotient.into_iter().rev().collect::<Vec<u32>>());
-	let remainder = Integer::new(digits[start..end].to_vec());
+	let remainder = Integer::new(digits);
 	(quotient, remainder)
 }
