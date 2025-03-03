@@ -1,5 +1,4 @@
 use gidth::numbers::Integer;
-use gidth::numbers::unsigned_integer_multiplication;
 
 #[test]
 fn big_int_sum() {
@@ -12,7 +11,8 @@ fn big_int_sum() {
 
 #[test]
 fn big_int_multiply() {
-	let x = Integer::new(35857);
-	let y = Integer::new(52);
-	println!("{}", unsigned_integer_multiplication(&x, &y));
+	let x = 84u128;
+	let y = 79832869873495734934538324235237923u128;
+	let z = Integer::new(x) * Integer::new(y);
+	println!("{}", z * Integer::new(-10));
 }

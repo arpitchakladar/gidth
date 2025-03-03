@@ -34,7 +34,12 @@ impl std::fmt::Display for Integer {
 			result.push('0');
 		}
 
-		write!(f, "{}", result.chars().rev().collect::<String>())
+		let sign = if self.positive {
+			""
+		} else {
+			"-"
+		};
+		write!(f, "{}{}", sign, result.chars().rev().collect::<String>())
 	}
 }
 
@@ -123,8 +128,8 @@ impl From<String> for Integer {
 			let mut carry = 0u64;
 			for byte in temp_digits.iter_mut() {
 				let current = (carry as u128) * CHUNK_SIZE + *byte as u128;
-				*byte = (current / INTEGER_BASE) as u64;
-				carry = (current % INTEGER_BASE) as u64;
+				*byte = (current >> 64) as u64;
+				carry = current as u64;
 			}
 			digits.push(carry);
 		}
