@@ -28,7 +28,7 @@ pub(crate) fn unsigned_integer_mul(lhs: &Integer, rhs: &Integer) -> Integer {
 fn slice_integer_sub(lhs: &mut [u32], rhs: &[u32]) {
 	let mut carry: u64 = 0;
 	for i in 0..rhs.len() {
-		let reg = carry + rhs[i] as u64;
+		let mut reg = carry + rhs[i] as u64;
 		let l = lhs[i] as u64;
 		if l >= reg {
 			lhs[i] = (l - reg) as u32;
@@ -39,5 +39,35 @@ fn slice_integer_sub(lhs: &mut [u32], rhs: &[u32]) {
 	}
 	if carry > 0 {
 		lhs[lhs.len() - 1] -= carry as u32;
+	}
+}
+
+fn digits_greater_than(lhs: &[u32], rhs: &[u32]) -> (bool, usize) {
+	if lhs.len() > rhs.len() {
+		(true, 0)
+	} else if lhs.len() < rhs.len() {
+		(false, 0)
+	} else {
+		for (i, (l, r)) in lhs.iter().rev().zip(rhs.iter().rev()).enumerate() {
+			if l > r {
+				return (true, i);
+			} else if l < r {
+				return (false, i);
+			}
+		}
+
+		(true, lhs.len())
+	}
+}
+
+fn small_int_mul(lhs: &mut Vec, rhs: u64) {
+	let mut carry = 0u32;
+	for d in lhs.iter_mut() {
+		let reg = rhs * *d as u64 + carry as u64;
+		carry = (reg >> 64) as u32;
+		*d = reg as u32;
+	}
+	if carry > 0 {
+		lhs.push(carry);
 	}
 }
