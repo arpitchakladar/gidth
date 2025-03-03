@@ -1,7 +1,9 @@
 mod additive;
-mod multiplicative;
+mod multiplication;
+mod division;
 mod comparison;
 
 pub(crate) use additive::*;
-pub use multiplicative::*;
-pub use comparison::*;
+pub(crate) use multiplication::*;
+pub(crate) use division::*;
+pub(crate) use comparison::*;

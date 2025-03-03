@@ -1,49 +1,41 @@
-use crate::numbers::Integer;
+use std::ops::Sub;
+use crate::numbers::{Integer, unsigned_integer_add, unsigned_integer_sub};
 
-use crate::numbers::{
-	unsigned_integer_add,
-	unsigned_integer_sub,
-};
-
-impl std::ops::Sub for &Integer {
+impl Sub for &Integer {
 	type Output = Integer;
 
 	fn sub(self, other: Self) -> Self::Output {
-		if self.positive && other.positive {
-			unsigned_integer_sub(self, other)
-		} else if self.positive && !other.positive {
-			unsigned_integer_add(self, other)
-		} else if !self.positive && other.positive {
-			let mut result = unsigned_integer_add(self, other);
-			result.positive = false;
-			result
-		} else {
-			unsigned_integer_sub(other, self)
+		match (self.positive, other.positive) {
+			(true, true) => unsigned_integer_sub(self, other),
+			(true, false) => unsigned_integer_add(self, other),
+			(false, true) => {
+				let mut result = unsigned_integer_add(self, other);
+				result.positive = false;
+				result
+			}
+			(false, false) => unsigned_integer_sub(other, self),
 		}
 	}
 }
 
-impl std::ops::Sub for Integer {
+impl Sub for Integer {
 	type Output = Integer;
-
 
 	fn sub(self, other: Self) -> Self::Output {
 		&self - &other
 	}
 }
 
-impl std::ops::Sub<&Integer> for Integer {
+impl Sub<&Integer> for Integer {
 	type Output = Integer;
 
-
-	fn sub(self, other: &Self) -> Self::Output {
+	fn sub(self, other: &Integer) -> Self::Output {
 		&self - other
 	}
 }
 
-impl std::ops::Sub<Integer> for &Integer {
+impl Sub<Integer> for &Integer {
 	type Output = Integer;
-
 
 	fn sub(self, other: Integer) -> Self::Output {
 		self - &other

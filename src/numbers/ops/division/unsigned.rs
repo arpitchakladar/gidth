@@ -4,43 +4,21 @@ use crate::numbers::{
 	unsigned_greater_than,
 };
 
-pub(crate) fn unsigned_integer_mul(lhs: &Integer, rhs: &Integer) -> Integer {
-	let mut result = Integer::new(0);
-	for (i, d1) in rhs.digits.iter().enumerate() {
-		let mut digits = Vec::with_capacity(i + lhs.digits.len() + 1);
-		for _ in 0..i {
-			digits.push(0);
-		}
-		let mut rem = 0u32;
-		for d2 in lhs.digits.iter() {
-			let reg = *d2 as u64 * *d1 as u64 + rem as u64;
-			rem = (reg >> 32) as u32;
-			// println!("{} {}", reg, rem);
-			digits.push(reg as u32);
-		}
-		if rem != 0 {
-			digits.push(rem);
-		}
-		result = result + Integer::new(digits);
-	}
-
-	result
-}
-
-fn slice_integer_sub(lhs: &mut [u32], rhs: &[u32]) -> usize {
-	let mut carry: u64 = 0;
+fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {
+	let mut borrow: u64 = 0;
 	for i in 0..rhs.len() {
-		let reg = carry + rhs[i] as u64;
-		let l = lhs[i] as u64;
-		if l >= reg {
-			lhs[i] = (l - reg) as u32;
+		let right_op = borrow + rhs[i] as u64;
+		let left_op = lhs[i] as u64;
+		let new_digit = if right_op > left_op {
+			INTEGER_BASE + left_op - right_op
 		} else {
-			lhs[i] = (l + INTEGER_BASE - reg) as u32;
-			carry = 1;
-		}
+			left_op - right_op
+		};
+		lhs[i] = new_digit as u32;
+		borrow = new_digit >> 32;
 	}
-	if carry > 0 {
-		lhs[lhs.len() - 1] -= carry as u32;
+	if borrow > 0 {
+		lhs[lhs.len() - 1] -= borrow as u32;
 	}
 	for i in (0..lhs.len()).rev() {
 		if lhs[i] != 0 {
@@ -50,7 +28,7 @@ fn slice_integer_sub(lhs: &mut [u32], rhs: &[u32]) -> usize {
 	lhs.len()
 }
 
-fn digits_greater_than(lhs: &[u32], rhs: &[u32]) -> bool {
+fn cmp_digit_arrays(lhs: &[u32], rhs: &[u32]) -> bool {
 	if lhs.len() > rhs.len() {
 		true
 	} else if lhs.len() < rhs.len() {
@@ -68,19 +46,19 @@ fn digits_greater_than(lhs: &[u32], rhs: &[u32]) -> bool {
 	}
 }
 
-fn small_int_mul(lhs: &mut Vec<u32>, rhs: u32) {
-	let mut carry = 0u32;
+fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
+	let mut carry = 0u64;
 	for d in lhs.iter_mut() {
-		let reg: u64 = rhs as u64 * *d as u64 + carry as u64;
-		carry = (reg >> 32) as u32;
+		let reg: u64 = rhs as u64 * *d as u64 + carry;
+		carry = reg >> 32;
 		*d = reg as u32;
 	}
 	if carry > 0 {
-		lhs.push(carry);
+		lhs.push(carry as u32);
 	}
 }
 
-pub fn unsigned_integer_div(lhs: &Integer, rhs: &Integer) -> (Integer, Integer) {
+pub fn unsigned_integer_divmod(lhs: &Integer, rhs: &Integer) -> (Integer, Integer) {
 	if unsigned_greater_than(rhs, lhs) {
 		return (Integer::new(0), lhs.clone());
 	}
@@ -96,7 +74,7 @@ pub fn unsigned_integer_div(lhs: &Integer, rhs: &Integer) -> (Integer, Integer) 
 
 	loop {
 		let reg = &mut digits[start..end];
-		if digits_greater_than(reg, &rhs.digits) {
+		if cmp_digit_arrays(reg, &rhs.digits) {
 			let sig: u64 = if reg.len() == l_rhs {
 				reg[reg.len() - 1] as u64
 			} else {
@@ -106,10 +84,10 @@ pub fn unsigned_integer_div(lhs: &Integer, rhs: &Integer) -> (Integer, Integer) 
 			let max = ((sig + 1) / sig_rhs) as u32;
 			for i in (min..=max).rev() {
 				let mut num = rhs.clone();
-				small_int_mul(&mut num.digits, i);
-				if digits_greater_than(reg, &num.digits) {
+				mul_by_small_int(&mut num.digits, i);
+				if cmp_digit_arrays(reg, &num.digits) {
 					quotient.push(i);
-					let offset = slice_integer_sub(reg, &num.digits);
+					let offset = sub_from_slice(reg, &num.digits);
 					end -= offset;
 					start = end - l_rhs;
 					break;

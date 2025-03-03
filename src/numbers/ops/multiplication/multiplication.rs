@@ -1,8 +1,11 @@
-use crate::numbers::Integer;
+use std::ops::Mul;
 
-use crate::numbers::unsigned_integer_mul;
+use crate::numbers::{
+	Integer,
+	unsigned_integer_mul
+};
 
-impl std::ops::Mul for &Integer {
+impl Mul for &Integer {
 	type Output = Integer;
 
 	fn mul(self, other: Self) -> Self::Output {
@@ -13,7 +16,7 @@ impl std::ops::Mul for &Integer {
 	}
 }
 
-impl std::ops::Mul for Integer {
+impl Mul for Integer {
 	type Output = Integer;
 
 	fn mul(self, other: Self) -> Self::Output {
@@ -21,7 +24,7 @@ impl std::ops::Mul for Integer {
 	}
 }
 
-impl std::ops::Mul<&Integer> for Integer {
+impl Mul<&Integer> for Integer {
 	type Output = Integer;
 
 	fn mul(self, other: &Self) -> Self::Output {
@@ -29,7 +32,7 @@ impl std::ops::Mul<&Integer> for Integer {
 	}
 }
 
-impl std::ops::Mul<Integer> for &Integer {
+impl Mul<Integer> for &Integer {
 	type Output = Integer;
 
 	fn mul(self, other: Integer) -> Self::Output {

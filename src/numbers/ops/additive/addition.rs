@@ -1,51 +1,48 @@
-use crate::numbers::Integer;
-
 use crate::numbers::{
+	Integer,
 	unsigned_integer_add,
 	unsigned_integer_sub,
 };
+use std::ops::Add;
 
-impl std::ops::Add for &Integer {
+impl Add for &Integer {
 	type Output = Integer;
 
 	fn add(self, other: Self) -> Self::Output {
-		if self.positive && other.positive {
-			unsigned_integer_add(self, other)
-		} else if self.positive && !other.positive {
-			unsigned_integer_sub(self, other)
-		} else if !self.positive && other.positive {
-			unsigned_integer_sub(other, self)
-		} else {
-			let mut result = unsigned_integer_add(self, other);
-			result.positive = false;
-			result
+		match (self.positive, other.positive) {
+			(true, true) => unsigned_integer_add(self, other),
+			(true, false) => unsigned_integer_sub(self, other),
+			(false, true) => unsigned_integer_sub(other, self),
+			(false, false) => {
+				let mut result = unsigned_integer_add(self, other);
+				result.positive = false;
+				result
+			}
 		}
 	}
 }
 
-impl std::ops::Add for Integer {
+impl Add for Integer {
 	type Output = Integer;
-
 
 	fn add(self, other: Self) -> Self::Output {
 		&self + &other
 	}
 }
 
-impl std::ops::Add<&Integer> for Integer {
+impl Add<&Integer> for Integer {
 	type Output = Integer;
 
-
-	fn add(self, other: &Self) -> Self::Output {
+	fn add(self, other: &Integer) -> Self::Output {
 		&self + other
 	}
 }
 
-impl std::ops::Add<Integer> for &Integer {
+impl Add<Integer> for &Integer {
 	type Output = Integer;
-
 
 	fn add(self, other: Integer) -> Self::Output {
 		self + &other
 	}
 }
+
