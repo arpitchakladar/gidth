@@ -7,11 +7,11 @@ pub(crate) fn unsigned_integer_mul(lhs: &Integer, rhs: &Integer) -> Integer {
 		for j in 0..i {
 			digits.push(0);
 		}
-		let mut rem = 0u64;
+		let mut rem = 0u32;
 		for d2 in lhs.digits.iter() {
-			let reg = *d2 as u128 * *d1 as u128 + rem as u128;
-			rem = (reg >> 64) as u64;
-			digits.push(reg as u64);
+			let reg = *d2 as u64 * *d1 as u64 + rem as u64;
+			rem = (reg >> 32) as u32;
+			digits.push(reg as u32);
 		}
 		if rem != 0 {
 			digits.push(rem);

@@ -36,6 +36,24 @@ impl Ord for Integer {
 	}
 }
 
+pub(crate) fn unsigned_greater_than_equal(lhs: &Integer, rhs: &Integer) -> bool {
+	if lhs.digits.len() > rhs.digits.len() {
+		true
+	} else if lhs.digits.len() < rhs.digits.len() {
+		false
+	} else {
+		for (a, b) in lhs.digits.iter().rev().zip(rhs.digits.iter().rev()) {
+			if a > b {
+				return true;
+			} else if a < b {
+				return false;
+			}
+		}
+
+		true
+	}
+}
+
 // impl PartialOrd for &Integer {
 // 	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
 // 		(*self).partial_cmp(*other)
