@@ -22,10 +22,9 @@ use gidth::numbers::{
 //
 #[test]
 fn big_int_divide() {
-	let x = 84u128;
-	let y = 23342234234234233u128;
-	let int_y = Integer::new(y);
+	let x = 8324324u128;
+	let int_y = Integer::new("233422342343243242334234233");
 	let int_x = Integer::new(x);
-	let z = &int_y * &int_x;
-	println!("{} {}", z, y * x);
+	let z = unsigned_integer_div(&int_y, &int_x);
+	println!("{}  {}", z.0, z.1);
 }

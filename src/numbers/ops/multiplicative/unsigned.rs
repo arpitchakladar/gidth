@@ -15,6 +15,7 @@ pub(crate) fn unsigned_integer_mul(lhs: &Integer, rhs: &Integer) -> Integer {
 		for d2 in lhs.digits.iter() {
 			let reg = *d2 as u64 * *d1 as u64 + rem as u64;
 			rem = (reg >> 32) as u32;
+			// println!("{} {}", reg, rem);
 			digits.push(reg as u32);
 		}
 		if rem != 0 {
@@ -121,7 +122,7 @@ pub fn unsigned_integer_div(lhs: &Integer, rhs: &Integer) -> (Integer, Integer) 
 		}
 	}
 
-	let quotient = Integer::new(quotient);
+	let quotient = Integer::new(quotient.into_iter().rev().collect::<Vec<u32>>());
 	let remainder = Integer::new(digits[start..end].to_vec());
 	(quotient, remainder)
 }
