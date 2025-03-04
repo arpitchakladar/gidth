@@ -4,6 +4,7 @@ mod division;
 mod divmod;
 mod exponentiation;
 mod multiplication;
+mod negation;
 mod remainder;
 mod substraction;
 mod unsigned_additive;
