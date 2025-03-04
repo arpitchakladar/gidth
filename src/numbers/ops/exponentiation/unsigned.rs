@@ -1,20 +1,20 @@
 use crate::numbers::{
 	BigInt,
-	divmod,
+	unsigned_big_int_divmod_by_small_int,
 };
 
 pub(crate) fn unsigned_big_int_exp(base: &BigInt, power: BigInt) -> BigInt {
-	if power == 0.into() {
+	if power.digits.len() == 1 && power.digits[0] == 0 {
 		return 1.into();
 	}
 
-	let two = 2.into();
-	let (quotient, remainder) = divmod(&power, &two);
+	let (quotient, remainder) = unsigned_big_int_divmod_by_small_int(&power, 2u32);
+	let exp_half_res = unsigned_big_int_exp(base, quotient);
+	let result = &exp_half_res * &exp_half_res;
 
-	let x = unsigned_big_int_exp(base, quotient);
-	if remainder == 1.into() {
-		base * &x * &x
+	if remainder == 1 {
+		base * &result
 	} else {
-		&x * &x
+		result
 	}
 }

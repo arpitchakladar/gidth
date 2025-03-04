@@ -116,7 +116,7 @@ pub(crate) fn unsigned_big_int_divmod(lhs: &BigInt, rhs: &BigInt) -> (BigInt, Bi
 	(quotient, remainder)
 }
 
-pub(crate) fn unsigned_big_int_divmod_by_small_int<T>(lhs: &BigInt, rhs: T) -> (BigInt, BigInt)
+pub(crate) fn unsigned_big_int_divmod_by_small_int<T>(lhs: &BigInt, rhs: T) -> (BigInt, u32)
 where
 	T: Into<u32> + Copy,
 	u64: From<T>,
@@ -136,6 +136,6 @@ where
 				.rev()
 				.collect::<Vec<u32>>()
 		),
-		remainder.into()
+		remainder
 	)
 }

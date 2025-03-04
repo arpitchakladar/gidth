@@ -24,7 +24,7 @@ fn big_int_multiply() {
 #[test]
 fn big_int_divide() {
 	let int_y = BigInt::new("233422342343243242334234233");
-	let int_x = BigInt::new(8324324u128);
+	let int_x = BigInt::new(83243u128);
 	let z = divmod(&int_y, &int_x);
 	println!("{} * {} + {} = {}", &z.0, &int_x, &z.1, &int_y);
 }
@@ -32,7 +32,7 @@ fn big_int_divide() {
 #[test]
 fn big_int_exponentiation() {
 	let y = BigInt::new("2334");
-	let x = BigInt::new(8u128);
+	let x = BigInt::new(8245u128);
 	let z = exp(&y, &x);
 	println!("{}", z);
 }
