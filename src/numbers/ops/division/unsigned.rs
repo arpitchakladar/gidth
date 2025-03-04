@@ -89,7 +89,11 @@ pub(crate) fn unsigned_big_int_divmod(lhs: &BigInt, rhs: &BigInt) -> (BigInt, Bi
 					quotient.push(i);
 					let offset = sub_from_slice(reg, &num.digits);
 					end -= offset;
-					start = end - l_rhs;
+					start = if end > l_rhs {
+						end - l_rhs
+					} else {
+						0
+					};
 					break;
 				}
 			}
