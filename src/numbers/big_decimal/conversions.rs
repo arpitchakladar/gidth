@@ -1,5 +1,7 @@
 use crate::numbers::BigDecimal;
 
+// TODO: Add conversion from floating point
+
 fn to_positive<T>(n: T) -> u128
 where
 	T: PartialOrd + std::ops::Neg<Output = T> + Copy + Default,
