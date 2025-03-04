@@ -25,7 +25,6 @@ fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {
 	lhs.len()
 }
 
-#[inline]
 fn cmp_digit_arrays(lhs: &[u32], rhs: &[u32]) -> bool {
 	if lhs.len() > rhs.len() {
 		true

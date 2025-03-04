@@ -1,4 +1,5 @@
 use crate::numbers::BigInt;
+use crate::utils::Abs;
 
 macro_rules! impl_from_int {
 	($($t:ty),*) => {
@@ -7,16 +8,17 @@ macro_rules! impl_from_int {
 		impl From<$t> for BigInt {
 			fn from(n: $t) -> Self {
 				let mut digits = Vec::new();
-				let mut num = n as u128;
+				let mut num = n.abs() as u64;
 				while num > 0 {
 					digits.push(num as u32);
-					num = num >> 32;
+					num >>= 32;
 				}
 				if digits.is_empty() {
 					digits.push(0);
 				}
 				BigInt {
-					positive: true,
+					#[allow(unused_comparisons)]
+					positive: n >= 0,
 					digits,
 				}
 			}
@@ -25,7 +27,7 @@ macro_rules! impl_from_int {
 	};
 }
 
-impl_from_int!(u8, u16, u32, u64, u128, i8, i16, i32, i64, i128);
+impl_from_int!(u8, u16, u32, u64, i8, i16, i32, i64);
 
 impl From<Vec<u32>> for BigInt {
 	fn from(digits: Vec<u32>) -> Self {
