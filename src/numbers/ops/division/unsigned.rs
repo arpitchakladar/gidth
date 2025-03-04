@@ -60,7 +60,7 @@ fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
 
 pub(crate) fn unsigned_integer_divmod(lhs: &Integer, rhs: &Integer) -> (Integer, Integer) {
 	if unsigned_greater_than(rhs, lhs) {
-		return (Integer::new(0), lhs.clone());
+		return (0.into(), lhs.clone());
 	}
 
 	let l_lhs = lhs.digits.len();
@@ -98,10 +98,6 @@ pub(crate) fn unsigned_integer_divmod(lhs: &Integer, rhs: &Integer) -> (Integer,
 		} else {
 			break;
 		}
-	}
-
-	while digits.last() == Some(&0) {
-		digits.pop();
 	}
 
 	let quotient = Integer::new(
@@ -110,103 +106,8 @@ pub(crate) fn unsigned_integer_divmod(lhs: &Integer, rhs: &Integer) -> (Integer,
 			.rev()
 			.collect::<Vec<u32>>()
 	);
-	let remainder = Integer::new(digits);
+	let mut remainder = Integer::new(digits);
+	remainder.trim();
+
 	(quotient, remainder)
-}
-
-pub(crate) fn unsigned_integer_div(lhs: &Integer, rhs: &Integer) -> Integer {
-	if unsigned_greater_than(rhs, lhs) {
-		return Integer::new(0);
-	}
-
-	let l_lhs = lhs.digits.len();
-	let l_rhs = rhs.digits.len();
-
-	let mut quotient = Vec::with_capacity(l_lhs - l_rhs + 1);
-	let sig_rhs = rhs.digits[l_rhs - 1] as u64;
-	let mut digits = lhs.digits.clone();
-	let mut start = l_lhs - l_rhs;
-	let mut end = l_lhs;
-
-	loop {
-		let reg = &mut digits[start..end];
-		if cmp_digit_arrays(reg, &rhs.digits) {
-			let sig: u64 = if reg.len() == l_rhs {
-				reg[reg.len() - 1] as u64
-			} else {
-				((reg[reg.len() - 1] as u64) << 32) + reg[reg.len() - 2] as u64
-			};
-			let min = (sig / (sig_rhs + 1)) as u32;
-			let max = ((sig + 1) / sig_rhs) as u32;
-			for i in (min..=max).rev() {
-				let mut num = rhs.clone();
-				mul_by_small_int(&mut num.digits, i);
-				if cmp_digit_arrays(reg, &num.digits) {
-					quotient.push(i);
-					let offset = sub_from_slice(reg, &num.digits);
-					end -= offset;
-					start = end - l_rhs;
-					break;
-				}
-			}
-		} else if start > 0 {
-			start -= 1;
-		} else {
-			break;
-		}
-	}
-
-	Integer::new(
-		quotient
-			.into_iter()
-			.rev()
-			.collect::<Vec<u32>>()
-	)
-}
-
-pub(crate) fn unsigned_integer_rem(lhs: &Integer, rhs: &Integer) -> Integer {
-	if unsigned_greater_than(rhs, lhs) {
-		return lhs.clone();
-	}
-
-	let l_lhs = lhs.digits.len();
-	let l_rhs = rhs.digits.len();
-
-	let sig_rhs = rhs.digits[l_rhs - 1] as u64;
-	let mut digits = lhs.digits.clone();
-	let mut start = l_lhs - l_rhs;
-	let mut end = l_lhs;
-
-	loop {
-		let reg = &mut digits[start..end];
-		if cmp_digit_arrays(reg, &rhs.digits) {
-			let sig: u64 = if reg.len() == l_rhs {
-				reg[reg.len() - 1] as u64
-			} else {
-				((reg[reg.len() - 1] as u64) << 32) + reg[reg.len() - 2] as u64
-			};
-			let min = (sig / (sig_rhs + 1)) as u32;
-			let max = ((sig + 1) / sig_rhs) as u32;
-			for i in (min..=max).rev() {
-				let mut num = rhs.clone();
-				mul_by_small_int(&mut num.digits, i);
-				if cmp_digit_arrays(reg, &num.digits) {
-					let offset = sub_from_slice(reg, &num.digits);
-					end -= offset;
-					start = end - l_rhs;
-					break;
-				}
-			}
-		} else if start > 0 {
-			start -= 1;
-		} else {
-			break;
-		}
-	}
-
-	while digits.last() == Some(&0) {
-		digits.pop();
-	}
-
-	Integer::new(digits)
 }

@@ -12,7 +12,7 @@ impl Sub for &Integer {
 				let mut result = unsigned_integer_add(self, other);
 				result.positive = false;
 				result
-			}
+			},
 			(false, false) => unsigned_integer_sub(other, self),
 		}
 	}

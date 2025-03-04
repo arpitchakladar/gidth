@@ -17,7 +17,7 @@ impl Add for &Integer {
 				let mut result = unsigned_integer_add(self, other);
 				result.positive = false;
 				result
-			}
+			},
 		}
 	}
 }
@@ -45,4 +45,3 @@ impl Add<Integer> for &Integer {
 		self + &other
 	}
 }
-

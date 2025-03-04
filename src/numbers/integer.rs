@@ -18,6 +18,12 @@ impl Integer {
 		self.positive = true;
 		self
 	}
+
+	pub fn trim(&mut self) {
+		while self.digits.last() == Some(&0) {
+			self.digits.pop();
+		}
+	}
 }
 
 impl std::fmt::Display for Integer {
@@ -68,7 +74,7 @@ macro_rules! impl_from_int {
 		impl From<$t> for Integer {
 			fn from(n: $t) -> Self {
 				let mut digits = Vec::new();
-				let mut num = n as u64;
+				let mut num = n as u128;
 				while num > 0 {
 					digits.push(num as u32);
 					num = num >> 32;

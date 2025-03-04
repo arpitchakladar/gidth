@@ -75,12 +75,11 @@ pub(crate) fn unsigned_integer_sub(lhs: &Integer, rhs: &Integer) -> Integer {
 		}
 	}
 
-	while digits.last() == Some(&0) {
-		digits.pop();
-	}
-
-	Integer {
+	let mut result = Integer {
 		positive,
 		digits,
-	}
+	};
+	result.trim();
+
+	result
 }
