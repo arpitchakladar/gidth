@@ -28,7 +28,7 @@ fn big_int_divide() {
 #[test]
 fn big_int_exponentiation() {
 	let y = BigInt::new("2334");
-	let x = BigInt::new(8245u128);
+	let x = BigInt::new(8u128);
 	let z = BigInt::exp(&y, &x);
 	println!("{}", z);
 }

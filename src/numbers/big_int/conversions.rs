@@ -1,20 +1,7 @@
 use crate::numbers::BigInt;
 
-fn to_positive<T>(n: T) -> u128
-where
-	T: PartialOrd + std::ops::Neg<Output = T> + Copy + Default,
-	i128: From<T>,
-{
-	let n: i128 = n.into();
-	if n >= 0 {
-		n as u128
-	} else {
-		(-n) as u128
-	}
-}
-
 macro_rules! impl_from_int {
-	($($t:ty),*; $($s:ty),*) => {
+	($($t:ty),*) => {
 		// Unsigned types
 		$(
 		impl From<$t> for BigInt {
@@ -35,31 +22,10 @@ macro_rules! impl_from_int {
 			}
 		}
 		)*
-
-		// Signed types
-		$(
-		impl From<$s> for BigInt {
-			fn from(n: $s) -> Self {
-				let mut digits = Vec::new();
-				let mut num = to_positive(n);
-				while num > 0 {
-					digits.push(num as u32);
-					num = num >> 32;
-				}
-				if digits.is_empty() {
-					digits.push(0);
-				}
-				BigInt {
-					positive: n >= 0,
-					digits,
-				}
-			}
-		}
-		)*
 	};
 }
 
-impl_from_int!(u8, u16, u32, u64, u128; i8, i16, i32, i64, i128);
+impl_from_int!(u8, u16, u32, u64, u128, i8, i16, i32, i64, i128);
 
 impl From<Vec<u32>> for BigInt {
 	fn from(digits: Vec<u32>) -> Self {

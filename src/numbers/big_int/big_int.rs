@@ -1,9 +1,10 @@
+use crate::utils::Integer;
+
 #[derive(Clone)]
 pub struct BigInt {
 	pub(crate) positive: bool,
 	pub(crate) digits: Vec<u32>,
 }
-
 
 impl BigInt {
 	pub const BASE: u64 = u32::MAX as u64 + 1;
@@ -21,3 +22,5 @@ impl BigInt {
 		}
 	}
 }
+
+impl Integer for BigInt {}
