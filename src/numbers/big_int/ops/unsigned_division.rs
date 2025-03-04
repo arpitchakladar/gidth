@@ -58,17 +58,17 @@ fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
 }
 
 impl BigInt {
-	pub(crate) fn unsigned_divmod(lhs: &BigInt, rhs: &BigInt) -> (BigInt, BigInt) {
-		if BigInt::unsigned_greater_than(rhs, lhs) {
-			return (0.into(), lhs.clone());
+	pub(crate) fn unsigned_divmod(&self, rhs: &BigInt) -> (BigInt, BigInt) {
+		if BigInt::unsigned_greater_than(rhs, self) {
+			return (0.into(), self.clone());
 		}
 
-		let l_lhs = lhs.digits.len();
+		let l_lhs = self.digits.len();
 		let l_rhs = rhs.digits.len();
 
 		let mut quotient = Vec::with_capacity(l_lhs - l_rhs + 1);
 		let sig_rhs = rhs.digits[l_rhs - 1] as u64;
-		let mut digits = lhs.digits.clone();
+		let mut digits = self.digits.clone();
 		let mut start = l_lhs - l_rhs;
 		let mut end = l_lhs;
 
@@ -116,14 +116,14 @@ impl BigInt {
 		(quotient, remainder)
 	}
 
-	pub(crate) fn unsigned_divmod_by_small_int<T>(lhs: &BigInt, rhs: T) -> (BigInt, u32)
+	pub(crate) fn unsigned_divmod_by_small_int<T>(&self, rhs: T) -> (BigInt, u32)
 	where
 		T: Into<u32> + Copy,
 		u64: From<T>,
 	{
-		let mut quotient = Vec::with_capacity(lhs.digits.len());
+		let mut quotient = Vec::with_capacity(self.digits.len());
 		let mut remainder = 0u32;
-		for byte in lhs.digits.iter().rev() {
+		for byte in self.digits.iter().rev() {
 			let current = ((remainder as u64) << 32) + *byte as u64; // Combine carry and byte
 			quotient.push((current / u64::from(rhs)) as u32);
 			remainder = (current % u64::from(rhs)) as u32; // New carry is the remainder
