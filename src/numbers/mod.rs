@@ -1,5 +1,5 @@
-mod integer;
+mod big_int;
 mod ops;
 
-pub use integer::*;
+pub use big_int::*;
 pub use ops::*;

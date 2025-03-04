@@ -1,38 +1,38 @@
 use std::ops::Div;
 
 use crate::numbers::{
-	Integer,
-	unsigned_integer_divmod,
+	BigInt,
+	unsigned_big_int_divmod,
 };
 
-impl Div for &Integer {
-	type Output = Integer;
+impl Div for &BigInt {
+	type Output = BigInt;
 
 	fn div(self, other: Self) -> Self::Output {
-		unsigned_integer_divmod(self, other).0
+		unsigned_big_int_divmod(self, other).0
 	}
 }
 
-impl Div for Integer {
-	type Output = Integer;
+impl Div for BigInt {
+	type Output = BigInt;
 
 	fn div(self, other: Self) -> Self::Output {
 		&self / &other
 	}
 }
 
-impl Div<&Integer> for Integer {
-	type Output = Integer;
+impl Div<&BigInt> for BigInt {
+	type Output = BigInt;
 
 	fn div(self, other: &Self) -> Self::Output {
 		&self / other
 	}
 }
 
-impl Div<Integer> for &Integer {
-	type Output = Integer;
+impl Div<BigInt> for &BigInt {
+	type Output = BigInt;
 
-	fn div(self, other: Integer) -> Self::Output {
+	fn div(self, other: BigInt) -> Self::Output {
 		self / &other
 	}
 }

@@ -1,9 +1,9 @@
 use crate::numbers::{
-	Integer,
-	unsigned_integer_divmod,
+	BigInt,
+	unsigned_big_int_divmod,
 };
 
 #[inline(always)]
-pub fn divmod(lhs: &Integer, rhs: &Integer) -> (Integer, Integer) {
-	unsigned_integer_divmod(lhs, rhs)
+pub fn divmod(lhs: &BigInt, rhs: &BigInt) -> (BigInt, BigInt) {
+	unsigned_big_int_divmod(lhs, rhs)
 }

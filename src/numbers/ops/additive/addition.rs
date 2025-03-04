@@ -1,20 +1,20 @@
 use crate::numbers::{
-	Integer,
-	unsigned_integer_add,
-	unsigned_integer_sub,
+	BigInt,
+	unsigned_big_int_add,
+	unsigned_big_int_sub,
 };
 use std::ops::Add;
 
-impl Add for &Integer {
-	type Output = Integer;
+impl Add for &BigInt {
+	type Output = BigInt;
 
 	fn add(self, other: Self) -> Self::Output {
 		match (self.positive, other.positive) {
-			(true, true) => unsigned_integer_add(self, other),
-			(true, false) => unsigned_integer_sub(self, other),
-			(false, true) => unsigned_integer_sub(other, self),
+			(true, true) => unsigned_big_int_add(self, other),
+			(true, false) => unsigned_big_int_sub(self, other),
+			(false, true) => unsigned_big_int_sub(other, self),
 			(false, false) => {
-				let mut result = unsigned_integer_add(self, other);
+				let mut result = unsigned_big_int_add(self, other);
 				result.positive = false;
 				result
 			},
@@ -22,26 +22,26 @@ impl Add for &Integer {
 	}
 }
 
-impl Add for Integer {
-	type Output = Integer;
+impl Add for BigInt {
+	type Output = BigInt;
 
 	fn add(self, other: Self) -> Self::Output {
 		&self + &other
 	}
 }
 
-impl Add<&Integer> for Integer {
-	type Output = Integer;
+impl Add<&BigInt> for BigInt {
+	type Output = BigInt;
 
-	fn add(self, other: &Integer) -> Self::Output {
+	fn add(self, other: &BigInt) -> Self::Output {
 		&self + other
 	}
 }
 
-impl Add<Integer> for &Integer {
-	type Output = Integer;
+impl Add<BigInt> for &BigInt {
+	type Output = BigInt;
 
-	fn add(self, other: Integer) -> Self::Output {
+	fn add(self, other: BigInt) -> Self::Output {
 		self + &other
 	}
 }

@@ -1,15 +1,15 @@
 #[derive(Debug, Clone)]
-pub struct Integer {
+pub struct BigInt {
 	pub(crate) positive: bool,
 	pub(crate) digits: Vec<u32>,
 }
 
 pub const INTEGER_BASE: u64 = u32::MAX as u64 + 1;
 
-impl Integer {
+impl BigInt {
 	pub fn new<T>(value: T) -> Self
 	where
-		T: Into<Integer>,
+		T: Into<BigInt>,
 	{
 		value.into()
 	}
@@ -26,7 +26,7 @@ impl Integer {
 	}
 }
 
-impl std::fmt::Display for Integer {
+impl std::fmt::Display for BigInt {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
 		let mut result = String::new();
 		let mut temp_digits = self.digits.clone();
@@ -71,7 +71,7 @@ macro_rules! impl_from_int {
 	($($t:ty),*; $($s:ty),*) => {
 		// Unsigned types
 		$(
-		impl From<$t> for Integer {
+		impl From<$t> for BigInt {
 			fn from(n: $t) -> Self {
 				let mut digits = Vec::new();
 				let mut num = n as u128;
@@ -82,7 +82,7 @@ macro_rules! impl_from_int {
 				if digits.is_empty() {
 					digits.push(0);
 				}
-				Integer {
+				BigInt {
 					positive: true,
 					digits,
 				}
@@ -92,7 +92,7 @@ macro_rules! impl_from_int {
 
 		// Signed types
 		$(
-		impl From<$s> for Integer {
+		impl From<$s> for BigInt {
 			fn from(n: $s) -> Self {
 				let mut digits = Vec::new();
 				let mut num = to_positive(n);
@@ -103,7 +103,7 @@ macro_rules! impl_from_int {
 				if digits.is_empty() {
 					digits.push(0);
 				}
-				Integer {
+				BigInt {
 					positive: n >= 0,
 					digits,
 				}
@@ -115,16 +115,16 @@ macro_rules! impl_from_int {
 
 impl_from_int!(u8, u16, u32, u64, u128; i8, i16, i32, i64, i128);
 
-impl From<Vec<u32>> for Integer {
+impl From<Vec<u32>> for BigInt {
 	fn from(digits: Vec<u32>) -> Self {
-		Integer {
+		BigInt {
 			positive: true,
 			digits,
 		}
 	}
 }
 
-impl From<&str> for Integer {
+impl From<&str> for BigInt {
 	fn from(s: &str) -> Self {
 		let mut digits = Vec::new();
 		let positive = !s.starts_with('-');
@@ -149,20 +149,20 @@ impl From<&str> for Integer {
 			digits.push(0);
 		}
 
-		Integer {
+		BigInt {
 			positive,
 			digits,
 		}
 	}
 }
 
-impl From<String> for Integer {
+impl From<String> for BigInt {
 	fn from(s: String) -> Self {
 		s.as_str().into()
 	}
 }
 
-impl From<&String> for Integer {
+impl From<&String> for BigInt {
 	fn from(s: &String) -> Self {
 		s.as_str().into()
 	}

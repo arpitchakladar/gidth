@@ -1,14 +1,14 @@
-use crate::numbers::Integer;
+use crate::numbers::BigInt;
 
-impl PartialEq for Integer {
+impl PartialEq for BigInt {
 	fn eq(&self, other: &Self) -> bool {
 		self.positive == other.positive && self.digits == other.digits
 	}
 }
 
-impl Eq for Integer {}
+impl Eq for BigInt {}
 
-impl PartialOrd for Integer {
+impl PartialOrd for BigInt {
 	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
 		if self.positive != other.positive {
 			return Some(if self.positive { std::cmp::Ordering::Greater } else { std::cmp::Ordering::Less });
@@ -30,13 +30,13 @@ impl PartialOrd for Integer {
 	}
 }
 
-impl Ord for Integer {
+impl Ord for BigInt {
 	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
 		self.partial_cmp(other).unwrap()
 	}
 }
 
-pub(crate) fn unsigned_greater_than(lhs: &Integer, rhs: &Integer) -> bool {
+pub(crate) fn unsigned_greater_than(lhs: &BigInt, rhs: &BigInt) -> bool {
 	if lhs.digits.len() > rhs.digits.len() {
 		true
 	} else if lhs.digits.len() < rhs.digits.len() {

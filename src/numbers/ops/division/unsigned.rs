@@ -1,5 +1,5 @@
 use crate::numbers::{
-	Integer,
+	BigInt,
 	INTEGER_BASE,
 	unsigned_greater_than,
 };
@@ -58,7 +58,7 @@ fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
 	}
 }
 
-pub(crate) fn unsigned_integer_divmod(lhs: &Integer, rhs: &Integer) -> (Integer, Integer) {
+pub(crate) fn unsigned_big_int_divmod(lhs: &BigInt, rhs: &BigInt) -> (BigInt, BigInt) {
 	if unsigned_greater_than(rhs, lhs) {
 		return (0.into(), lhs.clone());
 	}
@@ -100,13 +100,13 @@ pub(crate) fn unsigned_integer_divmod(lhs: &Integer, rhs: &Integer) -> (Integer,
 		}
 	}
 
-	let quotient = Integer::new(
+	let quotient = BigInt::new(
 		quotient
 			.into_iter()
 			.rev()
 			.collect::<Vec<u32>>()
 	);
-	let mut remainder = Integer::new(digits);
+	let mut remainder = BigInt::new(digits);
 	remainder.trim();
 
 	(quotient, remainder)

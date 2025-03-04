@@ -1,10 +1,10 @@
 use crate::numbers::{
-	Integer,
+	BigInt,
 	INTEGER_BASE,
 	unsigned_greater_than,
 };
 
-pub(crate) fn unsigned_integer_add(lhs: &Integer, rhs: &Integer) -> Integer {
+pub(crate) fn unsigned_big_int_add(lhs: &BigInt, rhs: &BigInt) -> BigInt {
 	let (larger, smaller) = if lhs.digits.len() > rhs.digits.len() {
 		(lhs, rhs)
 	} else {
@@ -33,13 +33,13 @@ pub(crate) fn unsigned_integer_add(lhs: &Integer, rhs: &Integer) -> Integer {
 		digits.push(carry);
 	}
 
-	Integer {
+	BigInt {
 		positive: true,
 		digits,
 	}
 }
 
-pub(crate) fn unsigned_integer_sub(lhs: &Integer, rhs: &Integer) -> Integer {
+pub(crate) fn unsigned_big_int_sub(lhs: &BigInt, rhs: &BigInt) -> BigInt {
 	let (larger, smaller, positive) = if unsigned_greater_than(lhs, rhs) {
 		(lhs, rhs, true)
 	} else {
@@ -75,7 +75,7 @@ pub(crate) fn unsigned_integer_sub(lhs: &Integer, rhs: &Integer) -> Integer {
 		}
 	}
 
-	let mut result = Integer {
+	let mut result = BigInt {
 		positive,
 		digits,
 	};

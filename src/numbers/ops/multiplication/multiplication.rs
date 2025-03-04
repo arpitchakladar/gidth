@@ -1,41 +1,41 @@
 use std::ops::Mul;
 
 use crate::numbers::{
-	Integer,
-	unsigned_integer_mul
+	BigInt,
+	unsigned_big_int_mul
 };
 
-impl Mul for &Integer {
-	type Output = Integer;
+impl Mul for &BigInt {
+	type Output = BigInt;
 
 	fn mul(self, other: Self) -> Self::Output {
-		let mut result = unsigned_integer_mul(self, other);
+		let mut result = unsigned_big_int_mul(self, other);
 		result.positive = self.positive == other.positive;
 
 		result
 	}
 }
 
-impl Mul for Integer {
-	type Output = Integer;
+impl Mul for BigInt {
+	type Output = BigInt;
 
 	fn mul(self, other: Self) -> Self::Output {
 		&self * &other
 	}
 }
 
-impl Mul<&Integer> for Integer {
-	type Output = Integer;
+impl Mul<&BigInt> for BigInt {
+	type Output = BigInt;
 
 	fn mul(self, other: &Self) -> Self::Output {
 		&self * other
 	}
 }
 
-impl Mul<Integer> for &Integer {
-	type Output = Integer;
+impl Mul<BigInt> for &BigInt {
+	type Output = BigInt;
 
-	fn mul(self, other: Integer) -> Self::Output {
+	fn mul(self, other: BigInt) -> Self::Output {
 		self * &other
 	}
 }

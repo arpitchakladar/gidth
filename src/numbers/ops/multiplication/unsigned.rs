@@ -1,6 +1,6 @@
-use crate::numbers::Integer;
+use crate::numbers::BigInt;
 
-pub(crate) fn unsigned_integer_mul(lhs: &Integer, rhs: &Integer) -> Integer {
+pub(crate) fn unsigned_big_int_mul(lhs: &BigInt, rhs: &BigInt) -> BigInt {
 	let mut result = 0.into();
 	for (i, d1) in rhs.digits.iter().enumerate() {
 		let mut digits = Vec::with_capacity(i + lhs.digits.len() + 1);
@@ -16,7 +16,7 @@ pub(crate) fn unsigned_integer_mul(lhs: &Integer, rhs: &Integer) -> Integer {
 		if rem != 0 {
 			digits.push(rem);
 		}
-		result = result + Integer::new(digits);
+		result = result + BigInt::new(digits);
 	}
 
 	result
