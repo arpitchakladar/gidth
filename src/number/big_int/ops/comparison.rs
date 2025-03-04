@@ -1,4 +1,4 @@
-use crate::numbers::BigInt;
+use crate::number::BigInt;
 
 impl PartialEq for BigInt {
 	fn eq(&self, other: &Self) -> bool {

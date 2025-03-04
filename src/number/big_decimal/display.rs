@@ -1,4 +1,4 @@
-use crate::numbers::BigDecimal;
+use crate::number::BigDecimal;
 
 // TODO: Properly display the floating point
 

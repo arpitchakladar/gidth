@@ -1,4 +1,4 @@
-use crate::numbers::BigInt;
+use crate::number::BigInt;
 
 impl std::fmt::Display for BigInt {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {

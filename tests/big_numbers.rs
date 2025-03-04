@@ -1,4 +1,4 @@
-use gidth::numbers::BigInt;
+use gidth::number::BigInt;
 
 #[test]
 fn big_int_sum() {

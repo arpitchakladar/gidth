@@ -1,4 +1,4 @@
-use crate::numbers::BigInt;
+use crate::number::BigInt;
 
 impl std::ops::Sub for &BigInt {
 	type Output = BigInt;

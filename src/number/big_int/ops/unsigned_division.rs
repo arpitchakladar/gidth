@@ -1,4 +1,4 @@
-use crate::numbers::BigInt;
+use crate::number::BigInt;
 
 #[inline]
 fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {

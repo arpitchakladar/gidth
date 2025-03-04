@@ -1,2 +1,2 @@
-pub mod numbers;
+pub mod number;
 pub mod utils;

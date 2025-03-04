@@ -1,4 +1,4 @@
-use crate::numbers::BigInt;
+use crate::number::BigInt;
 
 impl BigInt {
 	pub(crate) fn unsigned_exp(&self, power: BigInt) -> BigInt {

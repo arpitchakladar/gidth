@@ -1,4 +1,4 @@
-use crate::numbers::BigInt;
+use crate::number::BigInt;
 
 impl std::ops::Neg for BigInt {
 	type Output = BigInt;

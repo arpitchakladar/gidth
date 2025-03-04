@@ -1,4 +1,4 @@
-use crate::numbers::BigDecimal;
+use crate::number::BigDecimal;
 use crate::utils::Abs;
 
 // TODO: Add conversion from floating point

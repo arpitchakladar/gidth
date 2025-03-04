@@ -1,4 +1,4 @@
-use crate::numbers::BigInt;
+use crate::number::BigInt;
 
 impl BigInt {
 	pub(crate) fn unsigned_mul(&self, rhs: &BigInt) -> BigInt {

@@ -1,4 +1,4 @@
-use crate::numbers::BigInt;
+use crate::number::BigInt;
 use crate::utils::Abs;
 
 macro_rules! impl_from_int {
