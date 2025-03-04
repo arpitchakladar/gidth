@@ -1,19 +1,14 @@
-use std::ops::Rem;
+use crate::numbers::BigInt;
 
-use crate::numbers::{
-	BigInt,
-	unsigned_big_int_divmod,
-};
-
-impl Rem for &BigInt {
+impl std::ops::Rem for &BigInt {
 	type Output = BigInt;
 
 	fn rem(self, other: Self) -> Self::Output {
-		unsigned_big_int_divmod(self, other).1
+		BigInt::unsigned_divmod(self, other).1
 	}
 }
 
-impl Rem for BigInt {
+impl std::ops::Rem for BigInt {
 	type Output = BigInt;
 
 	fn rem(self, other: Self) -> Self::Output {
@@ -21,7 +16,7 @@ impl Rem for BigInt {
 	}
 }
 
-impl Rem<&BigInt> for BigInt {
+impl std::ops::Rem<&BigInt> for BigInt {
 	type Output = BigInt;
 
 	fn rem(self, other: &Self) -> Self::Output {
@@ -29,7 +24,7 @@ impl Rem<&BigInt> for BigInt {
 	}
 }
 
-impl Rem<BigInt> for &BigInt {
+impl std::ops::Rem<BigInt> for &BigInt {
 	type Output = BigInt;
 
 	fn rem(self, other: BigInt) -> Self::Output {

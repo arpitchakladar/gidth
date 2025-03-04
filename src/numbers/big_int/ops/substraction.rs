@@ -1,24 +1,23 @@
-use std::ops::Sub;
-use crate::numbers::{BigInt, unsigned_big_int_add, unsigned_big_int_sub};
+use crate::numbers::BigInt;
 
-impl Sub for &BigInt {
+impl std::ops::Sub for &BigInt {
 	type Output = BigInt;
 
 	fn sub(self, other: Self) -> Self::Output {
 		match (self.positive, other.positive) {
-			(true, true) => unsigned_big_int_sub(self, other),
-			(true, false) => unsigned_big_int_add(self, other),
+			(true, true) => BigInt::unsigned_sub(self, other),
+			(true, false) => BigInt::unsigned_add(self, other),
 			(false, true) => {
-				let mut result = unsigned_big_int_add(self, other);
+				let mut result = BigInt::unsigned_add(self, other);
 				result.positive = false;
 				result
 			},
-			(false, false) => unsigned_big_int_sub(other, self),
+			(false, false) => BigInt::unsigned_sub(other, self),
 		}
 	}
 }
 
-impl Sub for BigInt {
+impl std::ops::Sub for BigInt {
 	type Output = BigInt;
 
 	fn sub(self, other: Self) -> Self::Output {
@@ -26,7 +25,7 @@ impl Sub for BigInt {
 	}
 }
 
-impl Sub<&BigInt> for BigInt {
+impl std::ops::Sub<&BigInt> for BigInt {
 	type Output = BigInt;
 
 	fn sub(self, other: &BigInt) -> Self::Output {
@@ -34,7 +33,7 @@ impl Sub<&BigInt> for BigInt {
 	}
 }
 
-impl Sub<BigInt> for &BigInt {
+impl std::ops::Sub<BigInt> for &BigInt {
 	type Output = BigInt;
 
 	fn sub(self, other: BigInt) -> Self::Output {

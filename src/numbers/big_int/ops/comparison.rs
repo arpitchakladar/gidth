@@ -36,20 +36,22 @@ impl Ord for BigInt {
 	}
 }
 
-pub(crate) fn unsigned_greater_than(lhs: &BigInt, rhs: &BigInt) -> bool {
-	if lhs.digits.len() > rhs.digits.len() {
-		true
-	} else if lhs.digits.len() < rhs.digits.len() {
-		false
-	} else {
-		for (a, b) in lhs.digits.iter().rev().zip(rhs.digits.iter().rev()) {
-			if a > b {
-				return true;
-			} else if a < b {
-				return false;
+impl BigInt {
+	pub(crate) fn unsigned_greater_than(&self, rhs: &BigInt) -> bool {
+		if self.digits.len() > rhs.digits.len() {
+			true
+		} else if self.digits.len() < rhs.digits.len() {
+			false
+		} else {
+			for (a, b) in self.digits.iter().rev().zip(rhs.digits.iter().rev()) {
+				if a > b {
+					return true;
+				} else if a < b {
+					return false;
+				}
 			}
-		}
 
-		false
+			false
+		}
 	}
 }

@@ -1,19 +1,14 @@
-use std::ops::Div;
+use crate::numbers::BigInt;
 
-use crate::numbers::{
-	BigInt,
-	unsigned_big_int_divmod,
-};
-
-impl Div for &BigInt {
+impl std::ops::Div for &BigInt {
 	type Output = BigInt;
 
 	fn div(self, other: Self) -> Self::Output {
-		unsigned_big_int_divmod(self, other).0
+		BigInt::unsigned_divmod(self, other).0
 	}
 }
 
-impl Div for BigInt {
+impl std::ops::Div for BigInt {
 	type Output = BigInt;
 
 	fn div(self, other: Self) -> Self::Output {
@@ -21,7 +16,7 @@ impl Div for BigInt {
 	}
 }
 
-impl Div<&BigInt> for BigInt {
+impl std::ops::Div<&BigInt> for BigInt {
 	type Output = BigInt;
 
 	fn div(self, other: &Self) -> Self::Output {
@@ -29,7 +24,7 @@ impl Div<&BigInt> for BigInt {
 	}
 }
 
-impl Div<BigInt> for &BigInt {
+impl std::ops::Div<BigInt> for &BigInt {
 	type Output = BigInt;
 
 	fn div(self, other: BigInt) -> Self::Output {
