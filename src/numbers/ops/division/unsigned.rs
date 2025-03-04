@@ -115,3 +115,27 @@ pub(crate) fn unsigned_big_int_divmod(lhs: &BigInt, rhs: &BigInt) -> (BigInt, Bi
 
 	(quotient, remainder)
 }
+
+pub(crate) fn unsigned_big_int_divmod_by_small_int<T>(lhs: &BigInt, rhs: T) -> (BigInt, BigInt)
+where
+	T: Into<u32> + Copy,
+	u64: From<T>,
+{
+	let mut quotient = Vec::with_capacity(lhs.digits.len());
+	let mut remainder = 0u32;
+	for byte in lhs.digits.iter().rev() {
+		let current = ((remainder as u64) << 32) + *byte as u64; // Combine carry and byte
+		quotient.push((current / u64::from(rhs)) as u32);
+		remainder = (current % u64::from(rhs)) as u32; // New carry is the remainder
+	}
+
+	(
+		BigInt::new(
+			quotient
+				.into_iter()
+				.rev()
+				.collect::<Vec<u32>>()
+		),
+		remainder.into()
+	)
+}
