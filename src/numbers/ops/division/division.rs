@@ -2,14 +2,14 @@ use std::ops::Div;
 
 use crate::numbers::{
 	Integer,
-	unsigned_integer_divmod,
+	unsigned_integer_div,
 };
 
 impl Div for &Integer {
 	type Output = Integer;
 
 	fn div(self, other: Self) -> Self::Output {
-		unsigned_integer_divmod(self, other).0
+		unsigned_integer_div(self, other)
 	}
 }
 

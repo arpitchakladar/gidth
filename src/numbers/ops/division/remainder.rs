@@ -2,14 +2,14 @@ use std::ops::Rem;
 
 use crate::numbers::{
 	Integer,
-	unsigned_integer_divmod,
+	unsigned_integer_rem,
 };
 
 impl Rem for &Integer {
 	type Output = Integer;
 
 	fn rem(self, other: Self) -> Self::Output {
-		unsigned_integer_divmod(self, other).1
+		unsigned_integer_rem(self, other)
 	}
 }
 
