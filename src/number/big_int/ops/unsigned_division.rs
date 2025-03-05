@@ -115,17 +115,14 @@ impl BigInt {
 		(quotient, remainder)
 	}
 
-	pub(crate) fn unsigned_divmod_by_small_int<T>(&self, rhs: T) -> (BigInt, u32)
-	where
-		T: Into<u32> + Copy,
-		u64: From<T>,
-	{
+	pub(crate) fn unsigned_divmod_by_small_int(&self, rhs: u32) -> (BigInt, u32) {
 		let mut quotient = Vec::with_capacity(self.digits.len());
 		let mut remainder = 0u32;
+		let rhs = rhs as u64;
 		for byte in self.digits.iter().rev() {
 			let current = ((remainder as u64) << 32) + *byte as u64; // Combine carry and byte
-			quotient.push((current / u64::from(rhs)) as u32);
-			remainder = (current % u64::from(rhs)) as u32; // New carry is the remainder
+			quotient.push((current / rhs) as u32);
+			remainder = (current % rhs) as u32; // New carry is the remainder
 		}
 
 		(
@@ -135,7 +132,7 @@ impl BigInt {
 					.rev()
 					.collect::<Vec<u32>>()
 			),
-			remainder
+			remainder,
 		)
 	}
 }
