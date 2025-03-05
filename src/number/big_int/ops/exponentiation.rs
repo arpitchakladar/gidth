@@ -22,30 +22,23 @@ pub fn fast_square(num: &BigInt) -> BigInt {
 		result.push(reg as u32);
 		result.push((reg >> 32) as u32);
 	}
-	let mut carry = 0u64;
+	let mut carry = 0u128;
 	for i in 1..(result_len - 1) {
-		let mut x = 0u64;
+		let mut x = 0u128;
 		let start = if i >= num.digits.len() {
 			i - num.digits.len() + 1
 		} else {
 			0
 		};
 		for j in start..((i + 1) / 2) {
-			x += num.digits[j] as u64 * num.digits[i - j] as u64;
+			x += num.digits[j] as u128 * num.digits[i - j] as u128;
 		}
-		x *= 2;
-		let sum = x + carry + result[i] as u64;
+		x <<= 1;
+		let sum = x + carry + result[i] as u128;
 		carry = sum >> 32;
 		result[i] = sum as u32;
 	}
-	if carry != 0 {
-		sum = carry + result[result_len] as u64;
-		result[result_len] = sum as u32;
-		carry = sum >> 32;
-		if carry != 0 {
-			result.push(carry as u32);
-		}
-	}
+	result[result_len - 1] += carry as u32;
 
 	BigInt::new(result)
 }
