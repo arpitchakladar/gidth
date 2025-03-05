@@ -16,6 +16,13 @@ impl BigInt {
 		value.into()
 	}
 
+	pub fn with_capacity(len: usize) -> Self {
+		Self {
+			positive: true,
+			digits: Vec::with_capacity(len),
+		}
+	}
+
 	pub fn trim(&mut self) {
 		while self.digits.last() == Some(&0) {
 			self.digits.pop();

@@ -11,16 +11,15 @@ fn half_big_int(num: &mut BigInt) -> bool {
 	remainder == 1
 }
 
-pub fn fast_square(num: &BigInt) -> BigInt {
+fn fast_square(num: &BigInt, result: &mut BigInt) {
 	let result_len = num.digits.len() * 2;
-	let mut result = Vec::with_capacity(result_len);
 	let mut sum = 0u64;
 	for i in 0..num.digits.len() {
 		let d = num.digits[i] as u64;
 		sum += d;
 		let reg = d * d;
-		result.push(reg as u32);
-		result.push((reg >> 32) as u32);
+		result.digits.push(reg as u32);
+		result.digits.push((reg >> 32) as u32);
 	}
 	let mut carry = 0u128;
 	for i in 1..(result_len - 1) {
@@ -34,36 +33,40 @@ pub fn fast_square(num: &BigInt) -> BigInt {
 			x += num.digits[j] as u128 * num.digits[i - j] as u128;
 		}
 		x <<= 1;
-		let sum = x + carry + result[i] as u128;
+		let sum = x + carry + result.digits[i] as u128;
 		carry = sum >> 32;
-		result[i] = sum as u32;
+		result.digits[i] = sum as u32;
 	}
-	result[result_len - 1] += carry as u32;
-
-	BigInt::new(result)
+	result.digits[result_len - 1] += carry as u32;
 }
 
-fn inplace_exp(base: &BigInt, power: &mut BigInt, result: &mut BigInt) {
+fn inplace_exp(base: &BigInt, power: &mut BigInt, result: &mut BigInt, current: &mut BigInt) {
 	if power.digits.len() == 1 && power.digits[0] == 0 {
 		return;
 	}
 
 	let remainder = half_big_int(power);
-	inplace_exp(base, power, result);
-	let prod = fast_square(&*result);
+	inplace_exp(base, power, current, result);
+	result.digits.clear();
+	fast_square(&*current, result);
 
-	*result = if remainder {
-		base * prod
-	} else {
-		prod
-	};
+	if remainder {
+		*result = &*result * base;
+	}
 }
 
 impl BigInt {
 	pub(crate) fn unsigned_exp(&self, mut power: BigInt) -> BigInt {
-		let mut result = BigInt::new(1);
-		inplace_exp(self, &mut power, &mut result);
-		result
+		let mut buf1 = BigInt::with_capacity((self.digits.len() + 1) * power.digits.len());
+		let mut buf2 = BigInt::with_capacity((self.digits.len() + 1) * power.digits.len());
+		buf1.digits.push(1);
+		buf2.digits.push(1);
+		inplace_exp(self, &mut power, &mut buf1, &mut buf2);
+		if buf1.digits.len() > buf2.digits.len() {
+			buf1
+		} else {
+			buf2
+		}
 	}
 }
 

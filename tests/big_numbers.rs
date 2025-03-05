@@ -1,6 +1,5 @@
 use gidth::number::{
 	BigInt,
-	fast_square,
 };
 
 // #[test]
