@@ -28,20 +28,20 @@ use gidth::number::{
 // 	println!("{} * {} + {} = {}", &z.0, &int_x, &z.1, &int_y);
 // }
 
-// #[test]
-// fn big_int_exponentiation() {
-// 	let y = BigInt::new("2334");
-// 	let x = BigInt::new(82);
-// 	let z = BigInt::exp(&y, &x);
-// 	println!("{}", z);
-// }
-
 #[test]
 fn big_int_exponentiation() {
-	let x = BigInt::new(vec![u32::MAX,u32::MAX,u32::MAX,1]);
-	let mut r = BigInt::new(0);
-	r.clear();
-	fast_square(&x, &mut r);
-	let res = &x * &x;
-	println!("{} = {}", res, r);
+	let y = BigInt::new("2334");
+	let x = BigInt::new(82345);
+	let z = BigInt::exp(&y, &x);
+	println!("{}", z);
 }
+
+// #[test]
+// fn big_int_fast_square() {
+// 	let x = BigInt::new(vec![u32::MAX,u32::MAX,u32::MAX,1]);
+// 	let mut r = BigInt::new(0);
+// 	r.clear();
+// 	fast_square(&x, &mut r);
+// 	let res = &x * &x;
+// 	println!("{} = {}", res, r);
+// }

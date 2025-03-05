@@ -38,18 +38,22 @@ pub fn fast_square(num: &BigInt, result: &mut BigInt) {
 	}
 }
 
-fn inplace_exp(base: &BigInt, power: &mut BigInt, result: &mut BigInt, current: &mut BigInt) {
+fn inplace_exp(base: &BigInt, power: &mut BigInt, result: BigInt, current: BigInt) -> (BigInt, BigInt) {
 	if power.digits.len() == 1 && power.digits[0] == 0 {
-		return;
+		return (current, result);
 	}
 
 	let remainder = half_big_int(power);
-	inplace_exp(base, power, current, result);
+	let (mut current, mut result) = inplace_exp(base, power, current, result);
 	result.digits.clear();
-	fast_square(&*current, result);
+	fast_square(&current, &mut result);
 
 	if remainder {
-		*result = &*result * base;
+		current.digits.clear();
+		BigInt::unsigned_mul(&result, base, &mut current);
+		(current, result)
+	} else {
+		(result, current)
 	}
 }
 
@@ -59,12 +63,7 @@ impl BigInt {
 		let mut buf2 = BigInt::with_capacity((self.digits.len() + 1) * power.digits.len());
 		buf1.digits.push(1);
 		buf2.digits.push(1);
-		inplace_exp(self, &mut power, &mut buf1, &mut buf2);
-		if buf1.digits.len() > buf2.digits.len() {
-			buf1
-		} else {
-			buf2
-		}
+		inplace_exp(self, &mut power, buf1, buf2).0
 	}
 }
 
