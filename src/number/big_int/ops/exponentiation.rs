@@ -11,14 +11,53 @@ fn half_big_int(num: &mut BigInt) -> bool {
 	remainder == 1
 }
 
-fn exp(base: &BigInt, power: &mut BigInt, result: &mut BigInt) {
+pub fn fast_square(num: &BigInt) -> BigInt {
+	let result_len = num.digits.len() * 2;
+	let mut result = Vec::with_capacity(result_len);
+	let mut sum = 0u64;
+	for i in 0..num.digits.len() {
+		let d = num.digits[i] as u64;
+		sum += d;
+		let reg = d * d;
+		result.push(reg as u32);
+		result.push((reg >> 32) as u32);
+	}
+	let mut carry = 0u64;
+	for i in 1..(result_len - 1) {
+		let mut x = 0u64;
+		let start = if i >= num.digits.len() {
+			i - num.digits.len() + 1
+		} else {
+			0
+		};
+		for j in start..((i + 1) / 2) {
+			x += num.digits[j] as u64 * num.digits[i - j] as u64;
+		}
+		x *= 2;
+		let sum = x + carry + result[i] as u64;
+		carry = sum >> 32;
+		result[i] = sum as u32;
+	}
+	if carry != 0 {
+		sum = carry + result[result_len] as u64;
+		result[result_len] = sum as u32;
+		carry = sum >> 32;
+		if carry != 0 {
+			result.push(carry as u32);
+		}
+	}
+
+	BigInt::new(result)
+}
+
+fn inplace_exp(base: &BigInt, power: &mut BigInt, result: &mut BigInt) {
 	if power.digits.len() == 1 && power.digits[0] == 0 {
 		return;
 	}
 
 	let remainder = half_big_int(power);
-	exp(base, power, result);
-	let prod = &*result * &*result;
+	inplace_exp(base, power, result);
+	let prod = fast_square(&*result);
 
 	*result = if remainder {
 		base * prod
@@ -30,7 +69,7 @@ fn exp(base: &BigInt, power: &mut BigInt, result: &mut BigInt) {
 impl BigInt {
 	pub(crate) fn unsigned_exp(&self, mut power: BigInt) -> BigInt {
 		let mut result = BigInt::new(1);
-		exp(self, &mut power, &mut result);
+		inplace_exp(self, &mut power, &mut result);
 		result
 	}
 }

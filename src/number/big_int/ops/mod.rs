@@ -10,3 +10,5 @@ mod remainder;
 mod substraction;
 mod unsigned_additive;
 mod unsigned_division;
+
+pub use exponentiation::*;
