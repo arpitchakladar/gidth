@@ -11,33 +11,31 @@ fn half_big_int(num: &mut BigInt) -> bool {
 	remainder == 1
 }
 
-fn fast_square(num: &BigInt, result: &mut BigInt) {
-	let result_len = num.digits.len() * 2;
-	let mut sum = 0u64;
-	for i in 0..num.digits.len() {
-		let d = num.digits[i] as u64;
-		sum += d;
-		let reg = d * d;
-		result.digits.push(reg as u32);
-		result.digits.push((reg >> 32) as u32);
+fn fast_square_term(num: &BigInt, reg: u128, i: usize, carry: u128) -> u128 {
+	let mut x = 0u128;
+	let start = if i >= num.digits.len() {
+		i - num.digits.len() + 1
+	} else {
+		0
+	};
+	for j in start..((i + 1) / 2) {
+		x += num.digits[j] as u128 * num.digits[i - j] as u128;
 	}
+
+	(x << 1) + carry + reg as u128
+}
+
+pub fn fast_square(num: &BigInt, result: &mut BigInt) {
 	let mut carry = 0u128;
-	for i in 1..(result_len - 1) {
-		let mut x = 0u128;
-		let start = if i >= num.digits.len() {
-			i - num.digits.len() + 1
-		} else {
-			0
-		};
-		for j in start..((i + 1) / 2) {
-			x += num.digits[j] as u128 * num.digits[i - j] as u128;
-		}
-		x <<= 1;
-		let sum = x + carry + result.digits[i] as u128;
-		carry = sum >> 32;
-		result.digits[i] = sum as u32;
+	for i in 0..num.digits.len() {
+		let d = num.digits[i] as u128;
+		let x = i * 2;
+		let reg = fast_square_term(num, d * d, x, carry);
+		result.digits.push(reg as u32);
+		let reg = fast_square_term(num, 0, x + 1, reg >> 32);
+		result.digits.push(reg as u32);
+		carry = reg >> 32;
 	}
-	result.digits[result_len - 1] += carry as u32;
 }
 
 fn inplace_exp(base: &BigInt, power: &mut BigInt, result: &mut BigInt, current: &mut BigInt) {
