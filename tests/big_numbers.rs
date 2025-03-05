@@ -9,13 +9,13 @@ use gidth::number::BigInt;
 // 	println!("{}", my_int);
 // }
 
-#[test]
-fn big_int_multiply() {
-	let x = 8234324234324u64;
-	let y = 79832869324234324u64;
-	let z: BigInt = BigInt::new(x) * BigInt::new(y);
-	println!("{} = {}", z, x as u128 * y as u128);
-}
+// #[test]
+// fn big_int_multiply() {
+// 	let x = 8234324234324u64;
+// 	let y = 79832869324234324u64;
+// 	let z: BigInt = BigInt::new(x) * BigInt::new(y);
+// 	println!("{} = {}", z, x as u128 * y as u128);
+// }
 //
 // #[test]
 // fn big_int_divide() {
@@ -25,10 +25,10 @@ fn big_int_multiply() {
 // 	println!("{} * {} + {} = {}", &z.0, &int_x, &z.1, &int_y);
 // }
 
-// #[test]
-// fn big_int_exponentiation() {
-// 	let y = BigInt::new("2334");
-// 	let x = BigInt::new(82345);
-// 	let z = BigInt::exp(&y, &x);
-// 	println!("{}", z);
-// }
+#[test]
+fn big_int_exponentiation() {
+	let y = BigInt::new("2334");
+	let x = BigInt::new(82);
+	let z = BigInt::exp(&y, &x);
+	println!("{}", z);
+}
