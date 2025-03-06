@@ -1,5 +1,7 @@
-use crate::number::BigInt;
-use crate::utils::Abs;
+use crate::number::{
+	BigInt,
+	Abs,
+};
 
 macro_rules! impl_from_int {
 	($($t:ty),*) => {

@@ -1,5 +1,7 @@
-use crate::number::BigInt;
-use crate::utils::Abs;
+use crate::number::{
+	BigInt,
+	Abs,
+};
 
 impl Abs for BigInt {
 	#[inline]

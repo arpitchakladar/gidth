@@ -1,5 +1,7 @@
-use crate::number::BigInt;
-use crate::utils::Square;
+use crate::number::{
+	BigInt,
+	Square,
+};
 
 fn square_term(num: &BigInt, reg: u128, i: usize, carry: u128) -> u128 {
 	let mut x = 0u128;

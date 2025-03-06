@@ -1,4 +1,4 @@
-use crate::utils::Integer;
+use crate::number::Integer;
 
 #[derive(Clone)]
 pub struct BigInt {

@@ -1,4 +1,4 @@
-use crate::utils::{
+use crate::number::{
 	Abs,
 	Square,
 };
