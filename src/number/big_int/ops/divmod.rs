@@ -1,8 +1,11 @@
-use crate::number::BigInt;
+use crate::number::{
+	BigInt,
+	DivMod,
+};
 
-impl BigInt {
+impl DivMod<BigInt> for BigInt {
 	#[inline]
-	pub fn divmod(&self, rhs: &BigInt) -> (BigInt, BigInt) {
-		BigInt::unsigned_divmod(self, rhs)
+	fn divmod(self, rhs: BigInt) -> (BigInt, BigInt) {
+		BigInt::unsigned_divmod(&self, &rhs)
 	}
 }

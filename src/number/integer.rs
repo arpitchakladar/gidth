@@ -3,13 +3,20 @@ use crate::number::{
 	Square,
 };
 
+pub trait DivMod<T>: Sized
+where
+	Self: From<T>,
+{
+	fn divmod(self, rhs: T) -> (Self, T);
+}
+
 pub trait Integer:
 	std::ops::Add<Output = Self> +
 	std::ops::Sub<Output = Self> +
 	std::ops::Mul<Output = Self> +
 	std::ops::Div<Output = Self> +
 	std::ops::Rem<Output = Self> +
-	std::ops::Rem<Output = Self> +
+	DivMod<Self> +
 	Abs +
 	Square +
 	Sized
@@ -51,6 +58,12 @@ macro_rules! impl_integer {
 		impl Square for $t {
 			fn sq(self) -> Self {
 				self * self
+			}
+		}
+
+		impl DivMod<$t> for $t {
+			fn divmod(self, rhs: Self) -> (Self, Self) {
+				(self / rhs, self % rhs)
 			}
 		}
 

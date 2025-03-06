@@ -5,7 +5,10 @@ mod number;
 
 pub use big_decimal::BigDecimal;
 pub use big_int::BigInt;
-pub use integer::Integer;
+pub use integer::{
+	Integer,
+	DivMod,
+};
 pub use number::{
 	Abs,
 	Square,
