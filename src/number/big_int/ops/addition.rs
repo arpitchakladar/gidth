@@ -1,4 +1,5 @@
 use crate::number::BigInt;
+use crate::impl_binop_variants;
 
 impl std::ops::Add for &BigInt {
 	type Output = BigInt;
@@ -17,26 +18,4 @@ impl std::ops::Add for &BigInt {
 	}
 }
 
-impl std::ops::Add for BigInt {
-	type Output = BigInt;
-
-	fn add(self, other: Self) -> Self::Output {
-		&self + &other
-	}
-}
-
-impl std::ops::Add<&BigInt> for BigInt {
-	type Output = BigInt;
-
-	fn add(self, other: &BigInt) -> Self::Output {
-		&self + other
-	}
-}
-
-impl std::ops::Add<BigInt> for &BigInt {
-	type Output = BigInt;
-
-	fn add(self, other: BigInt) -> Self::Output {
-		self + &other
-	}
-}
+impl_binop_variants!(Add, add, +);

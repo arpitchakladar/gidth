@@ -9,7 +9,7 @@ impl BigInt {
 		};
 		let mut digits = Vec::with_capacity(larger.digits.len() + 1);
 		let mut carry: u32 = 0;
-		
+
 		for i in 0..smaller.digits.len() {
 			let sum = larger.digits[i] as u64 + smaller.digits[i] as u64 + carry as u64;
 			carry = (sum >> 32) as u32;

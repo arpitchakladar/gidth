@@ -1,4 +1,7 @@
-use crate::utils::Abs;
+use crate::utils::{
+	Abs,
+	Square,
+};
 
 pub trait Integer:
 	std::ops::Add<Output = Self> +
@@ -8,6 +11,7 @@ pub trait Integer:
 	std::ops::Rem<Output = Self> +
 	std::ops::Rem<Output = Self> +
 	Abs +
+	Square +
 	Sized
 {}
 
@@ -44,6 +48,12 @@ macro_rules! impl_abs_for_unsigned {
 macro_rules! impl_integer {
 	($($t:ty),*) => {
 		$(
+		impl Square for $t {
+			fn sq(self) -> Self {
+				self * self
+			}
+		}
+
 		impl Integer for $t {}
 		)*
 	};

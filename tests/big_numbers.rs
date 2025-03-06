@@ -1,7 +1,4 @@
-use gidth::number::{
-	BigInt,
-	fast_square,
-};
+use gidth::number::BigInt;
 
 // #[test]
 // fn big_int_sum() {
@@ -31,7 +28,7 @@ use gidth::number::{
 #[test]
 fn big_int_exponentiation() {
 	let y = BigInt::new("2334");
-	let x = BigInt::new(82345);
+	let x = BigInt::new(8);
 	let z = BigInt::exp(&y, &x);
 	println!("{}", z);
 }

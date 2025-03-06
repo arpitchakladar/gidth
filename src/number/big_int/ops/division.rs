@@ -1,4 +1,5 @@
 use crate::number::BigInt;
+use crate::impl_binop_variants;
 
 impl std::ops::Div for &BigInt {
 	type Output = BigInt;
@@ -8,26 +9,4 @@ impl std::ops::Div for &BigInt {
 	}
 }
 
-impl std::ops::Div for BigInt {
-	type Output = BigInt;
-
-	fn div(self, other: Self) -> Self::Output {
-		&self / &other
-	}
-}
-
-impl std::ops::Div<&BigInt> for BigInt {
-	type Output = BigInt;
-
-	fn div(self, other: &Self) -> Self::Output {
-		&self / other
-	}
-}
-
-impl std::ops::Div<BigInt> for &BigInt {
-	type Output = BigInt;
-
-	fn div(self, other: BigInt) -> Self::Output {
-		self / &other
-	}
-}
+impl_binop_variants!(Div, div, /);

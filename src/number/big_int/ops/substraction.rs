@@ -1,4 +1,5 @@
 use crate::number::BigInt;
+use crate::impl_binop_variants;
 
 impl std::ops::Sub for &BigInt {
 	type Output = BigInt;
@@ -17,26 +18,4 @@ impl std::ops::Sub for &BigInt {
 	}
 }
 
-impl std::ops::Sub for BigInt {
-	type Output = BigInt;
-
-	fn sub(self, other: Self) -> Self::Output {
-		&self - &other
-	}
-}
-
-impl std::ops::Sub<&BigInt> for BigInt {
-	type Output = BigInt;
-
-	fn sub(self, other: &BigInt) -> Self::Output {
-		&self - other
-	}
-}
-
-impl std::ops::Sub<BigInt> for &BigInt {
-	type Output = BigInt;
-
-	fn sub(self, other: BigInt) -> Self::Output {
-		self - &other
-	}
-}
+impl_binop_variants!(Sub, sub, -);
