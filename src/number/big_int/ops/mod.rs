@@ -12,5 +12,3 @@ mod square;
 mod substraction;
 mod unsigned_additive;
 mod unsigned_division;
-
-pub(crate) use binary_operation::*;

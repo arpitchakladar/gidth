@@ -54,7 +54,7 @@ impl BigInt {
 			(rhs, self, false)
 		};
 
-		let (digits, borrow) = larger.digits
+		let (digits, carry) = larger.digits
 			.iter()
 			.copied()
 			.zip(
@@ -68,8 +68,8 @@ impl BigInt {
 					Vec::with_capacity(larger.digits.len()),
 					0u64,
 				),
-				|(mut digits, borrow), (left_digit, right_digit)| {
-					let right_digit = right_digit as u64 + borrow;
+				|(mut digits, carry), (left_digit, right_digit)| {
+					let right_digit = right_digit as u64 + carry;
 					let (new_digit, overflowed) = left_digit
 						.wrapping_sub(right_digit as u32)
 						.overflowing_sub((right_digit >> 32) as u32);
@@ -82,19 +82,16 @@ impl BigInt {
 			.iter()
 			.copied()
 			.fold(
-				(digits, borrow),
-				|(mut digits, borrow), digit| {
+				(digits, carry),
+				|(mut digits, carry), digit| {
 					let (new_digit, overflowed) = digit
-						.overflowing_sub(digit);
+						.overflowing_sub(carry as u32);
 					digits.push(new_digit);
 					(digits, overflowed as u64)
 				},
 			);
 
-		let mut result = BigInt {
-			positive,
-			digits,
-		};
+		let mut result = BigInt::new(positive, digits);
 		result.trim();
 
 		result

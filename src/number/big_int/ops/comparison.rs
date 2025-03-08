@@ -10,23 +10,35 @@ impl Eq for BigInt {}
 
 impl PartialOrd for BigInt {
 	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-		if self.positive != other.positive {
-			return Some(if self.positive { std::cmp::Ordering::Greater } else { std::cmp::Ordering::Less });
-		}
-
-		if self.digits.len() != other.digits.len() {
-			let ord = self.digits.len().cmp(&other.digits.len());
-			return Some(if self.positive { ord } else { ord.reverse() });
-		}
-
-		for (a, b) in self.digits.iter().rev().zip(other.digits.iter().rev()) {
-			match a.cmp(b) {
-				std::cmp::Ordering::Equal => continue,
-				ord => return Some(if self.positive { ord } else { ord.reverse() }),
+		let ord = {
+			if self.positive != other.positive {
+				std::cmp::Ordering::Greater
+			} else if self.digits.len() != other.digits.len() {
+				self.digits
+					.len()
+					.cmp(&other.digits.len())
+			} else {
+				self.digits
+					.iter()
+					.rev()
+					.zip(other.digits.iter().rev())
+					.find_map(|(left, right)|
+						match left.cmp(right) {
+							std::cmp::Ordering::Equal => None,
+							ord => Some(ord)
+						}
+					)
+					.unwrap_or(std::cmp::Ordering::Equal)
 			}
-		}
+		};
 
-		Some(std::cmp::Ordering::Equal)
+		Some(
+			if self.positive {
+				ord
+			} else {
+				ord.reverse()
+			}
+		)
 	}
 }
 
@@ -38,20 +50,17 @@ impl Ord for BigInt {
 
 impl BigInt {
 	pub(crate) fn unsigned_greater_than(&self, rhs: &BigInt) -> bool {
-		if self.digits.len() > rhs.digits.len() {
-			true
-		} else if self.digits.len() < rhs.digits.len() {
-			false
-		} else {
-			for (a, b) in self.digits.iter().rev().zip(rhs.digits.iter().rev()) {
-				if a > b {
-					return true;
-				} else if a < b {
-					return false;
-				}
-			}
-
-			false
+		match self.digits.len().cmp(&rhs.digits.len()) {
+			std::cmp::Ordering::Greater => true,
+			std::cmp::Ordering::Less => false,
+			std::cmp::Ordering::Equal =>
+				self.digits
+					.iter()
+					.rev()
+					.zip(rhs.digits.iter().rev())
+					.find(|(left, right)| left != right)
+					.map(|(left, right)| left > right)
+					.unwrap_or(false),
 		}
 	}
 }

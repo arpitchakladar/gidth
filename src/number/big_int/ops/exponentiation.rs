@@ -1,14 +1,16 @@
 use crate::number::BigInt;
 
 fn half_big_int(num: &mut BigInt) -> bool {
-	let mut remainder = 0u64;
-	for d in num.digits.iter_mut() {
-		let reg = (remainder << 32) + *d as u64;
-		*d = (reg >> 1) as u32;
-		remainder = reg & 1;
-	}
-
-	remainder == 1
+	num.digits
+		.iter_mut()
+		.fold(
+			0u64,
+			|remainder, digit| {
+				let reg = (remainder << 32) + *digit as u64;
+				*digit = (reg >> 1) as u32;
+				reg & 1
+			},
+		) == 1
 }
 
 fn inplace_exp(base: &BigInt, power: &mut BigInt, result: BigInt, current: BigInt) -> (BigInt, BigInt) {
@@ -32,8 +34,9 @@ fn inplace_exp(base: &BigInt, power: &mut BigInt, result: BigInt, current: BigIn
 
 impl BigInt {
 	pub(crate) fn unsigned_exp(&self, mut power: BigInt) -> BigInt {
-		let mut buf1 = BigInt::with_capacity((self.digits.len() + 1) * power.digits.len());
-		let mut buf2 = BigInt::with_capacity((self.digits.len() + 1) * power.digits.len());
+		let buf_size = (self.digits.len() + 1) * power.digits.len();
+		let mut buf1 = BigInt::with_capacity(buf_size);
+		let mut buf2 = BigInt::with_capacity(buf_size);
 		buf1.digits.push(1);
 		buf2.digits.push(1);
 		inplace_exp(self, &mut power, buf1, buf2).0

@@ -3,32 +3,36 @@ use crate::number::{
 	Square,
 };
 
-fn square_term(num: &BigInt, reg: u128, i: usize, carry: u128) -> u128 {
-	let mut x = 0u128;
-	let start = if i >= num.digits.len() {
-		i - num.digits.len() + 1
-	} else {
-		0
-	};
-	for j in start..((i + 1) / 2) {
-		x += num.digits[j] as u128 * num.digits[i - j] as u128;
-	}
+fn square_term(num: &BigInt, res: u128, i: usize, carry: u128) -> u128 {
+	let start = i.checked_sub(num.digits.len())
+		.map(|x| x + 1)
+		.unwrap_or(0);
+	
+	let x = (start..((i + 1) / 2))
+		.map(|j| num.digits[j] as u128 * num.digits[i - j] as u128)
+		.sum::<u128>();
 
-	(x << 1) + carry + reg as u128
+	(x << 1) + carry + res
 }
 
 impl BigInt {
 	pub(crate) fn square_inplace(num: &BigInt, result: &mut BigInt) {
-		let mut carry = 0u128;
-		for i in 0..num.digits.len() {
-			let d = num.digits[i] as u128;
-			let x = i * 2;
-			let reg = square_term(&num, d * d, x, carry);
-			result.digits.push(reg as u32);
-			let reg = square_term(&num, 0, x + 1, reg >> 32);
-			result.digits.push(reg as u32);
-			carry = reg >> 32;
-		}
+		num.digits
+			.iter()
+			.copied()
+			.enumerate()
+			.fold(
+				0u128,
+				|carry, (i, digit)| {
+					let digit = digit as u128;
+					let x = i * 2;
+					let res = square_term(num, digit * digit, x, carry);
+					result.digits.push(res as u32);
+					let res = square_term(num, 0, x + 1, res >> 32);
+					result.digits.push(res as u32);
+					res >> 32
+				},
+			);
 
 		result.trim();
 	}

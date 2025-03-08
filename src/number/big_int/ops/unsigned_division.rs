@@ -116,7 +116,7 @@ impl BigInt {
 
 	pub(crate) fn unsigned_divmod_by_small_int(&self, rhs: u32) -> (BigInt, u32) {
 		let rhs = rhs as u64;
-		let (mut quotient, remainder) = self.digits
+		let (quotient, remainder) = self.digits
 			.iter()
 			.rev()
 			.fold(

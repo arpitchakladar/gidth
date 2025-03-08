@@ -1,4 +1,4 @@
-use gidth::number::BigInt;
+use gidth::number::{BigInt, Square};
 
 #[test]
 fn big_int_sum() {
@@ -6,6 +6,7 @@ fn big_int_sum() {
 	let z = BigInt::from("-102276255580139097615819404275666350670467982146909786100732684133793143719564593097343327");
 	let my_int = &x + &z + BigInt::from("22222222222222");
 	println!("{}", my_int);
+	println!("{}", my_int.sq());
 }
 
 // #[test]
