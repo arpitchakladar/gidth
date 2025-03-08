@@ -7,33 +7,44 @@ impl BigInt {
 		} else {
 			(rhs, self)
 		};
-		let mut digits = Vec::with_capacity(larger.digits.len() + 1);
-		let mut carry: u32 = 0;
 
-		for i in 0..smaller.digits.len() {
-			let sum = larger.digits[i] as u64 + smaller.digits[i] as u64 + carry as u64;
-			carry = (sum >> 32) as u32;
-			digits.push(sum as u32);
-		}
+		let (digits, carry) = larger.digits
+			.iter()
+			.copied()
+			.zip(
+				smaller.digits
+					.iter()
+					.copied(),
+			)
+			.fold(
+				(
+					Vec::with_capacity(larger.digits.len() + 1),
+					0u64,
+				),
+				|(mut digits, carry), (left_digit, right_digit)| {
+					let sum = left_digit as u64 + right_digit as u64 + carry;
+					digits.push(sum as u32);
+					(digits, sum >> 32)
+				},
+			);
 
-		for i in smaller.digits.len()..larger.digits.len() {
-			let sum = larger.digits[i] as u64 + carry as u64;
-			carry = (sum >> 32) as u32;
-			digits.push(sum as u32);
-			if carry == 0 {
-				digits.extend_from_slice(&larger.digits[i + 1..]);
-				break;
-			}
-		}
+		let (mut digits, carry) = larger.digits[smaller.digits.len()..]
+			.iter()
+			.copied()
+			.fold(
+				(digits, carry),
+				|(mut digits, carry), digit| {
+					let sum = digit as u64 + carry;
+					digits.push(sum as u32);
+					(digits, sum >> 32)
+				},
+			);
 
 		if carry != 0 {
-			digits.push(carry);
+			digits.push(carry as u32);
 		}
 
-		BigInt {
-			positive: true,
-			digits,
-		}
+		BigInt::from(digits)
 	}
 
 	pub(crate) fn unsigned_sub(&self, rhs: &BigInt) -> BigInt {
@@ -46,12 +57,15 @@ impl BigInt {
 		let (digits, borrow) = larger.digits
 			.iter()
 			.copied()
-			.zip(smaller.digits.iter().copied())
+			.zip(
+				smaller
+					.digits
+					.iter()
+					.copied(),
+			)
 			.fold(
 				(
-					Vec::with_capacity(
-						larger.digits.len(),
-					),
+					Vec::with_capacity(larger.digits.len()),
 					0u64,
 				),
 				|(mut digits, borrow), (left_digit, right_digit)| {
@@ -68,10 +82,7 @@ impl BigInt {
 			.iter()
 			.copied()
 			.fold(
-				(
-					digits,
-					borrow,
-				),
+				(digits, borrow),
 				|(mut digits, borrow), digit| {
 					let (new_digit, overflowed) = digit
 						.overflowing_sub(digit);
