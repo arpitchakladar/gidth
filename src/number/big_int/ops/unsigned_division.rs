@@ -5,18 +5,17 @@ fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {
 	let borrow = lhs
 		.iter_mut()
 		.zip(rhs.iter().copied())
-		.fold(0u64, |mut borrow, (left, right)| {
-			let right_op = borrow + right as u64;
-			let left_op = *left as u64;
-			let new_digit = if right_op > left_op {
-				BigInt::BASE + left_op - right_op
-			} else {
-				left_op - right_op
-			};
-			*left = new_digit as u32;
-			borrow = new_digit >> 32;
-			borrow
-		});
+		.fold(
+			0u64,
+			|borrow, (left_digit, right_digit)| {
+				let right_digit = borrow + right as u64;
+				let (new_digit, overflowed) = left_digit
+					.wrapping_sub(right_digit as u32)
+					.overflowing_sub((right_digit >> 32) as u32);
+				*left = new_digit;
+				overflowed as u64
+			},
+		);
 	
 	if borrow > 0 {
 		if let Some(last) = lhs.last_mut() {
@@ -47,11 +46,16 @@ fn cmp_digit_arrays(lhs: &[u32], rhs: &[u32]) -> bool {
 
 #[inline]
 fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
-	let carry = lhs.iter_mut().fold(0u64, |carry, d| {
-		let reg: u64 = rhs as u64 * *d as u64 + carry;
-		*d = reg as u32;
-		reg >> 32
-	});
+	let carry = lhs
+		.iter_mut()
+		.fold(
+			0u64,
+			|carry, d| {
+				let reg: u64 = rhs as u64 * *d as u64 + carry;
+				*d = reg as u32;
+				reg >> 32
+			}
+		);
 	
 	if carry > 0 {
 		lhs.push(carry as u32);
