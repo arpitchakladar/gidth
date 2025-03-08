@@ -42,35 +42,43 @@ impl BigInt {
 		} else {
 			(rhs, self, false)
 		};
-		let mut digits = Vec::with_capacity(larger.digits.len());
-		let mut borrow = 0u64;
 
-		for i in 0..smaller.digits.len() {
-			let right_op = smaller.digits[i] as u64 + borrow;
-			let left_op = larger.digits[i] as u64;
-			let new_digit = if right_op > left_op {
-				BigInt::BASE + left_op - right_op
-			} else {
-				left_op - right_op
-			};
-			digits.push(new_digit as u32);
-			borrow = new_digit >> 32;
-		}
+		let (digits, borrow) = larger.digits
+			.iter()
+			.copied()
+			.zip(smaller.digits.iter().copied())
+			.fold(
+				(
+					Vec::with_capacity(
+						larger.digits.len(),
+					),
+					0u64,
+				),
+				|(mut digits, borrow), (left_digit, right_digit)| {
+					let right_digit = right_digit as u64 + borrow;
+					let (new_digit, overflowed) = left_digit
+						.wrapping_sub(right_digit as u32)
+						.overflowing_sub((right_digit >> 32) as u32);
+					digits.push(new_digit);
+					(digits, overflowed as u64)
+				},
+			);
 
-		for i in smaller.digits.len()..larger.digits.len() {
-			let left_op = larger.digits[i] as u64;
-			let new_digit = if borrow > left_op {
-				BigInt::BASE + left_op - borrow
-			} else {
-				left_op - borrow
-			};
-			digits.push(new_digit as u32);
-			borrow = new_digit >> 32;
-			if borrow == 0 {
-				digits.extend_from_slice(&larger.digits[i + 1..]);
-				break;
-			}
-		}
+		let (digits, _) = larger.digits[smaller.digits.len()..]
+			.iter()
+			.copied()
+			.fold(
+				(
+					digits,
+					borrow,
+				),
+				|(mut digits, borrow), digit| {
+					let (new_digit, overflowed) = digit
+						.overflowing_sub(digit);
+					digits.push(new_digit);
+					(digits, overflowed as u64)
+				},
+			);
 
 		let mut result = BigInt {
 			positive,

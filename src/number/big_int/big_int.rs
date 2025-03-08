@@ -9,11 +9,11 @@ pub struct BigInt {
 impl BigInt {
 	pub const BASE: u64 = u32::MAX as u64 + 1;
 
-	pub fn new<T>(value: T) -> Self
-	where
-		T: Into<BigInt>,
-	{
-		value.into()
+	pub fn new<T>() -> Self {
+		Self {
+			positive: true,
+			digits: Vec::new(),
+		}
 	}
 
 	pub fn with_capacity(len: usize) -> Self {

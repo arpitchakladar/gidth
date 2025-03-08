@@ -1,13 +1,12 @@
 use gidth::number::BigInt;
 
-// #[test]
-// fn big_int_sum() {
-// 	let x = BigInt::new(vec![234, 21, 84, 89009, 889243, 09233, 8213, 88]);
-// 	let y = BigInt::new(vec![137, 45, 432, 482385, 88327498, 23,8234, 92, 893, 8204, 8921, 8402]);
-// 	let z = BigInt::new("-102276255580139097615819404275666350670467982146909786100732684133793143719564593097343327");
-// 	let my_int = &x + &y + &z;
-// 	println!("{}", my_int);
-// }
+#[test]
+fn big_int_sum() {
+	let x = BigInt::from("102276255580139097615819404275666350670467982146909786100732684133793143719564593097353327");
+	let z = BigInt::from("-102276255580139097615819404275666350670467982146909786100732684133793143719564593097343327");
+	let my_int = &x + &z;
+	println!("{}", my_int);
+}
 
 // #[test]
 // fn big_int_multiply() {
@@ -25,13 +24,13 @@ use gidth::number::BigInt;
 // 	println!("{} * {} + {} = {}", &z.0, &int_x, &z.1, &int_y);
 // }
 
-#[test]
-fn big_int_exponentiation() {
-	let y = BigInt::new("2334");
-	let x = BigInt::new(8);
-	let z = BigInt::exp(&y, &x);
-	println!("{}", z);
-}
+// #[test]
+// fn big_int_exponentiation() {
+// 	let y = BigInt::from("2334");
+// 	let x = BigInt::from(8);
+// 	let z = BigInt::exp(&y, &x);
+// 	println!("{}", z);
+// }
 
 // #[test]
 // fn big_int_fast_square() {

@@ -2,55 +2,57 @@ use crate::number::BigInt;
 
 #[inline]
 fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {
-	let mut borrow: u64 = 0;
-	for i in 0..rhs.len() {
-		let right_op = borrow + rhs[i] as u64;
-		let left_op = lhs[i] as u64;
-		let new_digit = if right_op > left_op {
-			BigInt::BASE + left_op - right_op
-		} else {
-			left_op - right_op
-		};
-		lhs[i] = new_digit as u32;
-		borrow = new_digit >> 32;
-	}
+	let borrow = lhs
+		.iter_mut()
+		.zip(rhs.iter().copied())
+		.fold(0u64, |mut borrow, (left, right)| {
+			let right_op = borrow + right as u64;
+			let left_op = *left as u64;
+			let new_digit = if right_op > left_op {
+				BigInt::BASE + left_op - right_op
+			} else {
+				left_op - right_op
+			};
+			*left = new_digit as u32;
+			borrow = new_digit >> 32;
+			borrow
+		});
+	
 	if borrow > 0 {
-		lhs[lhs.len() - 1] -= borrow as u32;
-	}
-	for i in (0..lhs.len()).rev() {
-		if lhs[i] != 0 {
-			return lhs.len() - i - 1;
+		if let Some(last) = lhs.last_mut() {
+			*last -= borrow as u32;
 		}
 	}
-	lhs.len()
+	
+	lhs.iter()
+		.rposition(|&x| x != 0)
+		.map(|i| lhs.len() - i - 1)
+		.unwrap_or(lhs.len())
 }
 
+#[inline]
 fn cmp_digit_arrays(lhs: &[u32], rhs: &[u32]) -> bool {
-	if lhs.len() > rhs.len() {
-		true
-	} else if lhs.len() < rhs.len() {
-		false
-	} else {
-		for (_, (l, r)) in lhs.iter().rev().zip(rhs.iter().rev()).enumerate() {
-			if l > r {
-				return true;
-			} else if l < r {
-				return false;
-			}
-		}
-
-		true
+	match lhs.len().cmp(&rhs.len()) {
+		std::cmp::Ordering::Greater => return true,
+		std::cmp::Ordering::Less => return false,
+		_ =>
+			lhs.iter()
+				.rev()
+				.zip(rhs.iter().rev())
+				.find(|(l, r)| l != r)
+				.map(|(l, r)| l > r)
+				.unwrap_or(true),
 	}
 }
 
 #[inline]
 fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
-	let mut carry = 0u64;
-	for d in lhs.iter_mut() {
+	let carry = lhs.iter_mut().fold(0u64, |carry, d| {
 		let reg: u64 = rhs as u64 * *d as u64 + carry;
-		carry = reg >> 32;
 		*d = reg as u32;
-	}
+		reg >> 32
+	});
+	
 	if carry > 0 {
 		lhs.push(carry as u32);
 	}
@@ -81,6 +83,7 @@ impl BigInt {
 				};
 				let min = (sig / (sig_rhs + 1)) as u32;
 				let max = ((sig + 1) / sig_rhs) as u32;
+
 				for i in (min..=max).rev() {
 					let mut num = rhs.clone();
 					mul_by_small_int(&mut num.digits, i);
@@ -88,11 +91,7 @@ impl BigInt {
 						quotient.push(i);
 						let offset = sub_from_slice(reg, &num.digits);
 						end -= offset;
-						start = if end > l_rhs {
-							end - l_rhs
-						} else {
-							0
-						};
+						start = end.saturating_sub(l_rhs);
 						break;
 					}
 				}
@@ -103,34 +102,44 @@ impl BigInt {
 			}
 		}
 
-		let quotient = BigInt::new(
+		let quotient = BigInt::from(
 			quotient
 				.into_iter()
 				.rev()
 				.collect::<Vec<u32>>()
 		);
-		let mut remainder = BigInt::new(digits);
+		let mut remainder = BigInt::from(digits);
 		remainder.trim();
 
 		(quotient, remainder)
 	}
 
 	pub(crate) fn unsigned_divmod_by_small_int(&self, rhs: u32) -> (BigInt, u32) {
-		let mut quotient = Vec::with_capacity(self.digits.len());
-		let mut remainder = 0u64;
 		let rhs = rhs as u64;
-		for byte in self.digits.iter().rev() {
-			let current = (remainder << 32) + *byte as u64; // Combine carry and byte
-			quotient.push((current / rhs) as u32);
-			remainder = current % rhs; // New carry is the remainder
-		}
+		let (mut quotient, remainder) = self.digits
+			.iter()
+			.rev()
+			.fold(
+				(
+					Vec::with_capacity(
+						self.digits.len(),
+					),
+					0u64,
+				),
+				|(mut quotient, mut remainder), &byte| {
+					let current = (remainder << 32) + byte as u64;
+					quotient.push((current / rhs) as u32);
+					remainder = current % rhs;
+					(quotient, remainder)
+				},
+			);
 
 		(
-			BigInt::new(
+			BigInt::from(
 				quotient
 					.into_iter()
 					.rev()
-					.collect::<Vec<u32>>()
+					.collect::<Vec<u32>>(),
 			),
 			remainder as u32,
 		)
