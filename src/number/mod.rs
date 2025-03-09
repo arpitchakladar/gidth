@@ -1,5 +1,6 @@
 mod big_decimal;
 mod big_int;
+mod binary_operation;
 mod integer;
 mod number;
 

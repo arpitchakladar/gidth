@@ -1,5 +1,5 @@
 use crate::number::BigInt;
-use crate::impl_binop_variants;
+use crate::impl_big_int_binop_variants;
 
 impl BigInt {
 	/// Multiplies two unsigned `BigInt` numbers and stores the result in `result`.
@@ -63,4 +63,4 @@ impl std::ops::Mul for &BigInt {
 	}
 }
 
-impl_binop_variants!(Mul, mul, *);
+impl_big_int_binop_variants!(Mul, mul, *);

@@ -1,5 +1,5 @@
 use crate::number::BigInt;
-use crate::impl_binop_variants;
+use crate::impl_big_int_binop_variants;
 
 impl std::ops::Sub for &BigInt {
 	type Output = BigInt;
@@ -18,4 +18,4 @@ impl std::ops::Sub for &BigInt {
 	}
 }
 
-impl_binop_variants!(Sub, sub, -);
+impl_big_int_binop_variants!(Sub, sub, -);
