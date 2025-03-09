@@ -6,11 +6,11 @@ impl std::ops::Add for &BigInt {
 
 	fn add(self, other: Self) -> Self::Output {
 		match (self.positive, other.positive) {
-			(true, true) => BigInt::unsigned_add(self, other),
-			(true, false) => BigInt::unsigned_sub(self, other),
-			(false, true) => BigInt::unsigned_sub(other, self),
+			(true, true) => BigInt::u_add(self, other),
+			(true, false) => BigInt::u_sub(self, other),
+			(false, true) => BigInt::u_sub(other, self),
 			(false, false) => {
-				let mut result = BigInt::unsigned_add(self, other);
+				let mut result = BigInt::u_add(self, other);
 				result.positive = false;
 				result
 			},

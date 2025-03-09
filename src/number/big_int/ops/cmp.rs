@@ -49,7 +49,7 @@ impl Ord for BigInt {
 }
 
 impl BigInt {
-	pub(crate) fn unsigned_greater_than(&self, rhs: &BigInt) -> bool {
+	pub(crate) fn u_gt(&self, rhs: &BigInt) -> bool {
 		match self.digits.len().cmp(&rhs.digits.len()) {
 			std::cmp::Ordering::Greater => true,
 			std::cmp::Ordering::Less => false,

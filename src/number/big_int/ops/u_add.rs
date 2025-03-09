@@ -1,7 +1,7 @@
 use crate::number::BigInt;
 
 impl BigInt {
-	pub(crate) fn unsigned_add(&self, rhs: &BigInt) -> BigInt {
+	pub(crate) fn u_add(&self, rhs: &BigInt) -> BigInt {
 		let (larger, smaller) = if self.digits.len() > rhs.digits.len() {
 			(self, rhs)
 		} else {
@@ -47,8 +47,8 @@ impl BigInt {
 		BigInt::from(digits)
 	}
 
-	pub(crate) fn unsigned_sub(&self, rhs: &BigInt) -> BigInt {
-		let (larger, smaller, positive) = if BigInt::unsigned_greater_than(self, rhs) {
+	pub(crate) fn u_sub(&self, rhs: &BigInt) -> BigInt {
+		let (larger, smaller, positive) = if BigInt::u_gt(self, rhs) {
 			(self, rhs, true)
 		} else {
 			(rhs, self, false)

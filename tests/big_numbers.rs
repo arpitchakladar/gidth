@@ -57,6 +57,6 @@ fn big_decimal_addition() {
 	};
 	println!("{:?} {}", x1.digits, x1.decimal_pos);
 	println!("{:?} {}", x2.digits, x2.decimal_pos);
-	let mut y = x1 - x2;
+	let y = x1 - x2;
 	println!("{:?} {}", y.digits, y.decimal_pos);
 }

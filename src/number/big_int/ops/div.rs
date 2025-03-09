@@ -5,7 +5,7 @@ impl std::ops::Div for &BigInt {
 	type Output = BigInt;
 
 	fn div(self, other: Self) -> Self::Output {
-		BigInt::unsigned_divmod(self, other).0
+		BigInt::u_divmod(self, other).0
 	}
 }
 

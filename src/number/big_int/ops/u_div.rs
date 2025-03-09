@@ -61,8 +61,8 @@ fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
 }
 
 impl BigInt {
-	pub(crate) fn unsigned_divmod(&self, rhs: &BigInt) -> (BigInt, BigInt) {
-		if BigInt::unsigned_greater_than(rhs, self) {
+	pub(crate) fn u_divmod(&self, rhs: &BigInt) -> (BigInt, BigInt) {
+		if BigInt::u_gt(rhs, self) {
 			return (0.into(), self.clone());
 		}
 
@@ -116,7 +116,7 @@ impl BigInt {
 		(quotient, remainder)
 	}
 
-	pub(crate) fn unsigned_divmod_by_small_int(&self, rhs: u32) -> (BigInt, u32) {
+	pub(crate) fn u_divmod_base(&self, rhs: u32) -> (BigInt, u32) {
 		let rhs = rhs as u64;
 		let (quotient, remainder) = self.digits
 			.iter()

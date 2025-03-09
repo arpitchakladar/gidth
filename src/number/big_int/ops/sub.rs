@@ -6,14 +6,14 @@ impl std::ops::Sub for &BigInt {
 
 	fn sub(self, other: Self) -> Self::Output {
 		match (self.positive, other.positive) {
-			(true, true) => BigInt::unsigned_sub(self, other),
-			(true, false) => BigInt::unsigned_add(self, other),
+			(true, true) => BigInt::u_sub(self, other),
+			(true, false) => BigInt::u_add(self, other),
 			(false, true) => {
-				let mut result = BigInt::unsigned_add(self, other);
+				let mut result = BigInt::u_add(self, other);
 				result.positive = false;
 				result
 			},
-			(false, false) => BigInt::unsigned_sub(other, self),
+			(false, false) => BigInt::u_sub(other, self),
 		}
 	}
 }

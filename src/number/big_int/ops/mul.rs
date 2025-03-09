@@ -3,7 +3,7 @@ use crate::impl_big_int_binop_variants;
 
 impl BigInt {
 	/// Multiplies two unsigned `BigInt` numbers and stores the result in `result`.
-	pub(crate) fn unsigned_inplace_mul(&self, rhs: &BigInt, result: &mut BigInt) {
+	pub(crate) fn u_mul_in(&self, rhs: &BigInt, result: &mut BigInt) {
 		// Ensure result has enough space to store the maximum possible digits.
 		result.digits.resize(
 			self.digits.len() + rhs.digits.len(),
@@ -52,7 +52,7 @@ impl std::ops::Mul for &BigInt {
 		let mut result = BigInt::with_capacity(
 			self.digits.len() + other.digits.len(),
 		);
-		BigInt::unsigned_inplace_mul(
+		BigInt::u_mul_in(
 			self,
 			other,
 			&mut result,
