@@ -48,7 +48,7 @@ fn big_decimal_addition() {
 	let x1 = BigDecimal::new(
 		true,
 		vec![23, 234, 134, 464, 234],
-		2,
+		10,
 	);
 	let x2 = BigDecimal::new(
 		true,

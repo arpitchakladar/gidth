@@ -21,15 +21,17 @@ impl BigDecimal {
 		};
 
 		let decimal_len_diff = longest_decimal.decimal_pos - shortest_decimal.decimal_pos;
+		let end_pos = decimal_len_diff.min(longest_decimal.digits.len());
+		let shorter = end_pos == longest_decimal.digits.len();
 
-		longest_decimal.digits[..decimal_len_diff]
+		longest_decimal.digits[..end_pos]
 			.iter()
 			.copied()
 			.for_each(
 				|digit| result.digits.push(digit),
 			);
 
-		let carry = longest_decimal.digits[decimal_len_diff..]
+		let carry = longest_decimal.digits[end_pos..]
 			.iter()
 			.copied()
 			.zip(
@@ -46,7 +48,14 @@ impl BigDecimal {
 				},
 			);
 
-		let remaining_start = longest_whole.decimal_pos + shortest_whole.digits.len() - shortest_whole.decimal_pos;
+		if shorter {
+			for _ in end_pos..decimal_len_diff {
+				result.digits.push(0);
+			}
+		}
+
+		let remaining_start = (longest_whole.decimal_pos + shortest_whole.digits.len())
+			.saturating_sub(shortest_whole.decimal_pos);
 		let carry = longest_whole.digits[remaining_start..]
 			.iter()
 			.copied()
