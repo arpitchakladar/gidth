@@ -1,4 +1,4 @@
-use gidth::number::{BigInt, Square};
+use gidth::number::{BigInt, BigDecimal, Square};
 
 // #[test]
 // fn big_int_sum() {
@@ -9,13 +9,13 @@ use gidth::number::{BigInt, Square};
 // 	println!("{}", my_int.sq());
 // }
 //
-#[test]
-fn big_int_multiply() {
-	let x = 8234324234324u64;
-	let y = 79832869324234324u64;
-	let z: BigInt = BigInt::from(x) * BigInt::from(y);
-	println!("{} = {}", z, x as u128 * y as u128);
-}
+// #[test]
+// fn big_int_multiply() {
+// 	let x = 8234324234324u64;
+// 	let y = 79832869324234324u64;
+// 	let z: BigInt = BigInt::from(x) * BigInt::from(y);
+// 	println!("{} = {}", z, x as u128 * y as u128);
+// }
 //
 // #[test]
 // fn big_int_divide() {
@@ -42,3 +42,22 @@ fn big_int_multiply() {
 // 	let res = &x * &x;
 // 	println!("{} = {}", res, r);
 // }
+//
+#[test]
+fn big_decimal_addition() {
+	let x1 = BigDecimal::new(
+		true,
+		vec![23, 234, 134, 464, 234],
+		2,
+	);
+	let x2 = BigDecimal::new(
+		true,
+		vec![23, 234, 134, 464, 234, 8423, 920342, 9423],
+		3,
+	);
+	println!("{:?} {}", x1.digits, x1.decimal_pos);
+	println!("{:?} {}", x2.digits, x2.decimal_pos);
+	let mut y: BigDecimal = BigDecimal::with_capacity(10);
+	BigDecimal::unsigned_add(&x1, &x2, &mut y);
+	println!("{:?} {}", y.digits, y.decimal_pos);
+}

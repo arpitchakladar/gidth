@@ -30,9 +30,8 @@ impl BigInt {
 						},
 					);
 
-				let result_len = result.digits.len();
 				let starting_pos = self.digits.len() + rhs_index;
-				result.digits[starting_pos..result_len]
+				result.digits[starting_pos..]
 					.iter_mut()
 					.fold(
 						carry,

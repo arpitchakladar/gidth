@@ -8,11 +8,11 @@ fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {
 		.fold(
 			0u64,
 			|borrow, (left_digit, right_digit)| {
-				let right_digit = borrow + right as u64;
+				let right_digit = borrow + right_digit as u64;
 				let (new_digit, overflowed) = left_digit
 					.wrapping_sub(right_digit as u32)
 					.overflowing_sub((right_digit >> 32) as u32);
-				*left = new_digit;
+				*left_digit = new_digit;
 				overflowed as u64
 			},
 		);
