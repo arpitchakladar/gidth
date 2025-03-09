@@ -10,7 +10,7 @@ where
 	fn divmod(self, rhs: T) -> (Self, T);
 }
 
-pub trait Integer:
+pub trait Int:
 	std::ops::Add<Output = Self> +
 	std::ops::Sub<Output = Self> +
 	std::ops::Mul<Output = Self> +
@@ -67,7 +67,7 @@ macro_rules! impl_integer {
 			}
 		}
 
-		impl Integer for $t {}
+		impl Int for $t {}
 		)*
 	};
 }

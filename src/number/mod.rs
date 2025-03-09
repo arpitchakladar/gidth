@@ -1,13 +1,13 @@
 mod big_decimal;
 mod big_int;
-mod binary_operation;
-mod integer;
+mod bin_op;
+mod int;
 mod number;
 
 pub use big_decimal::BigDecimal;
 pub use big_int::BigInt;
-pub use integer::{
-	Integer,
+pub use int::{
+	Int,
 	DivMod,
 };
 pub use number::{
