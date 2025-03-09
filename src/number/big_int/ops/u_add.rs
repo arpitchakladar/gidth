@@ -1,14 +1,14 @@
 use crate::number::BigInt;
 
 impl BigInt {
-	pub(crate) fn u_add(&self, rhs: &BigInt) -> BigInt {
+	pub(crate) fn u_add_in(&self, rhs: &BigInt, result: &mut BigInt) {
 		let (larger, smaller) = if self.digits.len() > rhs.digits.len() {
 			(self, rhs)
 		} else {
 			(rhs, self)
 		};
 
-		let (digits, carry) = larger.digits
+		let carry = larger.digits
 			.iter()
 			.copied()
 			.zip(
@@ -17,44 +17,41 @@ impl BigInt {
 					.copied(),
 			)
 			.fold(
-				(
-					Vec::with_capacity(larger.digits.len() + 1),
-					0u64,
-				),
-				|(mut digits, carry), (left_digit, right_digit)| {
+				0u64,
+				|carry, (left_digit, right_digit)| {
 					let sum = left_digit as u64 + right_digit as u64 + carry;
-					digits.push(sum as u32);
-					(digits, sum >> 32)
+					result.digits.push(sum as u32);
+
+					sum >> 32
 				},
 			);
 
-		let (mut digits, carry) = larger.digits[smaller.digits.len()..]
+		let carry = larger.digits[smaller.digits.len()..]
 			.iter()
 			.copied()
 			.fold(
-				(digits, carry),
-				|(mut digits, carry), digit| {
+				carry,
+				|carry, digit| {
 					let sum = digit as u64 + carry;
-					digits.push(sum as u32);
-					(digits, sum >> 32)
+					result.digits.push(sum as u32);
+
+					sum >> 32
 				},
 			);
 
 		if carry != 0 {
-			digits.push(carry as u32);
+			result.digits.push(carry as u32);
 		}
-
-		BigInt::from(digits)
 	}
 
-	pub(crate) fn u_sub(&self, rhs: &BigInt) -> BigInt {
+	pub(crate) fn u_sub_in(&self, rhs: &BigInt, result: &mut BigInt) {
 		let (larger, smaller, positive) = if BigInt::u_gt(self, rhs) {
 			(self, rhs, true)
 		} else {
 			(rhs, self, false)
 		};
 
-		let (digits, carry) = larger.digits
+		let borrow = larger.digits
 			.iter()
 			.copied()
 			.zip(
@@ -64,37 +61,31 @@ impl BigInt {
 					.copied(),
 			)
 			.fold(
-				(
-					Vec::with_capacity(larger.digits.len()),
-					0u64,
-				),
-				|(mut digits, borrow), (left_digit, right_digit)| {
+				0u64,
+				|borrow, (left_digit, right_digit)| {
 					let (new_digit, overflowed) = (left_digit as u64)
 						.overflowing_sub(right_digit as u64 + borrow);
-					digits.push(new_digit as u32);
-					(digits, overflowed as u64)
+					result.digits.push(new_digit as u32);
+
+					overflowed as u64
 				},
 			);
 
-		let (digits, _) = larger.digits[smaller.digits.len()..]
+		larger.digits[smaller.digits.len()..]
 			.iter()
 			.copied()
 			.fold(
-				(digits, carry),
-				|(mut digits, carry), digit| {
+				borrow,
+				|borrow, digit| {
 					let (new_digit, overflowed) = digit
-						.overflowing_sub(carry as u32);
-					digits.push(new_digit);
-					(digits, overflowed as u64)
+						.overflowing_sub(borrow as u32);
+					result.digits.push(new_digit);
+
+					overflowed as u64
 				},
 			);
 
-		let mut result = BigInt {
-			positive,
-			digits,
-		};
+		result.positive = positive;
 		result.trim();
-
-		result
 	}
 }
