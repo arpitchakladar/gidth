@@ -22,4 +22,8 @@ impl BigDecimal {
 			self.digits.pop();
 		}
 	}
+
+	pub(crate) fn order(&self) -> isize {
+		self.digits.len() as isize - self.decimal_pos as isize
+	}
 }

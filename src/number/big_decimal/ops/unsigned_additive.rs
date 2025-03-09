@@ -50,17 +50,10 @@ impl BigDecimal {
 				},
 			);
 
-		let (longest_whole, shortest_whole) = {
-			let lhs_whole_len = (self.digits.len() as isize)
-				.saturating_sub(self.decimal_pos as isize);
-			let rhs_whole_len = (rhs.digits.len() as isize)
-				.saturating_sub(rhs.decimal_pos as isize);
-
-			if lhs_whole_len > rhs_whole_len {
-				(self, rhs)
-			} else {
-				(rhs, self)
-			}
+		let (longest_whole, shortest_whole) = if self.order() > rhs.order() {
+			(self, rhs)
+		} else {
+			(rhs, self)
 		};
 
 		let remaining_start = (longest_whole.decimal_pos + shortest_whole.digits.len())
@@ -84,4 +77,8 @@ impl BigDecimal {
 
 		result.decimal_pos = longest_decimal.decimal_pos;
 	}
+
+	// pub fn unsigned_sub(&self, rhs: &BigDecimal, result: &mut BigDecimal) -> BigDecimal {
+	// 	
+	// }
 }

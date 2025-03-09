@@ -25,7 +25,7 @@ impl PartialOrd for BigInt {
 					.find_map(|(left, right)|
 						match left.cmp(right) {
 							std::cmp::Ordering::Equal => None,
-							ord => Some(ord)
+							ord => Some(ord),
 						}
 					)
 					.unwrap_or(std::cmp::Ordering::Equal)
