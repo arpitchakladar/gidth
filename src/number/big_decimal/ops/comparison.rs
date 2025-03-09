@@ -1,32 +1,32 @@
 use crate::number::BigDecimal;
 
 impl PartialEq for BigDecimal {
-	fn eq(&self, other: &Self) -> bool {
-		self.positive == other.positive &&
-		self.digits == other.digits &&
-		self.decimal_pos == other.decimal_pos
+	fn eq(&self, rhs: &Self) -> bool {
+		self.positive == rhs.positive &&
+		self.digits == rhs.digits &&
+		self.decimal_pos == rhs.decimal_pos
 	}
 }
 
 impl Eq for BigDecimal {}
 
 impl PartialOrd for BigDecimal {
-	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(&self, rhs: &Self) -> Option<std::cmp::Ordering> {
 		let ord = {
-			if self.positive != other.positive {
+			if self.positive != rhs.positive {
 				std::cmp::Ordering::Greater
 			} else {
-				let self_order = self.order();
-				let other_order = other.order();
+				let lhs_order = self.order();
+				let rhs_order = rhs.order();
 
-				if self_order != other_order {
-					self_order
-						.cmp(&other_order)
+				if lhs_order != rhs_order {
+					lhs_order
+						.cmp(&rhs_order)
 				} else {
 					self.digits
 						.iter()
 						.rev()
-						.zip(other.digits.iter().rev())
+						.zip(rhs.digits.iter().rev())
 						.find_map(|(left, right)|
 							match left.cmp(right) {
 								std::cmp::Ordering::Equal => None,
@@ -49,14 +49,14 @@ impl PartialOrd for BigDecimal {
 }
 
 impl Ord for BigDecimal {
-	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-		self.partial_cmp(other).unwrap()
+	fn cmp(&self, rhs: &Self) -> std::cmp::Ordering {
+		self.partial_cmp(rhs).unwrap()
 	}
 }
 
 impl BigDecimal {
 	pub(crate) fn unsigned_greater_than(&self, rhs: &BigDecimal) -> bool {
-		match self.digits.len().cmp(&rhs.digits.len()) {
+		match self.order().cmp(&rhs.order()) {
 			std::cmp::Ordering::Greater => true,
 			std::cmp::Ordering::Less => false,
 			std::cmp::Ordering::Equal =>
