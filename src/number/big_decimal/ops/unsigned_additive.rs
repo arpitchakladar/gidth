@@ -11,8 +11,8 @@ impl BigDecimal {
 		};
 
 		let (longest_whole, shortest_whole) = {
-			let lhs_whole_len = self.digits.len().saturating_sub(self.decimal_pos);
-			let rhs_whole_len = rhs.digits.len().saturating_sub(rhs.decimal_pos);
+			let lhs_whole_len = (self.digits.len() as isize).saturating_sub(self.decimal_pos as isize);
+			let rhs_whole_len = (rhs.digits.len() as isize).saturating_sub(rhs.decimal_pos as isize);
 			if lhs_whole_len > rhs_whole_len {
 				(self, rhs)
 			} else {
@@ -31,7 +31,7 @@ impl BigDecimal {
 				|digit| result.digits.push(digit),
 			);
 
-		let carry = if shorter {
+		if shorter {
 			for _ in end_pos..decimal_len_diff {
 				result.digits.push(0);
 			}
@@ -40,10 +40,8 @@ impl BigDecimal {
 				.iter()
 				.copied()
 				.for_each(|digit| result.digits.push(digit));
-
-			0u64
 		} else {
-			longest_decimal.digits[end_pos..]
+			let carry = longest_decimal.digits[end_pos..]
 				.iter()
 				.copied()
 				.zip(
@@ -58,28 +56,25 @@ impl BigDecimal {
 						result.digits.push(sum as u32);
 						sum >> 32
 					},
-				)
-		};
+				);
 
-		let remaining_start = std::cmp::min(
-			(longest_whole.decimal_pos + shortest_whole.digits.len())
-				.saturating_sub(shortest_whole.decimal_pos),
-			longest_whole.digits.len(),
-		);
-		let carry = longest_whole.digits[remaining_start..]
-			.iter()
-			.copied()
-			.fold(
-				carry,
-				|carry, ld| {
-					let sum = ld as u64 + carry;
-					result.digits.push(sum as u32);
-					sum >> 32
-				},
-			);
+			let remaining_start = (longest_whole.decimal_pos + shortest_whole.digits.len())
+				.saturating_sub(shortest_whole.decimal_pos);
+			let carry = longest_whole.digits[remaining_start..]
+				.iter()
+				.copied()
+				.fold(
+					carry,
+					|carry, ld| {
+						let sum = ld as u64 + carry;
+						result.digits.push(sum as u32);
+						sum >> 32
+					},
+				);
 
-		if carry != 0 {
-			result.digits.push(carry as u32);
+			if carry != 0 {
+				result.digits.push(carry as u32);
+			}
 		}
 
 		result.decimal_pos = longest_decimal.decimal_pos;

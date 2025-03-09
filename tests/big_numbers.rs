@@ -47,13 +47,13 @@ use gidth::number::{BigInt, BigDecimal, Square};
 fn big_decimal_addition() {
 	let x1 = BigDecimal::new(
 		true,
-		vec![23, 234, 134, 464, 234],
-		10,
+		vec![69, 54, 420, 89432, 78, 909234, 90823423, 982340, 90234, 8923, 912, 9834],
+		6,
 	);
 	let x2 = BigDecimal::new(
 		true,
-		vec![23, 234, 134, 464, 234, 8423, 920342, 9423],
-		19,
+		vec![23, 234, 134],
+		5,
 	);
 	println!("{:?} {}", x1.digits, x1.decimal_pos);
 	println!("{:?} {}", x2.digits, x2.decimal_pos);
