@@ -53,7 +53,7 @@ fn big_decimal_addition() {
 	let x2 = BigDecimal::new(
 		true,
 		vec![23, 234, 134, 464, 234, 8423, 920342, 9423],
-		3,
+		19,
 	);
 	println!("{:?} {}", x1.digits, x1.decimal_pos);
 	println!("{:?} {}", x2.digits, x2.decimal_pos);
