@@ -53,10 +53,11 @@ fn big_decimal_addition() {
 	let x2 = BigDecimal {
 		positive: true,
 		digits: vec![23, 234, 134],
-		decimal_pos: 10,
+		decimal_pos: 3,
 	};
 	println!("{:?} {}", x1.digits, x1.decimal_pos);
 	println!("{:?} {}", x2.digits, x2.decimal_pos);
-	let y = x1 - x2;
+	let y = x1 - &x2;
 	println!("{:?} {}", y.digits, y.decimal_pos);
+	println!("{}", x2);
 }

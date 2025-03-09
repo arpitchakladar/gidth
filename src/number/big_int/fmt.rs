@@ -5,12 +5,19 @@ impl std::fmt::Display for BigInt {
 		let mut result = String::new();
 		let mut temp_digits = self.digits.clone();
 		while temp_digits.iter().any(|&x| x != 0) {
-			let mut carry = 0u32;
-			for byte in temp_digits.iter_mut().rev() {
-				let current = ((carry as u64) << 32) + *byte as u64; // Combine carry and byte
-				*byte = (current / 10) as u32; // Quotient back into the byte
-				carry = (current % 10) as u32; // New carry is the remainder
-			}
+			let carry = temp_digits
+				.iter_mut()
+				.rev()
+				.fold(
+					0u64,
+					|carry, byte| {
+						// Combine carry and byte
+						let current = (carry << 32) + *byte as u64;
+						*byte = (current / 10) as u32; // Quotient back into the byte
+
+						current % 10 // New carry is the remainder
+					},
+				);
 
 			result.push((b'0' + carry as u8) as char);
 		}
@@ -24,6 +31,15 @@ impl std::fmt::Display for BigInt {
 		} else {
 			"-"
 		};
-		write!(f, "{}{}", sign, result.chars().rev().collect::<String>())
+
+		write!(
+			f,
+			"{}{}",
+			sign,
+			result
+				.chars()
+				.rev()
+				.collect::<String>(),
+		)
 	}
 }
