@@ -68,12 +68,10 @@ impl BigInt {
 					Vec::with_capacity(larger.digits.len()),
 					0u64,
 				),
-				|(mut digits, carry), (left_digit, right_digit)| {
-					let right_digit = right_digit as u64 + carry;
-					let (new_digit, overflowed) = left_digit
-						.wrapping_sub(right_digit as u32)
-						.overflowing_sub((right_digit >> 32) as u32);
-					digits.push(new_digit);
+				|(mut digits, borrow), (left_digit, right_digit)| {
+					let (new_digit, overflowed) = (left_digit as u64)
+						.overflowing_sub(right_digit as u64 + borrow);
+					digits.push(new_digit as u32);
 					(digits, overflowed as u64)
 				},
 			);
