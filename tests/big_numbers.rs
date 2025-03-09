@@ -48,16 +48,16 @@ fn big_decimal_addition() {
 	let x1 = BigDecimal {
 		positive: true,
 		digits: vec![69, 54, 420, 89432, 78, 909234, 90823423, 982340, 90234, 8923, 912, 9834],
-		decimal_pos: 6,
+		decimal_pos: 7,
 	};
 	let x2 = BigDecimal {
 		positive: true,
 		digits: vec![23, 234, 134],
-		decimal_pos: 5,
+		decimal_pos: 10,
 	};
 	println!("{:?} {}", x1.digits, x1.decimal_pos);
 	println!("{:?} {}", x2.digits, x2.decimal_pos);
 	let mut y: BigDecimal = BigDecimal::with_capacity(10);
-	BigDecimal::unsigned_add(&x1, &x2, &mut y);
+	BigDecimal::unsigned_sub(&x1, &x2, &mut y);
 	println!("{:?} {}", y.digits, y.decimal_pos);
 }

@@ -23,6 +23,7 @@ impl BigDecimal {
 		}
 	}
 
+	// Gives the place value of the most significant digit
 	pub(crate) fn order(&self) -> isize {
 		self.digits.len() as isize - self.decimal_pos as isize
 	}
