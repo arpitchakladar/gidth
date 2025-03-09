@@ -9,13 +9,6 @@ pub struct BigInt {
 impl BigInt {
 	pub const BASE: u64 = u32::MAX as u64 + 1;
 
-	pub fn new(positive: bool, digits: Vec<u32>) -> Self {
-		Self {
-			positive,
-			digits,
-		}
-	}
-
 	pub fn with_capacity(len: usize) -> Self {
 		Self {
 			positive: true,

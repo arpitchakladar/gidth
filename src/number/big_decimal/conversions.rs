@@ -1,5 +1,6 @@
 use crate::number::{
 	BigDecimal,
+	BigInt,
 	Abs,
 };
 
@@ -86,5 +87,15 @@ impl From<String> for BigDecimal {
 impl From<&String> for BigDecimal {
 	fn from(s: &String) -> Self {
 		s.as_str().into()
+	}
+}
+
+impl From<BigInt> for BigDecimal {
+	fn from(num: BigInt) -> Self {
+		BigDecimal {
+			positive: num.positive,
+			digits: num.digits,
+			decimal_pos: 0,
+		}
 	}
 }

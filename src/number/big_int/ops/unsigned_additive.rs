@@ -89,7 +89,10 @@ impl BigInt {
 				},
 			);
 
-		let mut result = BigInt::new(positive, digits);
+		let mut result = BigInt {
+			positive,
+			digits,
+		};
 		result.trim();
 
 		result
