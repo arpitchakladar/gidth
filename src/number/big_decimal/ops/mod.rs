@@ -1,5 +1,5 @@
-mod addition;
-mod binary_operation;
-mod comparison;
-mod substraction;
-mod unsigned_additive;
+mod add;
+mod bin_op;
+mod cmp;
+mod sub;
+mod u_add;

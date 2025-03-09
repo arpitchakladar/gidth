@@ -1,7 +1,7 @@
 use crate::number::BigDecimal;
 
 impl BigDecimal {
-	pub(crate) fn unsigned_add(&self, rhs: &BigDecimal, result: &mut BigDecimal) {
+	pub(crate) fn u_add_in(&self, rhs: &BigDecimal, result: &mut BigDecimal) {
 		let (longest_decimal, shortest_decimal) = {
 			if self.decimal_pos > rhs.decimal_pos {
 				(self, rhs)
@@ -78,8 +78,8 @@ impl BigDecimal {
 		}
 	}
 
-	pub(crate) fn unsigned_sub(&self, rhs: &BigDecimal, result: &mut BigDecimal) {
-		let (larger, smaller, positive) = if BigDecimal::unsigned_greater_than(self, rhs) {
+	pub(crate) fn u_sub_in(&self, rhs: &BigDecimal, result: &mut BigDecimal) {
+		let (larger, smaller, positive) = if BigDecimal::u_gt(self, rhs) {
 			(self, rhs, true)
 		} else {
 			(rhs, self, false)

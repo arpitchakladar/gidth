@@ -55,7 +55,7 @@ impl Ord for BigDecimal {
 }
 
 impl BigDecimal {
-	pub(crate) fn unsigned_greater_than(&self, rhs: &BigDecimal) -> bool {
+	pub(crate) fn u_gt(&self, rhs: &BigDecimal) -> bool {
 		match self.order().cmp(&rhs.order()) {
 			std::cmp::Ordering::Greater => true,
 			std::cmp::Ordering::Less => false,

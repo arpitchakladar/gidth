@@ -7,11 +7,11 @@ impl std::ops::Add for &BigDecimal {
 	fn add(self, other: Self) -> Self::Output {
 		let mut result = BigDecimal::with_capacity((self.order() - other.order()).abs() as usize);
 		match (self.positive, other.positive) {
-			(true, true) => BigDecimal::unsigned_add(self, other, &mut result),
-			(true, false) => BigDecimal::unsigned_sub(self, other, &mut result),
-			(false, true) => BigDecimal::unsigned_sub(other, self, &mut result),
+			(true, true) => BigDecimal::u_add_in(self, other, &mut result),
+			(true, false) => BigDecimal::u_sub_in(self, other, &mut result),
+			(false, true) => BigDecimal::u_sub_in(other, self, &mut result),
 			(false, false) => {
-				BigDecimal::unsigned_add(self, other, &mut result);
+				BigDecimal::u_add_in(self, other, &mut result);
 				result.positive = false;
 			},
 		}

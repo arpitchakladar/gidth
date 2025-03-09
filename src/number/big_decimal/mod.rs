@@ -1,6 +1,6 @@
 mod big_decimal;
-mod conversions;
-mod display;
+mod conv;
+mod fmt;
 mod ops;
 
 pub use big_decimal::BigDecimal;
