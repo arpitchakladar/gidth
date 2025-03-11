@@ -72,7 +72,7 @@ impl std::fmt::Display for BigDecimal {
 				.fold(
 					0u64,
 					|carry, limb| {
-						let current = (carry + *limb as u64) * 10;
+						let current = *limb as u64 * 10 + carry;
 						*limb = current as u32;
 
 						current >> 32
