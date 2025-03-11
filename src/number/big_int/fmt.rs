@@ -2,7 +2,12 @@ use crate::number::BigInt;
 
 impl std::fmt::Display for BigInt {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		let mut result = String::new();
+		let mut result = String::with_capacity(
+			std::cmp::max(
+				self.limbs.len() * 10usize,
+				1usize,
+			),
+		);
 		let mut temp_limbs = self.limbs.clone();
 		while temp_limbs.iter().any(|&x| x != 0) {
 			let carry = temp_limbs

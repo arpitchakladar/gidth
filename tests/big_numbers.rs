@@ -66,7 +66,7 @@ fn big_decimal_fmt() {
 	let x1 = BigDecimal {
 		positive: true,
 		limbs: vec![u32::MAX],
-		decimal_pos: 1,
+		decimal_pos: 5,
 	};
 	println!("{}", x1);
 }

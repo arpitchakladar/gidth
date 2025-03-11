@@ -4,7 +4,7 @@ impl BigDecimal {
 	fn estimate_max_digits(&self) -> usize {
 		// u32 ranges between 0 and 2^32 - 1 (10 digits)
 		const DIGITS_PER_INT_LIMB: usize = 10usize;
-		// for any integer if we multiply it by 10, 32 times it becomes
+		// for any integer K if we multiply 10, 32 times it becomes
 		// a multiple of 2^32
 		const DIGITS_PER_FRAC_LIMB: usize = 32usize;
 
@@ -56,10 +56,7 @@ impl std::fmt::Display for BigDecimal {
 		let expected_size = last_index + self.decimal_pos.saturating_sub(self.limbs.len());
 		let mut frac_limbs = Vec::with_capacity(expected_size);
 		frac_limbs.extend(self.limbs[..last_index].iter().copied());
-		frac_limbs.extend(
-			std::iter::repeat(0)
-				.take(self.decimal_pos.saturating_sub(self.limbs.len()))
-		);
+		frac_limbs.extend(std::iter::repeat(0).take(self.decimal_pos.saturating_sub(self.limbs.len())));
 
 		if frac_limbs.is_empty() {
 			result.push('0');
@@ -69,14 +66,13 @@ impl std::fmt::Display for BigDecimal {
 		while frac_limbs.iter().any(|&x| x != 0) {
 			let carry = frac_limbs
 				.iter_mut()
-				.fold(0u64,
-					|carry, limb| {
-						let current = (carry + *limb as u64) * 10;
-						*limb = current as u32;
+				.fold(0u64, |carry, limb| {
+					let current = (carry + *limb as u64) * 10;
+					*limb = current as u32;
 
-						current >> 32
-					}
-				);
+					current >> 32
+				}
+			);
 
 			result.push((b'0' + carry as u8) as char);
 		}
