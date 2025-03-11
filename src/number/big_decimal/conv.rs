@@ -55,20 +55,20 @@ impl From<&str> for BigDecimal {
 			(0, 0)
 		};
 
-		const CHUNK_SIZE_FRAC: u64 = 100_000_000u64;
+		const CHUNK_SIZE: u64 = 1_000_000_000u64;
 
-		let mut temp_frac_chunks = Vec::with_capacity(s.len() / 8);
+		let mut temp_frac_chunks = Vec::with_capacity(s.len() / 9);
 		temp_frac_chunks.extend(
 			s[(chunk_decimal_pos + chunk_decimal_point)..]
 				.as_bytes()
-				.chunks(8)
+				.chunks(9)
 				.filter_map(|chunk| std::str::from_utf8(chunk).ok()?.parse::<u32>().ok())
 		);
 
 		if let Some(last_digit) = temp_frac_chunks.last_mut() {
 			loop {
 				let current = *last_digit as u64 * 10u64;
-				if current >= CHUNK_SIZE_FRAC {
+				if current >= CHUNK_SIZE {
 					break;
 				} else {
 					*last_digit = current as u32;
@@ -86,9 +86,9 @@ impl From<&str> for BigDecimal {
 					0u64,
 					|carry, chunk| {
 						let prod = ((*chunk as u64) << 32) + carry;
-						*chunk = (prod % CHUNK_SIZE_FRAC) as u32;
+						*chunk = (prod % CHUNK_SIZE) as u32;
 
-						prod / CHUNK_SIZE_FRAC
+						prod / CHUNK_SIZE
 					},
 				);
 
@@ -97,7 +97,6 @@ impl From<&str> for BigDecimal {
 
 		limbs.reverse();
 
-		const CHUNK_SIZE_INT: u64 = 1_000_000_000u64;
 		let mut temp_int_chunks = Vec::with_capacity(s.len() / 9);
 		temp_int_chunks.extend(
 			s[..chunk_decimal_pos]
@@ -110,7 +109,7 @@ impl From<&str> for BigDecimal {
 		while temp_int_chunks.iter().any(|&x| x != 0) {
 			let mut carry = 0u32;
 			for byte in temp_int_chunks.iter_mut() {
-				let current = (carry as u64) * CHUNK_SIZE_INT + *byte as u64;
+				let current = (carry as u64) * CHUNK_SIZE + *byte as u64;
 				*byte = (current >> 32) as u32;
 				carry = current as u32;
 			}

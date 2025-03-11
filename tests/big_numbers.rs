@@ -73,6 +73,6 @@ use gidth::number::{BigInt, BigDecimal, Square};
 
 #[test]
 fn big_decimal_conv() {
-	let x1 = BigDecimal::from("2342323423269.99999999999999999999999999999");
-	println!("{} {:?}", &x1, &x1);
+	let x1 = BigDecimal::from("2342323423269.32097985340908728348735987493");
+	println!("{}", &x1);
 }
