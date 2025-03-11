@@ -3,7 +3,7 @@ use crate::number::Int;
 #[derive(Clone)]
 pub struct BigInt {
 	pub(crate) positive: bool,
-	pub(crate) digits: Vec<u32>,
+	pub(crate) limbs: Vec<u32>,
 }
 
 impl BigInt {
@@ -12,17 +12,17 @@ impl BigInt {
 	pub fn with_capacity(len: usize) -> Self {
 		Self {
 			positive: true,
-			digits: Vec::with_capacity(len),
+			limbs: Vec::with_capacity(len),
 		}
 	}
 
 	pub fn clear(&mut self) {
-		self.digits.clear();
+		self.limbs.clear();
 	}
 
 	pub fn trim(&mut self) {
-		while self.digits.last() == Some(&0) {
-			self.digits.pop();
+		while self.limbs.last() == Some(&0) {
+			self.limbs.pop();
 		}
 	}
 }

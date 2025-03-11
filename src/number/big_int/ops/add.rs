@@ -7,8 +7,8 @@ impl std::ops::Add for &BigInt {
 	fn add(self, rhs: Self) -> Self::Output {
 		let mut result = BigInt::with_capacity(
 			std::cmp::max(
-				self.digits.len(),
-				rhs.digits.len(),
+				self.limbs.len(),
+				rhs.limbs.len(),
 			) + 1,
 		);
 

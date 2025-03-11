@@ -7,10 +7,10 @@ fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {
 		.zip(rhs.iter().copied())
 		.fold(
 			0u64,
-			|borrow, (left_digit, right_digit)| {
-				let (new_digit, overflowed) = (*left_digit as u64)
-					.overflowing_sub(right_digit as u64 + borrow);
-				*left_digit = new_digit as u32;
+			|borrow, (left_limb, right_limb)| {
+				let (new_limb, overflowed) = (*left_limb as u64)
+					.overflowing_sub(right_limb as u64 + borrow);
+				*left_limb = new_limb as u32;
 				overflowed as u64
 			},
 		);
@@ -28,7 +28,7 @@ fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {
 }
 
 #[inline]
-fn cmp_digit_arrays(lhs: &[u32], rhs: &[u32]) -> bool {
+fn cmp_limb_arrays(lhs: &[u32], rhs: &[u32]) -> bool {
 	match lhs.len().cmp(&rhs.len()) {
 		std::cmp::Ordering::Greater => return true,
 		std::cmp::Ordering::Less => return false,
@@ -66,18 +66,18 @@ impl BigInt {
 			return (0.into(), self.clone());
 		}
 
-		let l_lhs = self.digits.len();
-		let l_rhs = rhs.digits.len();
+		let l_lhs = self.limbs.len();
+		let l_rhs = rhs.limbs.len();
 
 		let mut quotient = Vec::with_capacity(l_lhs - l_rhs + 1);
-		let sig_rhs = rhs.digits[l_rhs - 1] as u64;
-		let mut digits = self.digits.clone();
+		let sig_rhs = rhs.limbs[l_rhs - 1] as u64;
+		let mut limbs = self.limbs.clone();
 		let mut start = l_lhs - l_rhs;
 		let mut end = l_lhs;
 
 		loop {
-			let reg = &mut digits[start..end];
-			if cmp_digit_arrays(reg, &rhs.digits) {
+			let reg = &mut limbs[start..end];
+			if cmp_limb_arrays(reg, &rhs.limbs) {
 				let sig: u64 = if reg.len() == l_rhs {
 					reg[reg.len() - 1] as u64
 				} else {
@@ -88,10 +88,10 @@ impl BigInt {
 
 				for i in (min..=max).rev() {
 					let mut num = rhs.clone();
-					mul_by_small_int(&mut num.digits, i);
-					if cmp_digit_arrays(reg, &num.digits) {
+					mul_by_small_int(&mut num.limbs, i);
+					if cmp_limb_arrays(reg, &num.limbs) {
 						quotient.push(i);
-						let offset = sub_from_slice(reg, &num.digits);
+						let offset = sub_from_slice(reg, &num.limbs);
 						end -= offset;
 						start = end.saturating_sub(l_rhs);
 						break;
@@ -110,7 +110,7 @@ impl BigInt {
 				.rev()
 				.collect::<Vec<u32>>()
 		);
-		let mut remainder = BigInt::from(digits);
+		let mut remainder = BigInt::from(limbs);
 		remainder.trim();
 
 		(quotient, remainder)
@@ -118,13 +118,13 @@ impl BigInt {
 
 	pub(crate) fn u_divmod_base(&self, rhs: u32) -> (BigInt, u32) {
 		let rhs = rhs as u64;
-		let (quotient, remainder) = self.digits
+		let (quotient, remainder) = self.limbs
 			.iter()
 			.rev()
 			.fold(
 				(
 					Vec::with_capacity(
-						self.digits.len(),
+						self.limbs.len(),
 					),
 					0u64,
 				),

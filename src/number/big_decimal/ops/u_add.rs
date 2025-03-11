@@ -13,32 +13,32 @@ impl BigDecimal {
 		result.decimal_pos = longest_decimal.decimal_pos;
 
 		let decimal_len_diff = longest_decimal.decimal_pos - shortest_decimal.decimal_pos;
-		let end_pos = decimal_len_diff.min(longest_decimal.digits.len());
-		let shorter = end_pos == longest_decimal.digits.len();
+		let end_pos = decimal_len_diff.min(longest_decimal.limbs.len());
+		let shorter = end_pos == longest_decimal.limbs.len();
 
-		longest_decimal.digits[..end_pos]
+		longest_decimal.limbs[..end_pos]
 			.iter()
 			.copied()
-			.for_each(|digit| result.digits.push(digit));
+			.for_each(|limb| result.limbs.push(limb));
 
 		if shorter {
 			for _ in end_pos..decimal_len_diff {
-				result.digits.push(0u32);
+				result.limbs.push(0u32);
 			}
 
-			shortest_decimal.digits
+			shortest_decimal.limbs
 				.iter()
 				.copied()
-				.for_each(|digit| result.digits.push(digit));
+				.for_each(|limb| result.limbs.push(limb));
 
 			return;
 		}
 
-		let carry = longest_decimal.digits[end_pos..]
+		let carry = longest_decimal.limbs[end_pos..]
 			.iter()
 			.copied()
 			.zip(
-				shortest_decimal.digits
+				shortest_decimal.limbs
 					.iter()
 					.copied(),
 			)
@@ -46,7 +46,7 @@ impl BigDecimal {
 				0u64,
 				|carry, (ld, sd)| {
 					let sum = ld as u64 + sd as u64 + carry;
-					result.digits.push(sum as u32);
+					result.limbs.push(sum as u32);
 
 					sum >> 32
 				},
@@ -58,23 +58,23 @@ impl BigDecimal {
 			(rhs, self)
 		};
 
-		let remaining_start = (longest_whole.decimal_pos + shortest_whole.digits.len())
+		let remaining_start = (longest_whole.decimal_pos + shortest_whole.limbs.len())
 			.saturating_sub(shortest_whole.decimal_pos);
-		let carry = longest_whole.digits[remaining_start..]
+		let carry = longest_whole.limbs[remaining_start..]
 			.iter()
 			.copied()
 			.fold(
 				carry,
 				|carry, ld| {
 					let sum = ld as u64 + carry;
-					result.digits.push(sum as u32);
+					result.limbs.push(sum as u32);
 
 					sum >> 32
 				},
 			);
 
 		if carry != 0u64 {
-			result.digits.push(carry as u32);
+			result.limbs.push(carry as u32);
 		}
 	}
 
@@ -87,30 +87,30 @@ impl BigDecimal {
 
 		let (larger_remain, smaller_remain, borrow) = if larger.decimal_pos >= smaller.decimal_pos {
 			let end_pos = larger.decimal_pos - smaller.decimal_pos;
-			larger.digits[..end_pos]
+			larger.limbs[..end_pos]
 				.iter()
 				.copied()
-				.for_each(|digit| result.digits.push(digit));
+				.for_each(|limb| result.limbs.push(limb));
 
 			(
-				&larger.digits[end_pos..],
-				&smaller.digits[..],
+				&larger.limbs[end_pos..],
+				&smaller.limbs[..],
 				0u64
 			)
 		} else {
 			let decimal_pos_diff = smaller.decimal_pos - larger.decimal_pos;
 			let end_pos = std::cmp::min(
 				decimal_pos_diff,
-				smaller.digits.len(),
+				smaller.limbs.len(),
 			);
-			let borrow = smaller.digits[..end_pos]
+			let borrow = smaller.limbs[..end_pos]
 				.iter()
 				.copied()
 				.fold(
 					0u64,
-					|borrow, digit| {
-						result.digits
-							.push((BigDecimal::BASE - digit as u64 - borrow) as u32);
+					|borrow, limb| {
+						result.limbs
+							.push((BigDecimal::BASE - limb as u64 - borrow) as u32);
 
 						1u64
 					}
@@ -119,17 +119,17 @@ impl BigDecimal {
 			let borrow = if end_pos == decimal_pos_diff {
 				borrow
 			} else {
-				result.digits.push(0u32.wrapping_sub(borrow as u32));
+				result.limbs.push(0u32.wrapping_sub(borrow as u32));
 				for _ in (end_pos + 1)..decimal_pos_diff {
-					result.digits.push(0u32);
+					result.limbs.push(0u32);
 				}
 
 				0u64
 			};
 
 			(
-				&larger.digits[..],
-				&smaller.digits[end_pos..],
+				&larger.limbs[..],
+				&smaller.limbs[end_pos..],
 				borrow,
 			)
 		};
@@ -145,9 +145,9 @@ impl BigDecimal {
 			.fold(
 				borrow,
 				|borrow, (ld, sd)| {
-					let (new_digit, overflowed) = (ld as u64)
+					let (new_limb, overflowed) = (ld as u64)
 						.overflowing_sub(sd as u64 + borrow);
-					result.digits.push(new_digit as u32);
+					result.limbs.push(new_limb as u32);
 
 					overflowed as u64
 				},
@@ -158,9 +158,9 @@ impl BigDecimal {
 			.fold(
 				borrow,
 				|borrow, ld| {
-					let (new_digit, overflowed) = ld
+					let (new_limb, overflowed) = ld
 						.overflowing_sub(borrow as u32);
-					result.digits.push(new_digit);
+					result.limbs.push(new_limb);
 
 					overflowed as u64
 				},

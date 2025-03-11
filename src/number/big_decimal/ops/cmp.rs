@@ -3,7 +3,7 @@ use crate::number::BigDecimal;
 impl PartialEq for BigDecimal {
 	fn eq(&self, rhs: &Self) -> bool {
 		self.positive == rhs.positive &&
-		self.digits == rhs.digits &&
+		self.limbs == rhs.limbs &&
 		self.decimal_pos == rhs.decimal_pos
 	}
 }
@@ -23,10 +23,10 @@ impl PartialOrd for BigDecimal {
 					lhs_order
 						.cmp(&rhs_order)
 				} else {
-					self.digits
+					self.limbs
 						.iter()
 						.rev()
-						.zip(rhs.digits.iter().rev())
+						.zip(rhs.limbs.iter().rev())
 						.find_map(|(left, right)|
 							match left.cmp(right) {
 								std::cmp::Ordering::Equal => None,
@@ -60,10 +60,10 @@ impl BigDecimal {
 			std::cmp::Ordering::Greater => true,
 			std::cmp::Ordering::Less => false,
 			std::cmp::Ordering::Equal =>
-				self.digits
+				self.limbs
 					.iter()
 					.rev()
-					.zip(rhs.digits.iter().rev())
+					.zip(rhs.limbs.iter().rev())
 					.find(|(left, right)| left != right)
 					.map(|(left, right)| left > right)
 					.unwrap_or(false),

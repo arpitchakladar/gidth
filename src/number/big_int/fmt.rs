@@ -3,9 +3,9 @@ use crate::number::BigInt;
 impl std::fmt::Display for BigInt {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
 		let mut result = String::new();
-		let mut temp_digits = self.digits.clone();
-		while temp_digits.iter().any(|&x| x != 0) {
-			let carry = temp_digits
+		let mut temp_limbs = self.limbs.clone();
+		while temp_limbs.iter().any(|&x| x != 0) {
+			let carry = temp_limbs
 				.iter_mut()
 				.rev()
 				.fold(

@@ -65,7 +65,7 @@ use gidth::number::{BigInt, BigDecimal, Square};
 fn big_decimal_fmt() {
 	let x1 = BigDecimal {
 		positive: true,
-		digits: vec![23423u32, 3290234u32, 9023423u32, 90234823u32, 54645423u32, 69],
+		limbs: vec![23423u32, 3290234u32, 9023423u32, 90234823u32, 54645423u32, 69],
 		decimal_pos: 5,
 	};
 	println!("{}", x1);

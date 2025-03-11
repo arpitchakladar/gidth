@@ -9,19 +9,19 @@ macro_rules! impl_from_int {
 		$(
 		impl From<$t> for BigInt {
 			fn from(n: $t) -> Self {
-				let mut digits = Vec::new();
+				let mut limbs = Vec::new();
 				let mut num = n.abs() as u64;
 				while num > 0 {
-					digits.push(num as u32);
+					limbs.push(num as u32);
 					num >>= 32;
 				}
-				if digits.is_empty() {
-					digits.push(0);
+				if limbs.is_empty() {
+					limbs.push(0);
 				}
 				BigInt {
 					#[allow(unused_comparisons)]
 					positive: n >= 0,
-					digits,
+					limbs,
 				}
 			}
 		}
@@ -32,26 +32,26 @@ macro_rules! impl_from_int {
 impl_from_int!(u8, u16, u32, u64, i8, i16, i32, i64);
 
 impl From<Vec<u32>> for BigInt {
-	fn from(digits: Vec<u32>) -> Self {
+	fn from(limbs: Vec<u32>) -> Self {
 		BigInt {
 			positive: true,
-			digits,
+			limbs,
 		}
 	}
 }
 
-macro_rules! impl_from_digits {
+macro_rules! impl_from_limbs {
 	($($t:ty),*) => {
 		// Unsigned types
 		$(
 		impl From<Vec<$t>> for BigInt {
-			fn from(digits: Vec<$t>) -> Self {
+			fn from(limbs: Vec<$t>) -> Self {
 				BigInt::from(
-					digits
+					limbs
 						.into_iter()
 						.map(
-							|digit|
-								digit as u32
+							|limb|
+								limb as u32
 						)
 						.collect::<Vec<u32>>()
 				)
@@ -64,8 +64,8 @@ macro_rules! impl_from_digits {
 					arr
 						.into_iter()
 						.map(
-							|digit|
-								digit as u32
+							|limb|
+								limb as u32
 						)
 						.collect::<Vec<u32>>()
 				)
@@ -75,13 +75,13 @@ macro_rules! impl_from_digits {
 	};
 }
 
-impl_from_digits!(u8, u16, i8, i16);
+impl_from_limbs!(u8, u16, i8, i16);
 
 impl From<&str> for BigInt {
 	fn from(s: &str) -> Self {
-		let mut digits = Vec::new();
+		let mut limbs = Vec::new();
 		let positive = !s.starts_with('-');
-		let mut temp_digits: Vec<u32> = s
+		let mut temp_digit_chunks: Vec<u32> = s
 			.as_bytes()
 			.rchunks(9)
 			.rev()
@@ -95,23 +95,23 @@ impl From<&str> for BigInt {
 			.collect();
 		const CHUNK_SIZE: u64 = 1_000_000_000u64;
 
-		while temp_digits.iter().any(|&x| x != 0) {
+		while temp_digit_chunks.iter().any(|&x| x != 0) {
 			let mut carry = 0u64;
-			for byte in temp_digits.iter_mut() {
+			for byte in temp_digit_chunks.iter_mut() {
 				let current = carry * CHUNK_SIZE + *byte as u64;
 				*byte = (current >> 32) as u32;
 				carry = current & 0xFFFFFFFF;
 			}
-			digits.push(carry as u32);
+			limbs.push(carry as u32);
 		}
 
-		if digits.is_empty() {
-			digits.push(0);
+		if limbs.is_empty() {
+			limbs.push(0);
 		}
 
 		BigInt {
 			positive,
-			digits,
+			limbs,
 		}
 	}
 }
