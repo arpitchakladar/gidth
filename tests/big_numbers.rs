@@ -43,21 +43,32 @@ use gidth::number::{BigInt, BigDecimal, Square};
 // 	println!("{} = {}", res, r);
 // }
 //
+// #[test]
+// fn big_decimal_addition() {
+// 	let x1 = BigDecimal {
+// 		positive: true,
+// 		digits: vec![69, 54, 420, 89432, 78, 909234, 90823423, 982340, 90234, 8923, 912, 9834],
+// 		decimal_pos: 7,
+// 	};
+// 	let x2 = BigDecimal {
+// 		positive: true,
+// 		digits: vec![23, 234, 134],
+// 		decimal_pos: 3,
+// 	};
+// 	println!("{:?} {}", x1.digits, x1.decimal_pos);
+// 	println!("{:?} {}", x2.digits, x2.decimal_pos);
+// 	let y = x1 - &x2;
+// 	println!("{:?} {}", y.digits, y.decimal_pos);
+// 	println!("{}", x2);
+// }
 #[test]
-fn big_decimal_addition() {
+fn big_decimal_fmt() {
 	let x1 = BigDecimal {
 		positive: true,
-		digits: vec![69, 54, 420, 89432, 78, 909234, 90823423, 982340, 90234, 8923, 912, 9834],
-		decimal_pos: 7,
+		digits: vec![u32::MAX, 1, 1, 1, 1, 1],
+		decimal_pos: 1,
 	};
-	let x2 = BigDecimal {
-		positive: true,
-		digits: vec![23, 234, 134],
-		decimal_pos: 3,
-	};
-	println!("{:?} {}", x1.digits, x1.decimal_pos);
-	println!("{:?} {}", x2.digits, x2.decimal_pos);
-	let y = x1 - &x2;
-	println!("{:?} {}", y.digits, y.decimal_pos);
-	println!("{}", x2);
+	println!("{}", x1);
+	let x1 = BigInt::from(vec![1u32, 1u32, 1u32, 1u32, 1u32]);
+	println!("{}", x1);
 }
