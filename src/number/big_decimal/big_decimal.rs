@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct BigDecimal {
 	// TODO: Make these accessibilty pub(crate)
 	pub positive: bool,

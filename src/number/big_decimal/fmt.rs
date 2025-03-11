@@ -69,7 +69,8 @@ impl std::fmt::Display for BigDecimal {
 		while frac_limbs.iter().any(|&x| x != 0) {
 			let carry = frac_limbs
 				.iter_mut()
-				.fold(0u64,
+				.fold(
+					0u64,
 					|carry, limb| {
 						let current = (carry + *limb as u64) * 10;
 						*limb = current as u32;

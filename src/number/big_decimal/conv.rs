@@ -49,17 +49,68 @@ impl From<&str> for BigDecimal {
 	fn from(s: &str) -> Self {
 		let mut limbs = Vec::new();
 		let positive = !s.starts_with('-');
-		let mut temp_digit_chunks: Vec<u32> = s.as_bytes()
-			.rchunks(9)
-			.rev()
-			.filter_map(|chunk| std::str::from_utf8(chunk).ok()?.parse().ok())
-			.collect();
-		const CHUNK_SIZE: u64 = 1_000_000_000u64;
+		let (chunk_decimal_point, chunk_decimal_pos) = if let Some(index) = s.find('.') {
+			(1, index)
+		} else {
+			(0, 0)
+		};
 
-		while temp_digit_chunks.iter().any(|&x| x != 0) {
+		const CHUNK_SIZE_FRAC: u64 = 100_000_000u64;
+
+		let mut temp_frac_chunks = Vec::with_capacity(s.len() / 8);
+		temp_frac_chunks.extend(
+			s[(chunk_decimal_pos + chunk_decimal_point)..]
+				.as_bytes()
+				.chunks(8)
+				.filter_map(|chunk| std::str::from_utf8(chunk).ok()?.parse::<u32>().ok())
+		);
+
+		if let Some(last_digit) = temp_frac_chunks.last_mut() {
+			loop {
+				let current = *last_digit as u64 * 10u64;
+				if current >= CHUNK_SIZE_FRAC {
+					break;
+				} else {
+					*last_digit = current as u32;
+				}
+			}
+		}
+
+		let decimal_pos = temp_frac_chunks.len() + 1;
+		temp_frac_chunks.reverse();
+
+		for _ in 0..decimal_pos {
+			let carry = temp_frac_chunks
+				.iter_mut()
+				.fold(
+					0u64,
+					|carry, chunk| {
+						let prod = ((*chunk as u64) << 32) + carry;
+						*chunk = (prod % CHUNK_SIZE_FRAC) as u32;
+
+						prod / CHUNK_SIZE_FRAC
+					},
+				);
+
+			limbs.push(carry as u32);
+		}
+
+		limbs.reverse();
+
+		const CHUNK_SIZE_INT: u64 = 1_000_000_000u64;
+		let mut temp_int_chunks = Vec::with_capacity(s.len() / 9);
+		temp_int_chunks.extend(
+			s[..chunk_decimal_pos]
+				.as_bytes()
+				.rchunks(9)
+				.rev()
+				.filter_map(|chunk| std::str::from_utf8(chunk).ok()?.parse::<u32>().ok())
+		);
+
+		while temp_int_chunks.iter().any(|&x| x != 0) {
 			let mut carry = 0u32;
-			for byte in temp_digit_chunks.iter_mut() {
-				let current = (carry as u64) * CHUNK_SIZE + *byte as u64;
+			for byte in temp_int_chunks.iter_mut() {
+				let current = (carry as u64) * CHUNK_SIZE_INT + *byte as u64;
 				*byte = (current >> 32) as u32;
 				carry = current as u32;
 			}
@@ -73,7 +124,7 @@ impl From<&str> for BigDecimal {
 		BigDecimal {
 			positive,
 			limbs,
-			decimal_pos: 0,
+			decimal_pos,
 		}
 	}
 }

@@ -61,12 +61,18 @@ use gidth::number::{BigInt, BigDecimal, Square};
 // 	println!("{:?} {}", y.digits, y.decimal_pos);
 // 	println!("{}", x2);
 // }
+// #[test]
+// fn big_decimal_fmt() {
+// 	let x1 = BigDecimal {
+// 		positive: true,
+// 		limbs: vec![u32::MAX],
+// 		decimal_pos: 5,
+// 	};
+// 	println!("{}", x1);
+// }
+
 #[test]
-fn big_decimal_fmt() {
-	let x1 = BigDecimal {
-		positive: true,
-		limbs: vec![u32::MAX],
-		decimal_pos: 5,
-	};
-	println!("{}", x1);
+fn big_decimal_conv() {
+	let x1 = BigDecimal::from("2342323423269.32097985340908728348735987493");
+	println!("{} {:?}", &x1, &x1);
 }
