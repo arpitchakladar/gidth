@@ -1,8 +1,30 @@
 use crate::number::BigDecimal;
 
+impl BigDecimal {
+	fn estimate_max_digits(&self) -> usize {
+		// u32 ranges between 0 and 2^32 - 1 (10 digits)
+		const DIGITS_PER_INT_LIMB: usize = 10usize;
+		// for any integer K if we multiply 10, 32 times it becomes
+		// a multiple of 2^32
+		const DIGITS_PER_FRAC_LIMB: usize = 32usize;
+
+		1usize +
+		std::cmp::max(
+			self.limbs.len().saturating_sub(self.decimal_pos) * DIGITS_PER_INT_LIMB,
+			1usize,
+		) +
+		std::cmp::max(
+			self.decimal_pos * DIGITS_PER_FRAC_LIMB,
+			1usize,
+		)
+	}
+}
+
 impl std::fmt::Display for BigDecimal {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		let mut integer_part = String::new();
+		let mut integer_part = String::with_capacity(
+			self.estimate_max_digits(),
+		);
 		let last_index = self.decimal_pos.min(self.limbs.len());
 
 		let mut int_limbs: Vec<u32> = self.limbs[last_index..].to_vec();
@@ -51,6 +73,7 @@ impl std::fmt::Display for BigDecimal {
 				.fold(0u64, |carry, limb| {
 					let current = (carry + *limb as u64) * 10;
 					*limb = current as u32;
+
 					current >> 32
 				}
 			);

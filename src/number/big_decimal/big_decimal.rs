@@ -23,7 +23,7 @@ impl BigDecimal {
 		}
 	}
 
-	// Gives the place value of the most significant digit
+	// Gives the place value of the most significant limb
 	pub(crate) fn order(&self) -> isize {
 		self.limbs.len() as isize - self.decimal_pos as isize
 	}
