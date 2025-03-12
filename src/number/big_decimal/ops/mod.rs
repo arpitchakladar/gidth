@@ -3,6 +3,7 @@ mod bin_op;
 mod cmp;
 mod div;
 mod mul;
+mod sq;
 mod sub;
 mod u_addiv;
 mod u_div;

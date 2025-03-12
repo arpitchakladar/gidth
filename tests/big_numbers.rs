@@ -82,14 +82,23 @@ use gidth::number::{BigInt, BigDecimal, Square};
 // 	let x2 = BigDecimal::from(8904238.000000001f64);
 // 	println!("{}", &x1 * &x2);
 // }
+// #[test]
+// fn big_decimal_div() {
+// 	let x1 = BigDecimal::from(2342323423269.32097985340f64);
+// 	let x2 = BigDecimal::from(8904238.000000001f64);
+// 	let y = 2342323423269.32097985340f64 / 8904238.000000001f64;
+//
+// 	println!("Answer = {}        {:?}", y, BigDecimal::from(y));
+// 	println!("{}", x1 / x2);
+// 	println!("{}", BigDecimal::from(8723498) / BigDecimal::from(94923))
+// 	// println!("{}", x4);
+// }
+
 #[test]
 fn big_decimal_div() {
-	let x1 = BigDecimal::from(2342323423269.32097985340f64);
-	let x2 = BigDecimal::from(8904238.000000001f64);
-	let y = 2342323423269.32097985340f64 / 8904238.000000001f64;
-
-	println!("Answer = {}        {:?}", y, BigDecimal::from(y));
-	println!("{}", x1 / x2);
-	println!("{}", BigDecimal::from(8723498) / BigDecimal::from(94923))
+	let num = 2342323423269.321f64;
+	println!("{}", num);
+	let x1 = BigDecimal::from(num);
+	println!("{}", x1.sq())
 	// println!("{}", x4);
 }
