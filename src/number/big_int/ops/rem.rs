@@ -5,7 +5,7 @@ impl std::ops::Rem for &BigInt {
 	type Output = BigInt;
 
 	fn rem(self, other: Self) -> Self::Output {
-		BigInt::u_divmod(self, other).1
+		BigInt::u_rem(self, other)
 	}
 }
 

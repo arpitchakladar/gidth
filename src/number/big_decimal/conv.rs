@@ -125,7 +125,13 @@ impl From<&str> for BigDecimal {
 			s[(chunk_decimal_pos + chunk_decimal_point)..]
 				.as_bytes()
 				.chunks(9)
-				.filter_map(|chunk| std::str::from_utf8(chunk).ok()?.parse::<u32>().ok())
+				.filter_map(
+					|chunk|
+						std::str::from_utf8(chunk)
+						.ok()?
+						.parse::<u32>()
+						.ok(),
+				)
 		);
 
 		if let Some(last_digit) = temp_frac_chunks.last_mut() {
@@ -166,7 +172,13 @@ impl From<&str> for BigDecimal {
 				.as_bytes()
 				.rchunks(9)
 				.rev()
-				.filter_map(|chunk| std::str::from_utf8(chunk).ok()?.parse::<u32>().ok())
+				.filter_map(
+					|chunk|
+						std::str::from_utf8(chunk)
+						.ok()?
+						.parse::<u32>()
+						.ok(),
+				)
 		);
 
 		while temp_int_chunks.iter().any(|&x| x != 0) {

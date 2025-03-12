@@ -60,60 +60,109 @@ fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
 	}
 }
 
+macro_rules! bigint_division {
+	($self:expr, $rhs:expr, $quotient:expr, $remainder:expr) => {{
+		if BigInt::u_gt($rhs, $self) {
+			(
+				Some(0.into()),
+				Some($self.clone()),
+			)
+		} else {
+			let l_lhs = $self.limbs.len();
+			let l_rhs = $rhs.limbs.len();
+
+			let mut quotient = if $quotient {
+				Some(Vec::with_capacity(l_lhs - l_rhs + 1))
+			} else {
+				None
+			};
+			let mut remainder = if $remainder {
+				Some($self.limbs.clone())
+			} else {
+				None
+			};
+			
+			let sig_rhs = $rhs.limbs[l_rhs - 1] as u64;
+			let mut start = l_lhs - l_rhs;
+			let mut end = l_lhs;
+
+			loop {
+				let reg = &mut remainder.as_mut().unwrap()[start..end];
+				if cmp_limb_arrays(reg, &$rhs.limbs) {
+					let sig: u64 = if reg.len() == l_rhs {
+						reg[reg.len() - 1] as u64
+					} else {
+						((reg[reg.len() - 1] as u64) << 32) + reg[reg.len() - 2] as u64
+					};
+					let min = (sig / (sig_rhs + 1)) as u32;
+					let max = ((sig + 1) / sig_rhs) as u32;
+
+					for i in (min..=max).rev() {
+						let mut num = $rhs.clone();
+						mul_by_small_int(&mut num.limbs, i);
+						if cmp_limb_arrays(reg, &num.limbs) {
+							if let Some(q) = &mut quotient {
+								q.push(i);
+							}
+							let offset = sub_from_slice(reg, &num.limbs);
+							end -= offset;
+							start = end.saturating_sub(l_rhs);
+							break;
+						}
+					}
+				} else if start > 0 {
+					start -= 1;
+				} else {
+					break;
+				}
+			}
+
+			let quotient = if $quotient {
+				Some(
+					BigInt::from(
+						quotient
+							.unwrap()
+							.into_iter()
+							.rev()
+							.collect::<Vec<u32>>(),
+					),
+				)
+			} else {
+				None
+			};
+			let remainder = if $remainder {
+				let mut rem = BigInt::from(remainder.unwrap());
+				rem.trim();
+				Some(rem)
+			} else {
+				None
+			};
+
+			(quotient, remainder)
+		}
+	}};
+}
+
 impl BigInt {
 	pub(crate) fn u_divmod(&self, rhs: &BigInt) -> (BigInt, BigInt) {
-		if BigInt::u_gt(rhs, self) {
-			return (0.into(), self.clone());
-		}
+		let (quotient, remainder) = bigint_division!(self, rhs, true, true);
 
-		let l_lhs = self.limbs.len();
-		let l_rhs = rhs.limbs.len();
+		(
+			quotient.unwrap(),
+			remainder.unwrap(),
+		)
+	}
 
-		let mut quotient = Vec::with_capacity(l_lhs - l_rhs + 1);
-		let sig_rhs = rhs.limbs[l_rhs - 1] as u64;
-		let mut limbs = self.limbs.clone();
-		let mut start = l_lhs - l_rhs;
-		let mut end = l_lhs;
+	pub(crate) fn u_div(&self, rhs: &BigInt) -> BigInt {
+		let (quotient, _) = bigint_division!(self, rhs, true, false);
 
-		loop {
-			let reg = &mut limbs[start..end];
-			if cmp_limb_arrays(reg, &rhs.limbs) {
-				let sig: u64 = if reg.len() == l_rhs {
-					reg[reg.len() - 1] as u64
-				} else {
-					((reg[reg.len() - 1] as u64) << 32) + reg[reg.len() - 2] as u64
-				};
-				let min = (sig / (sig_rhs + 1)) as u32;
-				let max = ((sig + 1) / sig_rhs) as u32;
+		quotient.unwrap()
+	}
 
-				for i in (min..=max).rev() {
-					let mut num = rhs.clone();
-					mul_by_small_int(&mut num.limbs, i);
-					if cmp_limb_arrays(reg, &num.limbs) {
-						quotient.push(i);
-						let offset = sub_from_slice(reg, &num.limbs);
-						end -= offset;
-						start = end.saturating_sub(l_rhs);
-						break;
-					}
-				}
-			} else if start > 0 {
-				start -= 1;
-			} else {
-				break;
-			}
-		}
+	pub(crate) fn u_rem(&self, rhs: &BigInt) -> BigInt {
+		let (_, remainder) = bigint_division!(self, rhs, false, true);
 
-		let quotient = BigInt::from(
-			quotient
-				.into_iter()
-				.rev()
-				.collect::<Vec<u32>>()
-		);
-		let mut remainder = BigInt::from(limbs);
-		remainder.trim();
-
-		(quotient, remainder)
+		remainder.unwrap()
 	}
 
 	pub(crate) fn u_divmod_base(&self, rhs: u32) -> (BigInt, u32) {
