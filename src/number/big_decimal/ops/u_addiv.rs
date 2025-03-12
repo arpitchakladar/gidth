@@ -95,7 +95,7 @@ impl BigDecimal {
 			(
 				&larger.limbs[end_pos..],
 				&smaller.limbs[..],
-				0u64
+				0u32
 			)
 		} else {
 			let decimal_pos_diff = smaller.decimal_pos - larger.decimal_pos;
@@ -107,12 +107,16 @@ impl BigDecimal {
 				.iter()
 				.copied()
 				.fold(
-					0u64,
+					0u32,
 					|borrow, limb| {
 						result.limbs
-							.push((BigDecimal::BASE - limb as u64 - borrow) as u32);
+							.push(
+								0u32
+									.wrapping_sub(limb)
+									.wrapping_sub(borrow)
+							);
 
-						1u64
+						1u32
 					}
 				);
 
@@ -124,7 +128,7 @@ impl BigDecimal {
 					result.limbs.push(0u32);
 				}
 
-				0u64
+				0u32
 			};
 
 			(
@@ -146,10 +150,10 @@ impl BigDecimal {
 				borrow,
 				|borrow, (ld, sd)| {
 					let (new_limb, overflowed) = (ld as u64)
-						.overflowing_sub(sd as u64 + borrow);
+						.overflowing_sub(sd as u64 + borrow as u64);
 					result.limbs.push(new_limb as u32);
 
-					overflowed as u64
+					overflowed as u32
 				},
 			);
 		larger_remain[smaller_remain.len()..]
@@ -159,10 +163,10 @@ impl BigDecimal {
 				borrow,
 				|borrow, ld| {
 					let (new_limb, overflowed) = ld
-						.overflowing_sub(borrow as u32);
+						.overflowing_sub(borrow);
 					result.limbs.push(new_limb);
 
-					overflowed as u64
+					overflowed as u32
 				},
 			);
 
