@@ -134,6 +134,7 @@ impl From<&str> for BigDecimal {
 				)
 		);
 
+		// Padding the last digit chunk with zeros
 		if let Some(last_digit) = temp_frac_chunks.last_mut() {
 			loop {
 				let current = *last_digit as u64 * 10u64;

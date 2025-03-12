@@ -1,9 +1,8 @@
 #[derive(Clone, Debug)]
 pub struct BigDecimal {
-	// TODO: Make these accessibilty pub(crate)
-	pub positive: bool,
-	pub limbs: Vec<u32>,
-	pub decimal_pos: usize,
+	pub(crate) positive: bool,
+	pub(crate) limbs: Vec<u32>,
+	pub(crate) decimal_pos: usize,
 }
 
 impl BigDecimal {

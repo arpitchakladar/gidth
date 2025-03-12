@@ -60,34 +60,21 @@ fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
 	}
 }
 
+// Using macro for better removal of dead code
 macro_rules! bigint_division {
-	($self:expr, $rhs:expr, $quotient:expr, $remainder:expr) => {{
+	($self:expr, $rhs:expr, $quotient:expr, $remainder:expr, $has_quotient:expr, $has_remainder:expr) => {{
 		if BigInt::u_gt($rhs, $self) {
-			(
-				Some(0.into()),
-				Some($self.clone()),
-			)
+			return;
 		} else {
 			let l_lhs = $self.limbs.len();
 			let l_rhs = $rhs.limbs.len();
 
-			let mut quotient = if $quotient {
-				Some(Vec::with_capacity(l_lhs - l_rhs + 1))
-			} else {
-				None
-			};
-			let mut remainder = if $remainder {
-				Some($self.limbs.clone())
-			} else {
-				None
-			};
-			
 			let sig_rhs = $rhs.limbs[l_rhs - 1] as u64;
 			let mut start = l_lhs - l_rhs;
 			let mut end = l_lhs;
 
 			loop {
-				let reg = &mut remainder.as_mut().unwrap()[start..end];
+				let reg = &mut $remainder.limbs[start..end];
 				if cmp_limb_arrays(reg, &$rhs.limbs) {
 					let sig: u64 = if reg.len() == l_rhs {
 						reg[reg.len() - 1] as u64
@@ -101,8 +88,8 @@ macro_rules! bigint_division {
 						let mut num = $rhs.clone();
 						mul_by_small_int(&mut num.limbs, i);
 						if cmp_limb_arrays(reg, &num.limbs) {
-							if let Some(q) = &mut quotient {
-								q.push(i);
+							if $has_quotient {
+								$quotient.limbs.push(i);
 							}
 							let offset = sub_from_slice(reg, &num.limbs);
 							end -= offset;
@@ -117,52 +104,64 @@ macro_rules! bigint_division {
 				}
 			}
 
-			let quotient = if $quotient {
-				Some(
-					BigInt::from(
-						quotient
-							.unwrap()
-							.into_iter()
-							.rev()
-							.collect::<Vec<u32>>(),
-					),
-				)
-			} else {
-				None
-			};
-			let remainder = if $remainder {
-				let mut rem = BigInt::from(remainder.unwrap());
-				rem.trim();
-				Some(rem)
-			} else {
-				None
-			};
-
-			(quotient, remainder)
+			if $has_quotient {
+				$quotient.limbs.reverse();
+			}
+			if $has_remainder {
+				$remainder.trim();
+			}
 		}
 	}};
 }
 
 impl BigInt {
-	pub(crate) fn u_divmod(&self, rhs: &BigInt) -> (BigInt, BigInt) {
-		let (quotient, remainder) = bigint_division!(self, rhs, true, true);
-
-		(
-			quotient.unwrap(),
-			remainder.unwrap(),
-		)
+	pub(crate) fn u_divmod_in(
+		&self, rhs: &BigInt,
+		quotient: &mut BigInt,
+		remainder: &mut BigInt,
+	) {
+		bigint_division!(
+			self,
+			rhs,
+			quotient,
+			remainder,
+			true,
+			true
+		);
 	}
 
-	pub(crate) fn u_div(&self, rhs: &BigInt) -> BigInt {
-		let (quotient, _) = bigint_division!(self, rhs, true, false);
-
-		quotient.unwrap()
+	pub(crate) fn u_div_in(
+		&self,
+		rhs: &BigInt,
+		quotient: &mut BigInt,
+		remainder: &mut BigInt,
+	) {
+		bigint_division!(
+			self,
+			rhs,
+			quotient,
+			remainder,
+			true,
+			false
+		);
 	}
 
-	pub(crate) fn u_rem(&self, rhs: &BigInt) -> BigInt {
-		let (_, remainder) = bigint_division!(self, rhs, false, true);
-
-		remainder.unwrap()
+	pub(crate) fn u_rem_in(
+		&self,
+		rhs: &BigInt,
+		remainder: &mut BigInt,
+	) {
+		#[allow(deref_nullptr)]
+		unsafe {
+			bigint_division!(
+				self,
+				rhs,
+				*std::ptr::null_mut::<BigInt>(),
+				remainder,
+				false,
+				true
+			);
+		}
 	}
 
 	pub(crate) fn u_divmod_base(&self, rhs: u32) -> (BigInt, u32) {

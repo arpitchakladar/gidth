@@ -6,7 +6,16 @@ use crate::number::{
 impl DivMod<BigInt> for BigInt {
 	#[inline]
 	fn divmod(self, rhs: BigInt) -> (BigInt, BigInt) {
-		BigInt::u_divmod(&self, &rhs)
+		let mut quotient = BigInt::with_capacity(
+			self.limbs.len()
+				.saturating_sub(rhs.limbs.len()) + 1,
+		);
+		let mut remainder = BigInt::with_capacity(
+			rhs.limbs.len(),
+		);
+		BigInt::u_divmod_in(&self, &rhs, &mut quotient, &mut remainder);
+
+		(quotient, remainder)
 	}
 }
 
