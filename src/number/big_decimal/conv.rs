@@ -4,8 +4,6 @@ use crate::number::{
 	Abs,
 };
 
-// TODO: Add conversion from floating point
-
 macro_rules! impl_from_int {
 	($($t:ty),*) => {
 		// Signed types
@@ -34,6 +32,44 @@ macro_rules! impl_from_int {
 }
 
 impl_from_int!(u8, u16, u32, u64, i8, i16, i32, i64);
+
+macro_rules! impl_from_float {
+	($($t:ty),*) => {
+		// Signed types
+		$(
+		impl From<$t> for BigDecimal {
+			fn from(n: $t) -> Self {
+				let mut limbs = Vec::new();
+				let u_n = n.abs() as f64;
+				let mut fractional_part = u_n.fract();
+				let decimal_pos = 1; // FIXED FOR NOW
+				for _ in 0..decimal_pos {
+					fractional_part *= BigDecimal::BASE as f64;
+					limbs.push(fractional_part.trunc() as u32);
+					fractional_part = fractional_part.fract();
+				}
+				limbs.reverse();
+				let mut integer_part = u_n.trunc() as u64;
+				while integer_part > 0 {
+					limbs.push(integer_part as u32);
+					integer_part >>= 32;
+				}
+				if limbs.is_empty() {
+					limbs.push(0);
+				}
+				BigDecimal {
+					#[allow(unused_comparisons)]
+					positive: n >= 0.0,
+					limbs,
+					decimal_pos,
+				}
+			}
+		}
+		)*
+	};
+}
+
+impl_from_float!(f32, f64);
 
 impl From<Vec<u32>> for BigDecimal {
 	fn from(limbs: Vec<u32>) -> Self {
@@ -77,11 +113,11 @@ impl From<&str> for BigDecimal {
 		}
 
 		let decimal_pos = temp_frac_chunks.len() + 1;
-		temp_frac_chunks.reverse();
 
 		for _ in 0..decimal_pos {
 			let carry = temp_frac_chunks
 				.iter_mut()
+				.rev()
 				.fold(
 					0u64,
 					|carry, chunk| {
