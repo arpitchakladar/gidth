@@ -94,11 +94,18 @@ use gidth::number::{BigInt, BigDecimal, Square};
 // 	// println!("{}", x4);
 // }
 
+// #[test]
+// fn big_decimal_sq() {
+// 	let num = 2342323423269.321f64;
+// 	println!("{}", num);
+// 	let x1 = BigDecimal::from(num);
+// 	println!("{}", x1.sq())
+// 	// println!("{}", x4);
+// }
+
 #[test]
-fn big_decimal_div() {
-	let num = 2342323423269.321f64;
-	println!("{}", num);
-	let x1 = BigDecimal::from(num);
-	println!("{}", x1.sq())
+fn big_decimal_exp() {
+	let x1 = BigDecimal::from("2342323423269.32080078125");
+	println!("{}", x1.exp(10))
 	// println!("{}", x4);
 }
