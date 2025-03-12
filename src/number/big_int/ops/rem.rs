@@ -5,10 +5,8 @@ impl std::ops::Rem for &BigInt {
 	type Output = BigInt;
 
 	fn rem(self, rhs: Self) -> Self::Output {
-		let mut remainder = BigInt::with_capacity(
-			rhs.limbs.len(),
-		);
-		BigInt::u_rem_in(self, rhs, &mut remainder);
+		let mut remainder = self.clone();
+		BigInt::u_rem_in(&mut remainder, &rhs);
 
 		remainder
 	}

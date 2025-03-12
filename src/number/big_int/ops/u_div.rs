@@ -62,8 +62,10 @@ fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
 
 // Using macro for better removal of dead code
 macro_rules! bigint_division {
-	($self:expr, $rhs:expr, $quotient:expr, $remainder:expr, $has_quotient:expr, $has_remainder:expr) => {{
+	// NOTE: Quotient is an empty BigInt and remainder is a clone of self
+	($self:expr, $rhs:expr, $quotient:expr, $has_quotient:expr, $has_remainder:expr) => {{
 		if BigInt::u_gt($rhs, $self) {
+			$quotient.limbs.push(0u32);
 			return;
 		} else {
 			let l_lhs = $self.limbs.len();
@@ -74,15 +76,15 @@ macro_rules! bigint_division {
 			let mut end = l_lhs;
 
 			loop {
-				let reg = &mut $remainder.limbs[start..end];
+				let reg = &mut $self.limbs[start..end];
 				if cmp_limb_arrays(reg, &$rhs.limbs) {
 					let sig: u64 = if reg.len() == l_rhs {
 						reg[reg.len() - 1] as u64
 					} else {
 						((reg[reg.len() - 1] as u64) << 32) + reg[reg.len() - 2] as u64
 					};
-					let min = (sig / (sig_rhs + 1)) as u32;
-					let max = ((sig + 1) / sig_rhs) as u32;
+					let min = (sig / sig_rhs) as u32;
+					let max = ((sig + sig_rhs - 1) / sig_rhs) as u32;
 
 					for i in (min..=max).rev() {
 						let mut num = $rhs.clone();
@@ -108,7 +110,7 @@ macro_rules! bigint_division {
 				$quotient.limbs.reverse();
 			}
 			if $has_remainder {
-				$remainder.trim();
+				$self.trim();
 			}
 		}
 	}};
@@ -116,40 +118,35 @@ macro_rules! bigint_division {
 
 impl BigInt {
 	pub(crate) fn u_divmod_in(
-		&self, rhs: &BigInt,
+		&mut self, rhs: &BigInt,
 		quotient: &mut BigInt,
-		remainder: &mut BigInt,
 	) {
 		bigint_division!(
 			self,
 			rhs,
 			quotient,
-			remainder,
 			true,
 			true
 		);
 	}
 
 	pub(crate) fn u_div_in(
-		&self,
+		&mut self,
 		rhs: &BigInt,
 		quotient: &mut BigInt,
-		remainder: &mut BigInt,
 	) {
 		bigint_division!(
 			self,
 			rhs,
 			quotient,
-			remainder,
 			true,
 			false
 		);
 	}
 
 	pub(crate) fn u_rem_in(
-		&self,
+		&mut self,
 		rhs: &BigInt,
-		remainder: &mut BigInt,
 	) {
 		#[allow(deref_nullptr)]
 		unsafe {
@@ -157,7 +154,6 @@ impl BigInt {
 				self,
 				rhs,
 				*std::ptr::null_mut::<BigInt>(),
-				remainder,
 				false,
 				true
 			);

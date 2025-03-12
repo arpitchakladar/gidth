@@ -9,10 +9,9 @@ impl std::ops::Div for &BigInt {
 			self.limbs.len()
 				.saturating_sub(rhs.limbs.len()) + 1,
 		);
-		let mut remainder = BigInt::with_capacity(
-			rhs.limbs.len(),
-		);
-		BigInt::u_div_in(self, rhs, &mut quotient, &mut remainder);
+		let mut remainder = self.clone();
+		BigInt::u_div_in(&mut remainder, &rhs, &mut quotient);
+
 
 		quotient
 	}
