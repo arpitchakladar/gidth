@@ -3,7 +3,7 @@ use crate::number::{
 	Abs,
 };
 
-macro_rules! impl_from_int {
+macro_rules! impl_big_int_from_int {
 	($($t:ty),*) => {
 		// Unsigned types
 		$(
@@ -29,7 +29,7 @@ macro_rules! impl_from_int {
 	};
 }
 
-impl_from_int!(u8, u16, u32, u64, i8, i16, i32, i64);
+impl_big_int_from_int!(u8, u16, u32, u64, i8, i16, i32, i64);
 
 impl From<Vec<u32>> for BigInt {
 	fn from(limbs: Vec<u32>) -> Self {
@@ -40,7 +40,7 @@ impl From<Vec<u32>> for BigInt {
 	}
 }
 
-macro_rules! impl_from_limbs {
+macro_rules! impl_big_int_from_limbs {
 	($($t:ty),*) => {
 		// Unsigned types
 		$(
@@ -75,7 +75,34 @@ macro_rules! impl_from_limbs {
 	};
 }
 
-impl_from_limbs!(u8, u16, i8, i16);
+impl_big_int_from_limbs!(u8, u16, i8, i16);
+
+macro_rules! impl_big_int_from_large_int {
+	($($t:ty),*) => {
+		$(
+		impl From<$t> for BigInt {
+			fn from(n: $t) -> Self {
+				let mut limbs = Vec::new();
+				let mut num = n.abs() as u128;
+				while num > 0 {
+					limbs.push(num as u32);
+					num >>= 32;
+				}
+				if limbs.is_empty() {
+					limbs.push(0);
+				}
+				BigInt {
+					#[allow(unused_comparisons)]
+					positive: n >= 0,
+					limbs,
+				}
+			}
+		}
+		)*
+	};
+}
+
+impl_big_int_from_large_int!(u128, i128);
 
 impl From<&str> for BigInt {
 	fn from(s: &str) -> Self {
