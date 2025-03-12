@@ -1,4 +1,7 @@
-use crate::number::Int;
+use crate::number::{
+	Int,
+	Zero,
+};
 
 #[derive(Clone)]
 pub struct BigInt {
@@ -8,6 +11,13 @@ pub struct BigInt {
 
 impl BigInt {
 	pub const BASE: u64 = u32::MAX as u64 + 1;
+
+	pub fn zero() -> Self {
+		Self {
+			positive: true,
+			limbs: vec![0u32],
+		}
+	}
 
 	pub fn with_capacity(len: usize) -> Self {
 		Self {
@@ -24,6 +34,19 @@ impl BigInt {
 		while self.limbs.last() == Some(&0) {
 			self.limbs.pop();
 		}
+	}
+}
+
+impl Zero for BigInt {
+	fn zero() -> Self {
+		Self {
+			positive: true,
+			limbs: vec![0u32],
+		}
+	}
+
+	fn is_zero(&self) -> bool {
+		!self.limbs.iter().copied().any(|x| x != 0)
 	}
 }
 

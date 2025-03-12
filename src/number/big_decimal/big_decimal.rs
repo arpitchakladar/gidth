@@ -1,3 +1,8 @@
+use crate::number::{
+	Zero,
+	Real,
+};
+
 #[derive(Clone, Debug)]
 pub struct BigDecimal {
 	pub(crate) positive: bool,
@@ -27,3 +32,19 @@ impl BigDecimal {
 		self.limbs.len() as isize - self.decimal_pos as isize
 	}
 }
+
+impl Zero for BigDecimal {
+	fn zero() -> Self {
+		Self {
+			positive: true,
+			limbs: vec![0u32],
+			decimal_pos: 0,
+		}
+	}
+
+	fn is_zero(&self) -> bool {
+		!self.limbs.iter().copied().any(|x| x != 0)
+	}
+}
+
+impl Real for BigDecimal {}
