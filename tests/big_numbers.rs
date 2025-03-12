@@ -73,8 +73,13 @@ use gidth::number::{BigInt, BigDecimal, Square};
 
 #[test]
 fn big_decimal_conv() {
+	let x2 = BigDecimal::from(8904238.000000001f64);
+	println!("{}", &x2);
+}
+//
+#[test]
+fn big_decimal_mul() {
 	let x1 = BigDecimal::from("2342323423269.32097985340908728348735987493");
 	let x2 = BigDecimal::from(8904238.000000001f64);
-	println!("{:?}", &x2);
-	println!("{}", &x2);
+	println!("{}", &x1 * &x2);
 }
