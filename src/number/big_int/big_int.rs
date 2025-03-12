@@ -1,6 +1,7 @@
 use crate::number::{
 	Int,
 	Zero,
+	One,
 };
 
 #[derive(Clone)]
@@ -47,6 +48,24 @@ impl Zero for BigInt {
 
 	fn is_zero(&self) -> bool {
 		!self.limbs.iter().copied().any(|x| x != 0)
+	}
+}
+
+impl One for BigInt {
+	fn one() -> Self {
+		Self {
+			positive: true,
+			limbs: vec![1u32],
+		}
+	}
+
+	fn is_one(&self) -> bool {
+		self.limbs.len() > 0 &&
+		self.limbs[0] == 1 &&
+		!self.limbs[1..]
+			.iter()
+			.copied()
+			.any(|x| x != 0)
 	}
 }
 

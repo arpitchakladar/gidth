@@ -1,6 +1,7 @@
 use crate::number::{
 	Zero,
 	Real,
+	One,
 };
 
 #[derive(Clone, Debug)]
@@ -44,6 +45,26 @@ impl Zero for BigDecimal {
 
 	fn is_zero(&self) -> bool {
 		!self.limbs.iter().copied().any(|x| x != 0)
+	}
+}
+
+impl One for BigDecimal {
+	fn one() -> Self {
+		Self {
+			positive: true,
+			limbs: vec![1u32],
+			decimal_pos: 0,
+		}
+	}
+
+	fn is_one(&self) -> bool {
+		self.limbs.len() > 0 &&
+		self.order() >= 0 &&
+		self.limbs[self.decimal_pos] == 1 &&
+		!self.limbs[self.decimal_pos + 1..]
+			.iter()
+			.copied()
+			.any(|x| x != 0)
 	}
 }
 
