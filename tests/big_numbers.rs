@@ -29,7 +29,7 @@ use gidth::number::{BigInt, BigDecimal, Int, Real, Square};
 // fn big_int_exponentiation() {
 // 	let y = BigInt::from("2334");
 // 	let x = BigInt::from(8);
-// 	let z = BigInt::exp(&y, &x);
+// 	let z = BigInt::pow(&y, &x);
 // 	println!("{}", z);
 // }
 
@@ -94,18 +94,18 @@ use gidth::number::{BigInt, BigDecimal, Int, Real, Square};
 // 	// println!("{}", x4);
 // }
 
-#[test]
-fn big_decimal_sq() {
-	let num = 2342323423269.321f64;
-	println!("{}", num);
-	let x1 = BigDecimal::from(num);
-	println!("{}", x1.sq())
-	// println!("{}", x4);
-}
-
 // #[test]
-// fn big_decimal_exp() {
-// 	let x1 = BigDecimal::from("2342323423269.32080078125");
-// 	println!("{}", x1.exp(10))
+// fn big_decimal_sq() {
+// 	let num = 2342323423269.321f64;
+// 	println!("{}", num);
+// 	let x1 = BigDecimal::from(num);
+// 	println!("{}", x1.sq())
 // 	// println!("{}", x4);
 // }
+
+#[test]
+fn big_decimal_pow() {
+	let x1 = BigDecimal::from("2342323423269.32080078125");
+	println!("{}", x1.pow(10))
+	// println!("{}", x4);
+}

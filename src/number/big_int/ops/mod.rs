@@ -4,7 +4,7 @@ mod bin_op;
 mod cmp;
 mod div;
 mod divmod;
-mod exp;
+mod pow;
 mod mul;
 mod neg;
 mod rem;
