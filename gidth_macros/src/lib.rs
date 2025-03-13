@@ -2,9 +2,10 @@
 use proc_macro::TokenStream;
 use quote::{
 	quote,
+	format_ident,
 	ToTokens,
 };
-use syn::{parse_macro_input, parse_str, ItemTrait, TraitBound, TraitItem, ReturnType, FnArg, TypeParamBound, TraitItemFn};
+use syn::{parse_macro_input, Ident, parse::Parser, parse_str, ItemTrait, TraitBound, TraitItem, ReturnType, FnArg, TypeParamBound, TraitItemFn, ItemStruct};
 use std::sync::Mutex;
 use lazy_static::lazy_static;
 
@@ -111,11 +112,13 @@ pub fn siphon_traits(_attr: TokenStream, item: TokenStream) -> TokenStream {
 		}
 	}
 
+	let temp_trait = format_ident!("Satisfy{}", &trait_name);
 	let supertraits = &input.supertraits;
 
 	let expanded = quote! {
+		pub(crate) trait #temp_trait: #supertraits {}
 		#input
-		impl<T: #supertraits> #trait_name for T {
+		impl<T: #temp_trait> #trait_name for T {
 			#(#method_impls)*
 		}
 	};
@@ -123,3 +126,36 @@ pub fn siphon_traits(_attr: TokenStream, item: TokenStream) -> TokenStream {
 	TokenStream::from(expanded)
 }
 
+#[proc_macro_attribute]
+pub fn satisfies(attr: TokenStream, item: TokenStream) -> TokenStream {
+	// Parse the struct
+	let input = parse_macro_input!(item as ItemStruct);
+	let struct_name = &input.ident;
+
+	// Parse the attribute arguments
+	let attr_parsed = syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated
+		.parse(attr)
+		.unwrap();
+
+	let mut implementations = Vec::new();
+
+	// Extract trait names from #[satisfies(TraitName1, TraitName2)]
+	for arg in attr_parsed.iter() {
+		let temp_trait = format_ident!("Satisfy{}", &arg.segments.last().unwrap().ident);
+		implementations.push(quote! {
+			use crate::number::int::*;
+			use crate::number::real::*;
+			impl #temp_trait for #struct_name {}
+		});
+	}
+
+	// Generate the struct + implementations
+	let expanded = quote! {
+		#input
+		#(#implementations)*
+	};
+
+	println!("{}", &expanded);
+
+	TokenStream::from(expanded)
+}

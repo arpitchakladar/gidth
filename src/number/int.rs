@@ -97,6 +97,8 @@ macro_rules! impl_integer {
 				*self == 1
 			}
 		}
+
+		impl SatisfyInt for $t {}
 		)*
 	};
 }

@@ -63,6 +63,7 @@ macro_rules! impl_real {
 				*self == 1.0
 			}
 		}
+		impl SatisfyReal for $t {}
 		)*
 	};
 }
