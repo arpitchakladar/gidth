@@ -1,4 +1,5 @@
-use gidth::number::{BigInt, BigDecimal, Int, Real};
+use gidth::number::{Int};
+// use gidth_macros::auto_wrap_ints;
 
 // #[test]
 // fn big_int_sum() {
@@ -90,7 +91,7 @@ use gidth::number::{BigInt, BigDecimal, Int, Real};
 //
 // 	println!("Answer = {}        {:?}", y, BigDecimal::from(y));
 // 	println!("{}", x1 / x2);
-// 	println!("{}", BigDecimal::from(8723498) / BigDecimal::from(94923))
+// 	println!("{}", BigDecimal::from(8723498) / BigDecimal::from(94923));
 // 	// println!("{}", x4);
 // }
 
@@ -99,14 +100,21 @@ use gidth::number::{BigInt, BigDecimal, Int, Real};
 // 	let num = 2342323423269.321f64;
 // 	println!("{}", num);
 // 	let x1 = BigDecimal::from(num);
-// 	println!("{}", x1.sq())
+// 	println!("{}", x1.sq());
 // 	// println!("{}", x4);
 // }
 
-#[test]
-fn big_decimal_pow() {
-	let x1 = BigDecimal::from("2342323423269.32080078125");
-	println!("{}", x1.pow(10));
-	println!("{}", x1.sq());
-	// println!("{}", x4);
-}
+// #[test]
+// fn big_decimal_pow() {
+// 	let x1 = BigDecimal::from("2342323423269.32080078125");
+// 	println!("{}", x1.pow(10));
+// 	println!("{}", x1.sq());
+// 	// println!("{}", x4);
+// }
+
+// #[test]
+// // #[auto_wrap_ints]
+// fn testing() {
+// 	let x: i32 = 69;
+// 	println!("{:?}", x.sq());
+// }

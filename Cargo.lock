@@ -6,7 +6,16 @@ version = 4
 name = "gidth"
 version = "0.1.0"
 dependencies = [
+ "gidth_macros",
  "inherent",
+]
+
+[[package]]
+name = "gidth_macros"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn",
 ]
 
 [[package]]

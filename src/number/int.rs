@@ -4,6 +4,7 @@ use crate::number::{
 	Zero,
 	One,
 };
+use gidth_macros::siphon_traits;
 
 pub trait DivMod<T>: Sized
 where
@@ -12,6 +13,7 @@ where
 	fn divmod(self, rhs: T) -> (Self, T);
 }
 
+#[siphon_traits]
 pub trait Int:
 	std::ops::Add<Output = Self> +
 	std::ops::Sub<Output = Self> +
