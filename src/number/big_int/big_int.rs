@@ -65,5 +65,3 @@ impl One for BigInt {
 			.any(|x| x != 0)
 	}
 }
-
-impl Int for BigInt {}

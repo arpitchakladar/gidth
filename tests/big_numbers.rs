@@ -112,9 +112,9 @@ use gidth::number::{Int};
 // 	// println!("{}", x4);
 // }
 
-// #[test]
-// // #[auto_wrap_ints]
-// fn testing() {
-// 	let x: i32 = 69;
-// 	println!("{:?}", x.sq());
-// }
+#[test]
+// #[auto_wrap_ints]
+fn testing() {
+	let x: i32 = 69;
+	println!("{:?}", x.sq());
+}

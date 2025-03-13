@@ -13,6 +13,7 @@ where
 	fn divmod(self, rhs: T) -> (Self, T);
 }
 
+#[allow(private_bounds)]
 #[siphon_traits]
 pub trait Int:
 	std::ops::Add<Output = Self> +
@@ -96,8 +97,6 @@ macro_rules! impl_integer {
 				*self == 1
 			}
 		}
-
-		impl Int for $t {}
 		)*
 	};
 }

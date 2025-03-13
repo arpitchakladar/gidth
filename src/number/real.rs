@@ -4,7 +4,10 @@ use crate::number::{
 	Zero,
 	One,
 };
+use gidth_macros::siphon_traits;
 
+#[allow(private_bounds)]
+#[siphon_traits]
 pub trait Real:
 	std::ops::Add<Output = Self> +
 	std::ops::Sub<Output = Self> +
@@ -60,8 +63,6 @@ macro_rules! impl_real {
 				*self == 1.0
 			}
 		}
-
-		impl Real for $t {}
 		)*
 	};
 }

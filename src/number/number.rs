@@ -1,17 +1,23 @@
-pub trait Abs {
+use gidth_macros::register_trait;
+
+#[register_trait]
+pub(crate) trait Abs {
 	fn abs(self) -> Self;
 }
 
-pub trait Square {
+#[register_trait]
+pub(crate) trait Square {
 	fn sq(self) -> Self;
 }
 
-pub trait Zero {
+#[register_trait]
+pub(crate) trait Zero {
 	fn zero() -> Self;
 	fn is_zero(&self) -> bool;
 }
 
-pub trait One {
+#[register_trait]
+pub(crate) trait One {
 	fn one() -> Self;
 	fn is_one(&self) -> bool;
 }
