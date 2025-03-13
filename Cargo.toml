@@ -8,3 +8,4 @@ name = "gidth"
 path = "src/lib.rs"
 
 [dependencies]
+inherent = "1.0.12"

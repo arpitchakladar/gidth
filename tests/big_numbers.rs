@@ -1,4 +1,4 @@
-use gidth::number::{BigInt, BigDecimal, Int, Real, Square};
+use gidth::number::{BigInt, BigDecimal, Int, Real};
 
 // #[test]
 // fn big_int_sum() {
@@ -106,6 +106,7 @@ use gidth::number::{BigInt, BigDecimal, Int, Real, Square};
 #[test]
 fn big_decimal_pow() {
 	let x1 = BigDecimal::from("2342323423269.32080078125");
-	println!("{}", x1.pow(10))
+	println!("{}", x1.pow(10));
+	println!("{}", x1.sq());
 	// println!("{}", x4);
 }

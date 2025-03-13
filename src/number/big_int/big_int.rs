@@ -1,3 +1,5 @@
+use inherent::inherent;
+
 use crate::number::{
 	Int,
 	Zero,
@@ -12,13 +14,6 @@ pub struct BigInt {
 
 impl BigInt {
 	pub const BASE: u64 = u32::MAX as u64 + 1;
-
-	pub fn zero() -> Self {
-		Self {
-			positive: true,
-			limbs: vec![0u32],
-		}
-	}
 
 	pub fn with_capacity(len: usize) -> Self {
 		Self {
@@ -38,28 +33,30 @@ impl BigInt {
 	}
 }
 
+#[inherent]
 impl Zero for BigInt {
-	fn zero() -> Self {
+	pub fn zero() -> Self {
 		Self {
 			positive: true,
 			limbs: vec![0u32],
 		}
 	}
 
-	fn is_zero(&self) -> bool {
+	pub fn is_zero(&self) -> bool {
 		!self.limbs.iter().copied().any(|x| x != 0)
 	}
 }
 
+#[inherent]
 impl One for BigInt {
-	fn one() -> Self {
+	pub fn one() -> Self {
 		Self {
 			positive: true,
 			limbs: vec![1u32],
 		}
 	}
 
-	fn is_one(&self) -> bool {
+	pub fn is_one(&self) -> bool {
 		self.limbs.len() > 0 &&
 		self.limbs[0] == 1 &&
 		!self.limbs[1..]

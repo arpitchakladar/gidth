@@ -1,3 +1,5 @@
+use inherent::inherent;
+
 use crate::number::{
 	Zero,
 	Real,
@@ -34,8 +36,9 @@ impl BigDecimal {
 	}
 }
 
+#[inherent]
 impl Zero for BigDecimal {
-	fn zero() -> Self {
+	pub fn zero() -> Self {
 		Self {
 			positive: true,
 			limbs: vec![0u32],
@@ -43,13 +46,14 @@ impl Zero for BigDecimal {
 		}
 	}
 
-	fn is_zero(&self) -> bool {
+	pub fn is_zero(&self) -> bool {
 		!self.limbs.iter().copied().any(|x| x != 0)
 	}
 }
 
+#[inherent]
 impl One for BigDecimal {
-	fn one() -> Self {
+	pub fn one() -> Self {
 		Self {
 			positive: true,
 			limbs: vec![1u32],
@@ -57,7 +61,7 @@ impl One for BigDecimal {
 		}
 	}
 
-	fn is_one(&self) -> bool {
+	pub fn is_one(&self) -> bool {
 		self.limbs.len() > 0 &&
 		self.order() >= 0 &&
 		self.limbs[self.decimal_pos] == 1 &&

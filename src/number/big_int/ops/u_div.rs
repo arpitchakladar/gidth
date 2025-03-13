@@ -112,7 +112,7 @@ impl BigInt {
 		}
 	}
 
-	pub(crate) fn u_divmod_base(&self, rhs: u32) -> (BigInt, u32) {
+	pub(crate) fn u_divmod_small(&self, rhs: u32) -> (BigInt, u32) {
 		let rhs = rhs as u64;
 		let (quotient, remainder) = self.limbs
 			.iter()

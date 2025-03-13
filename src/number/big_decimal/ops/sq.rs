@@ -1,3 +1,5 @@
+use inherent::inherent;
+
 use crate::number::{
 	BigDecimal,
 	Square,
@@ -47,8 +49,9 @@ impl BigDecimal {
 	}
 }
 
+#[inherent]
 impl Square for BigDecimal {
-	fn sq(self) -> Self {
+	pub fn sq(self) -> Self {
 		let mut result = BigDecimal::with_capacity(
 			self.limbs.len() * 2
 		);

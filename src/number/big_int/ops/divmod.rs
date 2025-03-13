@@ -1,3 +1,5 @@
+// use inherent::inherent;
+
 use crate::number::{
 	BigInt,
 	DivMod,
@@ -20,6 +22,6 @@ impl DivMod<BigInt> for BigInt {
 impl DivMod<u32> for BigInt {
 	#[inline]
 	fn divmod(self, rhs: u32) -> (BigInt, u32) {
-		BigInt::u_divmod_base(&self, rhs)
+		BigInt::u_divmod_small(&self, rhs)
 	}
 }
