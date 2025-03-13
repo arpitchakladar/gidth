@@ -1,12 +1,22 @@
 use crate::number::BigInt;
 
-fn u_pow_small_in(base: &BigInt, power: usize, result: BigInt, current: BigInt) -> (BigInt, BigInt) {
+fn u_pow_small_in(
+	base: &BigInt,
+	power: usize,
+	result: BigInt,
+	current: BigInt,
+) -> (BigInt, BigInt) {
 	if power == 0 {
 		return (current, result);
 	}
 
 	let (power, remainder) = (power / 2, power % 2);
-	let (mut current, mut result) = u_pow_small_in(base, power, current, result);
+	let (mut current, mut result) = u_pow_small_in(
+		base,
+		power,
+		current,
+		result,
+	);
 	result.limbs.clear();
 	BigInt::sq_in(&current, &mut result);
 

@@ -1,11 +1,17 @@
 use crate::number::BigInt;
 
 impl BigInt {
-	pub(crate) fn u_add_in(&self, rhs: &BigInt, result: &mut BigInt) {
-		let (larger, smaller) = if self.limbs.len() > rhs.limbs.len() {
-			(self, rhs)
-		} else {
-			(rhs, self)
+	pub(crate) fn u_add_in(
+		&self,
+		rhs: &BigInt,
+		result: &mut BigInt,
+	) {
+		let (larger, smaller) = {
+			if self.limbs.len() > rhs.limbs.len() {
+				(self, rhs)
+			} else {
+				(rhs, self)
+			}
 		};
 
 		let carry = larger.limbs
@@ -19,10 +25,11 @@ impl BigInt {
 			.fold(
 				0u64,
 				|carry, (left_limb, right_limb)| {
-					let sum = left_limb as u64 + right_limb as u64 + carry;
-					result.limbs.push(sum as u32);
+					let sum = left_limb as u64 + right_limb as u64;
+					let total_sum = sum + carry;
+					result.limbs.push(total_sum as u32);
 
-					sum >> 32
+					total_sum >> 32
 				},
 			);
 
@@ -44,11 +51,17 @@ impl BigInt {
 		}
 	}
 
-	pub(crate) fn u_sub_in(&self, rhs: &BigInt, result: &mut BigInt) {
-		let (larger, smaller, positive) = if BigInt::u_gt(self, rhs) {
-			(self, rhs, true)
-		} else {
-			(rhs, self, false)
+	pub(crate) fn u_sub_in(
+		&self,
+		rhs: &BigInt,
+		result: &mut BigInt,
+	) {
+		let (larger, smaller, positive) = {
+			if BigInt::u_gt(self, rhs) {
+				(self, rhs, true)
+			} else {
+				(rhs, self, false)
+			}
 		};
 
 		let borrow = larger.limbs

@@ -27,7 +27,8 @@ impl BigDecimal {
 				let sig: u64 = if reg.len() == l_rhs {
 					reg[reg.len() - 1] as u64
 				} else {
-					((reg[reg.len() - 1] as u64) << 32) + reg[reg.len() - 2] as u64
+					((reg[reg.len() - 1] as u64) << 32) +
+					reg[reg.len() - 2] as u64
 				};
 				let min = (sig / sig_rhs) as u32;
 				let max = ((sig + sig_rhs - 1) / sig_rhs) as u32;

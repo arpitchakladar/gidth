@@ -1,7 +1,11 @@
 use crate::number::BigDecimal;
 
 impl BigDecimal {
-	pub(crate) fn u_add_in(&self, rhs: &BigDecimal, result: &mut BigDecimal) {
+	pub(crate) fn u_add_in(
+		&self,
+		rhs: &BigDecimal,
+		result: &mut BigDecimal,
+	) {
 		let (longest_decimal, shortest_decimal) = {
 			if self.decimal_pos > rhs.decimal_pos {
 				(self, rhs)
@@ -52,13 +56,16 @@ impl BigDecimal {
 				},
 			);
 
-		let (longest_whole, shortest_whole) = if self.order() > rhs.order() {
-			(self, rhs)
-		} else {
-			(rhs, self)
+		let (longest_whole, shortest_whole) = {
+			if self.order() > rhs.order() {
+				(self, rhs)
+			} else {
+				(rhs, self)
+			}
 		};
 
-		let remaining_start = (longest_whole.decimal_pos + shortest_whole.limbs.len())
+		let longest_end_pos = longest_whole.decimal_pos + shortest_whole.limbs.len();
+		let remaining_start = longest_end_pos
 			.saturating_sub(shortest_whole.decimal_pos);
 		let carry = longest_whole.limbs[remaining_start..]
 			.iter()
@@ -78,64 +85,72 @@ impl BigDecimal {
 		}
 	}
 
-	pub(crate) fn u_sub_in(&self, rhs: &BigDecimal, result: &mut BigDecimal) {
-		let (larger, smaller, positive) = if BigDecimal::u_gt(self, rhs) {
-			(self, rhs, true)
-		} else {
-			(rhs, self, false)
+	pub(crate) fn u_sub_in(
+		&self,
+		rhs: &BigDecimal,
+		result: &mut BigDecimal,
+	) {
+		let (larger, smaller, positive) = {
+			if BigDecimal::u_gt(self, rhs) {
+				(self, rhs, true)
+			} else {
+				(rhs, self, false)
+			}
 		};
 
-		let (larger_remain, smaller_remain, borrow) = if larger.decimal_pos >= smaller.decimal_pos {
-			let end_pos = larger.decimal_pos - smaller.decimal_pos;
-			larger.limbs[..end_pos]
-				.iter()
-				.copied()
-				.for_each(|limb| result.limbs.push(limb));
+		let (larger_remain, smaller_remain, borrow) = {
+			if larger.decimal_pos >= smaller.decimal_pos {
+				let end_pos = larger.decimal_pos - smaller.decimal_pos;
+				larger.limbs[..end_pos]
+					.iter()
+					.copied()
+					.for_each(|limb| result.limbs.push(limb));
 
-			(
-				&larger.limbs[end_pos..],
-				&smaller.limbs[..],
-				0u32
-			)
-		} else {
-			let decimal_pos_diff = smaller.decimal_pos - larger.decimal_pos;
-			let end_pos = std::cmp::min(
-				decimal_pos_diff,
-				smaller.limbs.len(),
-			);
-			let borrow = smaller.limbs[..end_pos]
-				.iter()
-				.copied()
-				.fold(
+				(
+					&larger.limbs[end_pos..],
+					&smaller.limbs[..],
 					0u32,
-					|borrow, limb| {
-						result.limbs
-							.push(
-								0u32
-									.wrapping_sub(limb)
-									.wrapping_sub(borrow)
-							);
-
-						1u32
-					}
-				);
-
-			let borrow = if end_pos == decimal_pos_diff {
-				borrow
+				)
 			} else {
-				result.limbs.push(0u32.wrapping_sub(borrow as u32));
-				for _ in (end_pos + 1)..decimal_pos_diff {
-					result.limbs.push(0u32);
-				}
+				let decimal_pos_diff = smaller.decimal_pos - larger.decimal_pos;
+				let end_pos = std::cmp::min(
+					decimal_pos_diff,
+					smaller.limbs.len(),
+				);
+				let borrow = smaller.limbs[..end_pos]
+					.iter()
+					.copied()
+					.fold(
+						0u32,
+						|borrow, limb| {
+							result.limbs
+								.push(
+									0u32
+										.wrapping_sub(limb)
+										.wrapping_sub(borrow)
+								);
 
-				0u32
-			};
+							1u32
+						}
+					);
 
-			(
-				&larger.limbs[..],
-				&smaller.limbs[end_pos..],
-				borrow,
-			)
+				let borrow = if end_pos == decimal_pos_diff {
+					borrow
+				} else {
+					result.limbs.push(0u32.wrapping_sub(borrow as u32));
+					for _ in (end_pos + 1)..decimal_pos_diff {
+						result.limbs.push(0u32);
+					}
+
+					0u32
+				};
+
+				(
+					&larger.limbs[..],
+					&smaller.limbs[end_pos..],
+					borrow,
+				)
+			}
 		};
 
 		let borrow = larger_remain
@@ -171,6 +186,9 @@ impl BigDecimal {
 			);
 
 		result.positive = positive;
-		result.decimal_pos = std::cmp::max(self.decimal_pos, rhs.decimal_pos);
+		result.decimal_pos = std::cmp::max(
+			self.decimal_pos,
+			rhs.decimal_pos,
+		);
 	}
 }

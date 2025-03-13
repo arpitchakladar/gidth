@@ -2,7 +2,11 @@ use crate::number::BigDecimal;
 use crate::impl_big_decimal_binop_variants;
 
 impl BigDecimal {
-	pub(crate) fn u_mul_in(&self, rhs: &BigDecimal, result: &mut BigDecimal) {
+	pub(crate) fn u_mul_in(
+		&self,
+		rhs: &BigDecimal,
+		result: &mut BigDecimal,
+	) {
 		result.limbs.resize(
 			self.limbs.len() + rhs.limbs.len(),
 			0,
@@ -24,8 +28,10 @@ impl BigDecimal {
 						|carry, (lhs_index, lhs_limb)| {
 							let result_index = rhs_index + lhs_index;
 							let product = lhs_limb as u64 * rhs_limb as u64;
-							let sum = product + carry + result.limbs[result_index] as u64;
+							let current_limb = result.limbs[result_index] as u64;
+							let sum = product + carry + current_limb;
 							result.limbs[result_index] = sum as u32;
+
 							sum >> 32
 						},
 					);
@@ -38,6 +44,7 @@ impl BigDecimal {
 						|carry, limb| {
 							let sum = carry + *limb as u64;
 							*limb = sum as u32;
+
 							sum >> 32
 						},
 					);

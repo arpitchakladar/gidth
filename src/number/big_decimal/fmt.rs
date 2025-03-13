@@ -10,7 +10,8 @@ impl BigDecimal {
 
 		1usize +
 		std::cmp::max(
-			self.limbs.len().saturating_sub(self.decimal_pos) * DIGITS_PER_INT_LIMB,
+			self.limbs.len()
+				.saturating_sub(self.decimal_pos) * DIGITS_PER_INT_LIMB,
 			1usize,
 		) +
 		std::cmp::max(
@@ -25,17 +26,27 @@ impl std::fmt::Display for BigDecimal {
 		let mut result = String::with_capacity(
 			self.estimate_max_digits(),
 		);
-		let last_index = self.decimal_pos.min(self.limbs.len());
+		let last_index = std::cmp::min(
+			self.decimal_pos,
+			self.limbs.len(),
+		);
 
-		let mut int_limbs: Vec<u32> = self.limbs[last_index..].to_vec();
+		let mut int_limbs: Vec<u32> = self.limbs[last_index..]
+			.to_vec();
 
 		// Convert integer part to string
 		while int_limbs.iter().any(|&x| x != 0) {
-			let remainder = int_limbs.iter_mut().rev().fold(0u64, |carry, limb| {
-				let current = (carry << 32) + *limb as u64;
-				*limb = (current / 10) as u32; // Store quotient back
-				current % 10 // New carry (remainder)
-			});
+			let remainder = int_limbs
+				.iter_mut()
+				.rev()
+				.fold(
+					0u64,
+					|carry, limb| {
+						let current = (carry << 32) + *limb as u64;
+						*limb = (current / 10) as u32; // Store quotient back
+						current % 10 // New carry (remainder)
+					},
+				);
 
 			result.push((b'0' + remainder as u8) as char);
 		}
@@ -53,12 +64,21 @@ impl std::fmt::Display for BigDecimal {
 		result.push('.');
 
 		// Prepare fractional part
-		let expected_size = last_index + self.decimal_pos.saturating_sub(self.limbs.len());
+		let trailing_limbs = self.decimal_pos
+			.saturating_sub(self.limbs.len());
+		let expected_size = last_index + trailing_limbs;
 		let mut frac_limbs = Vec::with_capacity(expected_size);
-		frac_limbs.extend(self.limbs[..last_index].iter().copied());
+		frac_limbs.extend(
+			self.limbs[..last_index]
+				.iter()
+				.copied(),
+		);
 		frac_limbs.extend(
 			std::iter::repeat(0)
-				.take(self.decimal_pos.saturating_sub(self.limbs.len()))
+				.take(
+					self.decimal_pos
+						.saturating_sub(self.limbs.len()),
+				),
 		);
 
 		if frac_limbs.is_empty() {

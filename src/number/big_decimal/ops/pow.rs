@@ -1,12 +1,22 @@
 use crate::number::BigDecimal;
 
-fn u_pow_small_in(base: &BigDecimal, power: usize, result: BigDecimal, current: BigDecimal) -> (BigDecimal, BigDecimal) {
+fn u_pow_small_in(
+	base: &BigDecimal,
+	power: usize,
+	result: BigDecimal,
+	current: BigDecimal,
+) -> (BigDecimal, BigDecimal) {
 	if power == 0 {
 		return (current, result);
 	}
 
 	let (power, remainder) = (power / 2, power % 2);
-	let (mut current, mut result) = u_pow_small_in(base, power, current, result);
+	let (mut current, mut result) = u_pow_small_in(
+		base,
+		power,
+		current,
+		result,
+	);
 	result.limbs.clear();
 	BigDecimal::sq_in(&current, &mut result);
 
@@ -15,6 +25,7 @@ fn u_pow_small_in(base: &BigDecimal, power: usize, result: BigDecimal, current: 
 	} else {
 		current.limbs.clear();
 		BigDecimal::u_mul_in(&result, base, &mut current);
+
 		(current, result)
 	}
 }

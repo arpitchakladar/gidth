@@ -8,7 +8,13 @@ use crate::number::utils::{
 // Using macro for better removal of dead code
 macro_rules! bigint_division {
 	// NOTE: Quotient is an empty BigInt and remainder is a clone of self
-	($self:expr, $rhs:expr, $quotient:expr, $has_quotient:expr, $has_remainder:expr) => {{
+	(
+		$self:expr,
+		$rhs:expr,
+		$quotient:expr,
+		$has_quotient:expr,
+		$has_remainder:expr,
+	) => {{
 		if BigInt::u_gt($rhs, $self) {
 			$quotient.limbs.push(0u32);
 			return;
@@ -26,7 +32,8 @@ macro_rules! bigint_division {
 					let sig: u64 = if reg.len() == l_rhs {
 						reg[reg.len() - 1] as u64
 					} else {
-						((reg[reg.len() - 1] as u64) << 32) + reg[reg.len() - 2] as u64
+						((reg[reg.len() - 1] as u64) << 32) +
+						reg[reg.len() - 2] as u64
 					};
 					let min = (sig / sig_rhs) as u32;
 					let max = ((sig + sig_rhs - 1) / sig_rhs) as u32;
@@ -71,7 +78,7 @@ impl BigInt {
 			rhs,
 			quotient,
 			true,
-			true
+			true,
 		);
 	}
 
@@ -85,7 +92,7 @@ impl BigInt {
 			rhs,
 			quotient,
 			true,
-			false
+			false,
 		);
 	}
 
@@ -100,7 +107,7 @@ impl BigInt {
 				rhs,
 				*std::ptr::null_mut::<BigInt>(),
 				false,
-				true
+				true,
 			);
 		}
 	}

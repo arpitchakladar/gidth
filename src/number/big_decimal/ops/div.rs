@@ -7,7 +7,8 @@ impl std::ops::Div for &BigDecimal {
 	fn div(self, rhs: Self) -> Self::Output {
 		let precision = rhs.decimal_pos + self.decimal_pos + 1;
 		let mut quotient = BigDecimal::with_capacity(
-			self.limbs.len().saturating_sub(rhs.limbs.len()) + 1 + precision,
+			self.limbs.len()
+				.saturating_sub(rhs.limbs.len()) + 1 + precision,
 		);
 
 		let mut remainder = BigDecimal::with_capacity(

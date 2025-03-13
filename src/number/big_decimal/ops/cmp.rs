@@ -11,7 +11,10 @@ impl PartialEq for BigDecimal {
 impl Eq for BigDecimal {}
 
 impl PartialOrd for BigDecimal {
-	fn partial_cmp(&self, rhs: &Self) -> Option<std::cmp::Ordering> {
+	fn partial_cmp(
+		&self,
+		rhs: &Self,
+	) -> Option<std::cmp::Ordering> {
 		let ord = {
 			if self.positive != rhs.positive {
 				std::cmp::Ordering::Greater

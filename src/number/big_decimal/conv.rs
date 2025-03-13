@@ -112,15 +112,19 @@ impl From<&str> for BigDecimal {
 	fn from(s: &str) -> Self {
 		let mut limbs = Vec::new();
 		let positive = !s.starts_with('-');
-		let (chunk_decimal_point, chunk_decimal_pos) = if let Some(index) = s.find('.') {
-			(1, index)
-		} else {
-			(0, 0)
+		let (chunk_decimal_point, chunk_decimal_pos) = {
+			if let Some(index) = s.find('.') {
+				(1, index)
+			} else {
+				(0, 0)
+			}
 		};
 
 		const CHUNK_SIZE: u64 = 1_000_000_000u64;
 
-		let mut temp_frac_chunks = Vec::with_capacity(s.len() / 9);
+		let mut temp_frac_chunks = Vec::with_capacity(
+			s.len() / 9,
+		);
 		temp_frac_chunks.extend(
 			s[(chunk_decimal_pos + chunk_decimal_point)..]
 				.as_bytes()
@@ -167,7 +171,9 @@ impl From<&str> for BigDecimal {
 
 		limbs.reverse();
 
-		let mut temp_int_chunks = Vec::with_capacity(s.len() / 9);
+		let mut temp_int_chunks = Vec::with_capacity(
+			s.len() / 9,
+		);
 		temp_int_chunks.extend(
 			s[..chunk_decimal_pos]
 				.as_bytes()
@@ -185,7 +191,8 @@ impl From<&str> for BigDecimal {
 		while temp_int_chunks.iter().any(|&x| x != 0) {
 			let mut carry = 0u32;
 			for byte in temp_int_chunks.iter_mut() {
-				let current = (carry as u64) * CHUNK_SIZE + *byte as u64;
+				let carry_value = (carry as u64) * CHUNK_SIZE;
+				let current = carry_value + *byte as u64;
 				*byte = (current >> 32) as u32;
 				carry = current as u32;
 			}

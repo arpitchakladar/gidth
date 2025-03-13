@@ -5,7 +5,9 @@ impl std::ops::Add for &BigDecimal {
 	type Output = BigDecimal;
 
 	fn add(self, other: Self) -> Self::Output {
-		let mut result = BigDecimal::with_capacity((self.order() - other.order()).abs() as usize);
+		let mut result = BigDecimal::with_capacity(
+			(self.order() - other.order()).abs() as usize
+		);
 		match (self.positive, other.positive) {
 			(true, true) => BigDecimal::u_add_in(self, other, &mut result),
 			(true, false) => BigDecimal::u_sub_in(self, other, &mut result),

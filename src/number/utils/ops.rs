@@ -1,4 +1,7 @@
-pub(crate) fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {
+pub(crate) fn sub_from_slice(
+	lhs: &mut [u32],
+	rhs: &[u32],
+) -> usize {
 	let borrow = lhs
 		.iter_mut()
 		.zip(rhs.iter().copied())
@@ -24,7 +27,10 @@ pub(crate) fn sub_from_slice(lhs: &mut [u32], rhs: &[u32]) -> usize {
 		.unwrap_or(lhs.len())
 }
 
-pub(crate) fn cmp_limb_arrays(lhs: &[u32], rhs: &[u32]) -> bool {
+pub(crate) fn cmp_limb_arrays(
+	lhs: &[u32],
+	rhs: &[u32],
+) -> bool {
 	match lhs.len().cmp(&rhs.len()) {
 		std::cmp::Ordering::Greater => return true,
 		std::cmp::Ordering::Less => return false,
@@ -38,7 +44,10 @@ pub(crate) fn cmp_limb_arrays(lhs: &[u32], rhs: &[u32]) -> bool {
 	}
 }
 
-pub(crate) fn mul_by_small_int(lhs: &mut Vec<u32>, rhs: u32) {
+pub(crate) fn mul_by_small_int(
+	lhs: &mut Vec<u32>,
+	rhs: u32,
+) {
 	let carry = lhs
 		.iter_mut()
 		.fold(

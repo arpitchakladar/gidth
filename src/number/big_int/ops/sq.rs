@@ -3,7 +3,12 @@ use crate::number::{
 	Square,
 };
 
-fn sq_term(num: &BigInt, res: u128, i: usize, carry: u128) -> u128 {
+fn sq_term(
+	num: &BigInt,
+	res: u128,
+	i: usize,
+	carry: u128,
+) -> u128 {
 	let start = i.checked_sub(num.limbs.len())
 		.map(|x| x + 1)
 		.unwrap_or(0);
@@ -40,7 +45,9 @@ impl BigInt {
 
 impl Square for BigInt {
 	fn sq(self) -> Self {
-		let mut result = BigInt::with_capacity(self.limbs.len() * 2);
+		let mut result = BigInt::with_capacity(
+			self.limbs.len() * 2,
+		);
 		BigInt::sq_in(
 			&self,
 			&mut result,
