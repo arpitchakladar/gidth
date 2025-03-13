@@ -1,37 +1,69 @@
-use crate::number::Integer;
+use inherent::inherent;
+
+use crate::number::{
+	Int,
+	Zero,
+	One,
+};
 
 #[derive(Clone)]
 pub struct BigInt {
 	pub(crate) positive: bool,
-	pub(crate) digits: Vec<u32>,
+	pub(crate) limbs: Vec<u32>,
 }
 
 impl BigInt {
 	pub const BASE: u64 = u32::MAX as u64 + 1;
 
-	pub fn new(positive: bool, digits: Vec<u32>) -> Self {
-		Self {
-			positive,
-			digits,
-		}
-	}
-
 	pub fn with_capacity(len: usize) -> Self {
 		Self {
 			positive: true,
-			digits: Vec::with_capacity(len),
+			limbs: Vec::with_capacity(len),
 		}
 	}
 
 	pub fn clear(&mut self) {
-		self.digits.clear();
+		self.limbs.clear();
 	}
 
 	pub fn trim(&mut self) {
-		while self.digits.last() == Some(&0) {
-			self.digits.pop();
+		while self.limbs.last() == Some(&0) {
+			self.limbs.pop();
 		}
 	}
 }
 
-impl Integer for BigInt {}
+#[inherent]
+impl Zero for BigInt {
+	pub fn zero() -> Self {
+		Self {
+			positive: true,
+			limbs: vec![0u32],
+		}
+	}
+
+	pub fn is_zero(&self) -> bool {
+		!self.limbs.iter().copied().any(|x| x != 0)
+	}
+}
+
+#[inherent]
+impl One for BigInt {
+	pub fn one() -> Self {
+		Self {
+			positive: true,
+			limbs: vec![1u32],
+		}
+	}
+
+	pub fn is_one(&self) -> bool {
+		self.limbs.len() > 0 &&
+		self.limbs[0] == 1 &&
+		!self.limbs[1..]
+			.iter()
+			.copied()
+			.any(|x| x != 0)
+	}
+}
+
+impl Int for BigInt {}

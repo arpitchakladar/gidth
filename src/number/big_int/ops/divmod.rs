@@ -1,3 +1,5 @@
+// use inherent::inherent;
+
 use crate::number::{
 	BigInt,
 	DivMod,
@@ -6,13 +8,20 @@ use crate::number::{
 impl DivMod<BigInt> for BigInt {
 	#[inline]
 	fn divmod(self, rhs: BigInt) -> (BigInt, BigInt) {
-		BigInt::unsigned_divmod(&self, &rhs)
+		let mut quotient = BigInt::with_capacity(
+			self.limbs.len()
+				.saturating_sub(rhs.limbs.len()) + 1,
+		);
+		let mut remainder = self.clone();
+		BigInt::u_divmod_in(&mut remainder, &rhs, &mut quotient);
+
+		(quotient, remainder)
 	}
 }
 
 impl DivMod<u32> for BigInt {
 	#[inline]
 	fn divmod(self, rhs: u32) -> (BigInt, u32) {
-		BigInt::unsigned_divmod_by_small_int(&self, rhs)
+		BigInt::u_divmod_small(&self, rhs)
 	}
 }

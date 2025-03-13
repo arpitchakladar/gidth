@@ -1,6 +1,8 @@
 use crate::number::{
 	Abs,
 	Square,
+	Zero,
+	One,
 };
 
 pub trait DivMod<T>: Sized
@@ -10,13 +12,15 @@ where
 	fn divmod(self, rhs: T) -> (Self, T);
 }
 
-pub trait Integer:
+pub trait Int:
 	std::ops::Add<Output = Self> +
 	std::ops::Sub<Output = Self> +
 	std::ops::Mul<Output = Self> +
 	std::ops::Div<Output = Self> +
 	std::ops::Rem<Output = Self> +
 	DivMod<Self> +
+	Zero +
+	One +
 	Abs +
 	Square +
 	Sized
@@ -67,7 +71,31 @@ macro_rules! impl_integer {
 			}
 		}
 
-		impl Integer for $t {}
+		impl Zero for $t {
+			#[inline(always)]
+			fn zero() -> Self {
+				0
+			}
+
+			#[inline(always)]
+			fn is_zero(&self) -> bool {
+				*self == 0
+			}
+		}
+
+		impl One for $t {
+			#[inline(always)]
+			fn one() -> Self {
+				1
+			}
+
+			#[inline(always)]
+			fn is_one(&self) -> bool {
+				*self == 1
+			}
+		}
+
+		impl Int for $t {}
 		)*
 	};
 }

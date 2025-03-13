@@ -1,11 +1,14 @@
+pub use inherent::inherent;
+
 use crate::number::{
 	BigInt,
 	Abs,
 };
 
+#[inherent]
 impl Abs for BigInt {
 	#[inline]
-	fn abs(mut self) -> BigInt {
+	pub fn abs(mut self) -> BigInt {
 		self.positive = true;
 
 		self
