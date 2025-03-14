@@ -98,6 +98,7 @@ macro_rules! impl_integer {
 			}
 		}
 
+		pub use crate::__hidden::*;
 		impl SatisfyInt for $t {}
 		)*
 	};

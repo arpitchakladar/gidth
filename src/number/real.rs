@@ -63,6 +63,8 @@ macro_rules! impl_real {
 				*self == 1.0
 			}
 		}
+
+		use crate::__hidden::*;
 		impl SatisfyReal for $t {}
 		)*
 	};
