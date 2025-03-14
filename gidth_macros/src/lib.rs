@@ -1,5 +1,9 @@
 use std::collections::HashMap;
-use proc_macro::TokenStream;
+use proc_macro::{
+	TokenStream,
+	TokenTree,
+};
+use proc_macro2::Span;
 use quote::{
 	quote,
 	format_ident,
@@ -9,6 +13,7 @@ use syn::{
 	parse_str,
 	parse::Parser,
 	punctuated::Punctuated,
+	Ident,
 	ItemTrait,
 	TraitBound,
 	TraitItem,
@@ -159,13 +164,14 @@ pub fn siphon_traits(
 		}
 	}
 
-	let temp_trait = format_ident!("Satisfy{}", &trait_name);
+	let satisfy_trait = format_ident!("Satisfy{}", &trait_name);
 	let supertraits = &input.supertraits;
-	derived_trait_registry.push(temp_trait.to_string());
+	derived_trait_registry.push(satisfy_trait.to_string());
 
 	let expanded = quote! {
+		use crate::__hidden::#satisfy_trait;
 		#input
-		impl<T: #temp_trait + #supertraits> #trait_name for T {
+		impl<T: #satisfy_trait + #supertraits> #trait_name for T {
 			#(#method_impls)*
 		}
 	};
@@ -198,6 +204,51 @@ pub fn place_hidden(_item: TokenStream) -> TokenStream {
 	TokenStream::from(expanded)
 }
 
+#[proc_macro]
+pub fn satisfy(input: TokenStream) -> TokenStream {
+	let mut tokens = input.into_iter();
+	let target_type = match tokens.next() {
+		Some(TokenTree::Group(group)) => {
+			let stream = group.stream();
+			parse_macro_input!(stream as Ident)
+		},
+		_ => panic!("Expected an identifier as the first parameter"),
+	};
+	match tokens.next() {
+		Some(TokenTree::Punct(p)) if p.as_char() == ';' => {},
+		_ => panic!("Expected a semicolon `;` after the first parameter"),
+	}
+	let trait_list = tokens
+		.filter_map(|token| {
+			match token {
+				TokenTree::Ident(ident) => {
+					Some(
+						format_ident!(
+							"Satisfy{}",
+							Ident::new(
+								&ident.to_string(),
+								Span::call_site(),
+							),
+						),
+					)
+				},
+				// Skip commas
+				TokenTree::Punct(p) if p.as_char() == ',' => None,
+				_ => panic!("Unexpected token in type list"),
+			}
+		})
+		.collect::<Vec<_>>();
+
+	let expanded = quote! {
+		pub use crate::__hidden::*;
+		#(
+			impl #trait_list for #target_type {}
+		)*
+	};
+
+	TokenStream::from(expanded)
+}
+
 #[proc_macro_attribute]
 pub fn satisfies(attr: TokenStream, item: TokenStream) -> TokenStream {
 	// Parse the struct
@@ -214,14 +265,14 @@ pub fn satisfies(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 	// Extract trait names from #[satisfies(TraitName1, TraitName2)]
 	for arg in attr_parsed.iter() {
-		let temp_trait = format_ident!(
+		let satisfy_trait = format_ident!(
 			"Satisfy{}",
 			&arg.segments
 				.last()
 				.unwrap().ident,
 		);
 		implementations.push(quote! {
-			impl #temp_trait for #struct_name {}
+			impl #satisfy_trait for #struct_name {}
 		});
 	}
 

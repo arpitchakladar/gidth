@@ -4,7 +4,10 @@ use crate::number::{
 	Zero,
 	One,
 };
-use gidth_macros::siphon_traits;
+use gidth_macros::{
+	siphon_traits,
+	satisfy,
+};
 
 #[allow(private_bounds)]
 #[siphon_traits]
@@ -64,8 +67,7 @@ macro_rules! impl_real {
 			}
 		}
 
-		use crate::__hidden::*;
-		impl SatisfyReal for $t {}
+		satisfy!($t; Real);
 		)*
 	};
 }

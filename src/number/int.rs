@@ -4,7 +4,10 @@ use crate::number::{
 	Zero,
 	One,
 };
-use gidth_macros::siphon_traits;
+use gidth_macros::{
+	siphon_traits,
+	satisfy,
+};
 
 pub trait DivMod<T>: Sized
 where
@@ -98,8 +101,7 @@ macro_rules! impl_integer {
 			}
 		}
 
-		pub use crate::__hidden::*;
-		impl SatisfyInt for $t {}
+		satisfy!($t; Int, Real);
 		)*
 	};
 }
