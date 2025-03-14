@@ -39,7 +39,8 @@ pub fn register_trait(
 	_attr: TokenStream,
 	item: TokenStream,
 ) -> TokenStream {
-	let input = parse_macro_input!(item as ItemTrait);
+	let input_item = item.clone();
+	let input = parse_macro_input!(input_item as ItemTrait);
 	let trait_name = input.ident.to_string();
 
 	// Extract full method signatures
@@ -99,11 +100,7 @@ pub fn register_trait(
 		.unwrap()
 		.insert(trait_name.clone(), method_signatures.clone());
 
-	let expanded = quote! {
-		#input
-	};
-
-	TokenStream::from(expanded)
+	item
 }
 
 #[proc_macro_attribute]
@@ -153,6 +150,7 @@ pub fn siphon_traits(
 					}
 				}).collect();
 
+				// TODO: Avoid reimplmenting conflicting methods
 				// Generate method delegation dynamically
 				method_impls.push(quote! {
 					#[inline(always)]
@@ -169,8 +167,8 @@ pub fn siphon_traits(
 	derived_trait_registry.push(satisfy_trait.to_string());
 
 	let expanded = quote! {
-		use crate::__hidden::#satisfy_trait;
 		#input
+		use crate::__hidden::#satisfy_trait;
 		impl<T: #satisfy_trait + #supertraits> #trait_name for T {
 			#(#method_impls)*
 		}
@@ -218,7 +216,7 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 		Some(TokenTree::Punct(p)) if p.as_char() == ';' => {},
 		_ => panic!("Expected a semicolon `;` after the first parameter"),
 	}
-	let (trait_list, satisfy_trait_list): (Vec<_>, Vec<_>) = tokens
+	let implementations = tokens
 		.filter_map(|token| {
 			match token {
 				TokenTree::Ident(ident) => {
@@ -230,30 +228,27 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 						"Satisfy{}",
 						&current_trait,
 					);
+
 					Some(
-						(
-							current_trait,
-							satisfy_trait,
-						),
+						quote! {
+							const _: () = {
+								let _ = {
+									struct _Check<T: #current_trait>(T);
+								};
+							};
+							impl #satisfy_trait for #target_type {}
+						}
 					)
 				},
 				// Skip commas
 				TokenTree::Punct(p) if p.as_char() == ',' => None,
 				_ => panic!("Unexpected token in type list"),
 			}
-		})
-		.unzip();
+		});
 
 	let expanded = quote! {
 		pub use crate::__hidden::*;
-		#(
-			const _: () = {
-				let _ = {
-					struct _Check<T: #trait_list>(T);
-				};
-			};
-			impl #satisfy_trait_list for #target_type {}
-		)*
+		#(#implementations)*
 	};
 
 	TokenStream::from(expanded)
@@ -271,31 +266,31 @@ pub fn satisfies(attr: TokenStream, item: TokenStream) -> TokenStream {
 		.parse(attr)
 		.unwrap();
 
-	let mut implementations = Vec::new();
+	let implementations = attr_parsed
+		.iter()
+		.map(|arg| {
+			let target_trait = &arg.segments
+				.last()
+				.unwrap().ident;
+			let satisfy_trait = format_ident!(
+				"Satisfy{}",
+				target_trait,
+			);
 
-	// Extract trait names from #[satisfies(TraitName1, TraitName2)]
-	for arg in attr_parsed.iter() {
-		let target_trait = &arg.segments
-			.last()
-			.unwrap().ident;
-		let satisfy_trait = format_ident!(
-			"Satisfy{}",
-			target_trait,
-		);
-		implementations.push(quote! {
-			const _: () = {
-				let _ = {
-					struct _Check<T: #target_trait>(T);
+			quote! {
+				const _: () = {
+					let _ = {
+						struct _Check<T: #target_trait>(T);
+					};
 				};
-			};
-			impl #satisfy_trait for #struct_name {}
+				impl #satisfy_trait for #struct_name {}
+			}
 		});
-	}
 
 	// Generate the struct + implementations
 	let expanded = quote! {
-		use crate::__hidden::*;
 		#input
+		use crate::__hidden::*;
 		#(#implementations)*
 	};
 

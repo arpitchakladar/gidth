@@ -20,6 +20,7 @@ where
 #[allow(private_bounds)]
 #[siphon_traits]
 pub trait Int:
+	Real +
 	std::ops::Add<Output = Self> +
 	std::ops::Sub<Output = Self> +
 	std::ops::Mul<Output = Self> +
