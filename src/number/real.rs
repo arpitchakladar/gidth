@@ -26,48 +26,48 @@ pub trait Real:
 macro_rules! impl_real {
 	($($t:ty),*) => {
 		$(
-		impl Abs for $t {
-			#[inline(always)]
-			fn abs(self) -> Self {
-				if self >= 0.0 {
-					self
-				} else {
-					-self
+			impl Abs for $t {
+				#[inline(always)]
+				fn abs(self) -> Self {
+					if self >= 0.0 {
+						self
+					} else {
+						-self
+					}
 				}
 			}
-		}
 
-		impl Square for $t {
-			fn sq(self) -> Self {
-				self * self
-			}
-		}
-
-		impl Zero for $t {
-			#[inline(always)]
-			fn zero() -> Self {
-				0.0
+			impl Square for $t {
+				fn sq(self) -> Self {
+					self * self
+				}
 			}
 
-			#[inline(always)]
-			fn is_zero(&self) -> bool {
-				*self == 0.0
-			}
-		}
+			impl Zero for $t {
+				#[inline(always)]
+				fn zero() -> Self {
+					0.0
+				}
 
-		impl One for $t {
-			#[inline(always)]
-			fn one() -> Self {
-				1.0
+				#[inline(always)]
+				fn is_zero(&self) -> bool {
+					*self == 0.0
+				}
 			}
 
-			#[inline(always)]
-			fn is_one(&self) -> bool {
-				*self == 1.0
-			}
-		}
+			impl One for $t {
+				#[inline(always)]
+				fn one() -> Self {
+					1.0
+				}
 
-		satisfy!($t; Real);
+				#[inline(always)]
+				fn is_one(&self) -> bool {
+					*self == 1.0
+				}
+			}
+
+			satisfy!($t; Real);
 		)*
 	};
 }

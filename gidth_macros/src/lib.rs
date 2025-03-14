@@ -218,17 +218,22 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 		Some(TokenTree::Punct(p)) if p.as_char() == ';' => {},
 		_ => panic!("Expected a semicolon `;` after the first parameter"),
 	}
-	let trait_list = tokens
+	let (trait_list, satisfy_trait_list): (Vec<_>, Vec<_>) = tokens
 		.filter_map(|token| {
 			match token {
 				TokenTree::Ident(ident) => {
+					let current_trait = Ident::new(
+						&ident.to_string(),
+						Span::call_site(),
+					);
+					let satisfy_trait = format_ident!(
+						"Satisfy{}",
+						&current_trait,
+					);
 					Some(
-						format_ident!(
-							"Satisfy{}",
-							Ident::new(
-								&ident.to_string(),
-								Span::call_site(),
-							),
+						(
+							current_trait,
+							satisfy_trait,
 						),
 					)
 				},
@@ -237,12 +242,17 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 				_ => panic!("Unexpected token in type list"),
 			}
 		})
-		.collect::<Vec<_>>();
+		.unzip();
 
 	let expanded = quote! {
 		pub use crate::__hidden::*;
 		#(
-			impl #trait_list for #target_type {}
+			const _: () = {
+				let _ = {
+					struct _Check<T: #trait_list>(T);
+				};
+			};
+			impl #satisfy_trait_list for #target_type {}
 		)*
 	};
 
@@ -265,13 +275,19 @@ pub fn satisfies(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 	// Extract trait names from #[satisfies(TraitName1, TraitName2)]
 	for arg in attr_parsed.iter() {
+		let target_trait = &arg.segments
+			.last()
+			.unwrap().ident;
 		let satisfy_trait = format_ident!(
 			"Satisfy{}",
-			&arg.segments
-				.last()
-				.unwrap().ident,
+			target_trait,
 		);
 		implementations.push(quote! {
+			const _: () = {
+				let _ = {
+					struct _Check<T: #target_trait>(T);
+				};
+			};
 			impl #satisfy_trait for #struct_name {}
 		});
 	}
