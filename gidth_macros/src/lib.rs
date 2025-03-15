@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 use proc_macro::{
 	TokenStream,
 	TokenTree,
@@ -30,8 +31,8 @@ lazy_static! {
 	static ref METHOD_REGISTRY: Mutex<HashMap<String, Vec<String>>> =
 		Mutex::new(HashMap::new());
 
-	static ref DERIVED_TRAIT_REGISTRY: Mutex<Vec<String>> =
-		Mutex::new(Vec::new());
+	static ref DERIVED_TRAIT_REGISTRY: Mutex<HashMap<String, (Vec<String>, Vec<String>, String)>> =
+		Mutex::new(HashMap::new());
 }
 
 #[proc_macro_attribute]
@@ -109,13 +110,12 @@ pub fn siphon_traits(
 	item: TokenStream,
 ) -> TokenStream {
 	// Parse the trait definition
-	let mut input = parse_macro_input!(item as ItemTrait);
+	let input = parse_macro_input!(item as ItemTrait);
 	let trait_name = &input.ident;
-
-	let mut method_impls = Vec::new();
 
 	let method_registry = METHOD_REGISTRY.lock().unwrap();
 	let mut derived_trait_registry = DERIVED_TRAIT_REGISTRY.lock().unwrap();
+	let mut base_traits = Vec::new();
 
 	// Iterate over supertraits
 	for supertrait in &input.supertraits {
@@ -124,54 +124,78 @@ pub fn siphon_traits(
 				.last()
 				.unwrap()
 				.ident.to_string();
+
 			let method_signatures = method_registry
-				.get(&trait_ident)
-				.cloned()
-				.unwrap_or_default();
-
-			for method_signature in method_signatures.into_iter() {
-				let parsed_fn: TraitItemFn = parse_str(&method_signature)
-					.expect("Failed to parse method signature");
-				input.items.push(syn::TraitItem::Fn(parsed_fn.clone()));
-
-				let method_name = &parsed_fn.sig.ident;
-				let inputs = &parsed_fn.sig.inputs;
-				let output = &parsed_fn.sig.output;
-
-				// Extract parameter names
-				let param_names: Vec<_> = inputs.iter().map(|arg| {
-					match arg {
-						// Handle `self` properly
-						FnArg::Receiver(_) => quote!{ self },
-						FnArg::Typed(pat_type) => {
-							let pat = &pat_type.pat;
-							quote! { #pat }
-						}
-					}
-				}).collect();
-
-				// TODO: Avoid reimplmenting conflicting methods
-				// Generate method delegation dynamically
-				method_impls.push(quote! {
-					#[inline(always)]
-					fn #method_name(#inputs) #output {
-						#path::#method_name(#(#param_names),*)
-					}
-				});
+				.get(&trait_ident);
+			if let Some(_) = &method_signatures {
+				base_traits.push(trait_ident.clone());
 			}
 		}
 	}
+	let method_signatures: Vec<String> = input.items
+		.iter()
+		.filter_map(|item| {
+			if let TraitItem::Fn(TraitItemFn { sig, .. }) = item {
+				let method_name = sig.ident.to_string();
+
+				// Extract parameter types
+				let params: Vec<String> = sig.inputs
+					.iter()
+					.map(|arg| {
+						match arg {
+							FnArg::Receiver(rec) => {
+								let has_ref = if rec.reference.is_none() {
+									""
+								} else {
+									"&"
+								};
+								let if_mut = if rec.mutability.is_none() {
+									""
+								} else {
+									"mut"
+								};
+
+								format!("{}{} self", has_ref, if_mut)
+							},
+							FnArg::Typed(pat_type) => {
+								format!("{}", quote! { #pat_type })
+							},
+						}
+					}).collect();
+
+				// Extract return type
+				let return_type = match &sig.output {
+					ReturnType::Default => "-> ()".to_string(),
+					ReturnType::Type(_, ty) => format!("-> {}", quote! { #ty }),
+				};
+
+				Some(
+					format!(
+						"fn {}({}) {};",
+						method_name,
+						params.join(", "),
+						return_type,
+					),
+				)
+			} else {
+				None
+			}
+		}).collect();
 
 	let satisfy_trait = format_ident!("Satisfy{}", &trait_name);
 	let supertraits = &input.supertraits;
-	derived_trait_registry.push(satisfy_trait.to_string());
+	derived_trait_registry.insert(
+		trait_name.to_string(),
+		(
+			base_traits,
+			method_signatures,
+			(quote! { #supertraits })
+				.to_string(),
+		),
+	);
 
 	let expanded = quote! {
-		#input
-		use crate::__hidden::#satisfy_trait;
-		impl<T: #satisfy_trait + #supertraits> #trait_name for T {
-			#(#method_impls)*
-		}
+		pub use crate::__hidden::{ #satisfy_trait, #trait_name };
 	};
 
 	TokenStream::from(expanded)
@@ -182,13 +206,78 @@ pub fn place_hidden(_item: TokenStream) -> TokenStream {
 	let derived_trait_registry = DERIVED_TRAIT_REGISTRY
 		.lock()
 		.unwrap();
-
+	let method_registry = METHOD_REGISTRY.lock().unwrap();
 	let trait_definitions: Vec<_> = derived_trait_registry
 		.iter()
-		.map(|name| {
-			let trait_ident = format_ident!("{}", name);
+		.map(|(trait_name, (supertraits, method_signatures, x))| {
+			let trait_name = format_ident!("{}", trait_name);
+			let satisfy_trait_ident = format_ident!("Satisfy{}", &trait_name);
+			let mut method_impls = Vec::new();
+			let mut x_method_signatures = method_signatures
+				.iter()
+				.map(|method_signature| {
+					let parsed_str = parse_str::<TraitItemFn>(&method_signature)
+						.expect("Failed to parse method signature");
+					quote! { #parsed_str }
+				})
+				.collect::<Vec<_>>();
+			for trait_ident in supertraits.iter() {
+				let method_signatures = method_registry
+					.get(trait_ident)
+					.cloned()
+					.unwrap_or_default();
+				let trait_ident = format_ident!("{}", trait_ident);
+
+				for method_signature in method_signatures.iter() {
+					let parsed_fn: TraitItemFn = parse_str(method_signature)
+						.expect("Failed to parse method signature");
+
+					let method_name = &parsed_fn.sig.ident;
+					let inputs = &parsed_fn.sig.inputs;
+					let output = &parsed_fn.sig.output;
+
+					// Extract parameter names
+					let param_names: Vec<_> = inputs
+						.iter()
+						.map(|arg| {
+							match arg {
+								// Handle `self` properly
+								FnArg::Receiver(_) => quote!{ self },
+								FnArg::Typed(pat_type) => {
+									let pat = &pat_type.pat;
+									quote! { #pat }
+								}
+							}
+						}).collect();
+
+					// TODO: Avoid reimplmenting conflicting methods
+					// Generate method delegation dynamically
+					method_impls.push(quote! {
+						#[inline(always)]
+						fn #method_name(#inputs) #output {
+							#trait_ident::#method_name(#(#param_names),*)
+						}
+					});
+
+					x_method_signatures.push(
+						quote! {
+							fn #method_name(#inputs) #output;
+						}
+					);
+				}
+			}
+
+			let supertraits = proc_macro2::TokenStream::from_str(x).unwrap();
+
 			quote! {
-				pub trait #trait_ident {}
+				use crate::number::*;
+				pub trait #satisfy_trait_ident {}
+				pub trait #trait_name: #supertraits {
+					#(#x_method_signatures)*
+				}
+				impl<T: #satisfy_trait_ident + #supertraits> #trait_name for T {
+					#(#method_impls)*
+				}
 			}
 		})
 		.collect();

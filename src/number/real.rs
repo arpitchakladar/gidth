@@ -9,7 +9,6 @@ use gidth_macros::{
 	satisfy,
 };
 
-#[allow(private_bounds)]
 #[siphon_traits]
 pub trait Real:
 	std::ops::Add<Output = Self> +
@@ -67,6 +66,7 @@ macro_rules! impl_real {
 				}
 			}
 
+			// Make all primitive floats satisfyReal
 			satisfy!($t; Real);
 		)*
 	};

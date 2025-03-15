@@ -17,7 +17,6 @@ where
 	fn divmod(self, rhs: T) -> (Self, T);
 }
 
-#[allow(private_bounds)]
 #[siphon_traits]
 pub trait Int:
 	Real +
@@ -103,6 +102,7 @@ macro_rules! impl_integer {
 				}
 			}
 
+			// Make all primitive integers satisfy Int and Real
 			satisfy!($t; Int, Real);
 		)*
 	};
