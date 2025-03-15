@@ -14,6 +14,7 @@ lazy_static! {
 	pub(crate) static ref METHOD_REGISTRY: Mutex<HashMap<String, Vec<String>>> = Mutex::new(HashMap::new());
 }
 
+// TODO: Make it work with traits with generics and lifetimes
 pub(crate) fn register_trait(
 	_attr: TokenStream,
 	trait_item: TokenStream,
@@ -22,7 +23,10 @@ pub(crate) fn register_trait(
 	let trait_name = parsed_trait.ident.to_string();
 
 	// Extract method signatures
-	let method_signatures: Vec<String> = extract_method_signatures(&parsed_trait);
+	let method_signatures: Vec<String> =
+		extract_method_signatures(
+			&parsed_trait,
+		);
 
 	// Store method signatures in the registry
 	if let Ok(mut registry) = METHOD_REGISTRY.lock() {

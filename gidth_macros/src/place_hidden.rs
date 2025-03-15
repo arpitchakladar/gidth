@@ -59,16 +59,19 @@ pub fn place_hidden(_input: TokenStream) -> TokenStream {
 						});
 
 						// Add the method signature to the trait
-						trait_method_signatures.push(quote! {
-							fn #method_name(#method_params) #return_type;
-						});
+						trait_method_signatures.push(
+							quote! {
+								fn #method_name(#method_params) #return_type;
+							},
+						);
 					}
 				}
 			}
 
-			let supertraits_tokens = proc_macro2::TokenStream::from_str(
-				supertraits_tokens,
-			).unwrap();
+			let supertraits_tokens =
+				proc_macro2::TokenStream::from_str(
+					supertraits_tokens,
+				).unwrap();
 
 			quote! {
 				pub trait #satisfy_trait_ident {}

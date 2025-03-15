@@ -18,7 +18,8 @@ impl std::fmt::Display for BigInt {
 					|carry, byte| {
 						// Combine carry and byte
 						let current = (carry << 32) + *byte as u64;
-						*byte = (current / 10) as u32; // Quotient back into the byte
+						// Quotient back into the byte
+						*byte = (current / 10) as u32;
 
 						current % 10 // New carry is the remainder
 					},

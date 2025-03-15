@@ -20,7 +20,9 @@ use syn::{
 };
 
 /// Parses the first identifier from the input token stream.
-fn parse_target_type(tokens: &mut impl Iterator<Item = TokenTree>) -> Ident {
+fn parse_target_type(
+	tokens: &mut impl Iterator<Item = TokenTree>,
+) -> Ident {
 	match tokens.next() {
 		Some(TokenTree::Group(group)) => {
 			parse2::<Ident>(
@@ -36,7 +38,9 @@ fn parse_target_type(tokens: &mut impl Iterator<Item = TokenTree>) -> Ident {
 
 
 /// Ensures the next token is a semicolon, otherwise panics.
-fn expect_semicolon(tokens: &mut impl Iterator<Item = TokenTree>) {
+fn expect_semicolon(
+	tokens: &mut impl Iterator<Item = TokenTree>,
+) {
 	match tokens.next() {
 		Some(TokenTree::Punct(p)) if p.as_char() == ';' => {}
 		_ => panic!("Expected a semicolon `;` after the first parameter"),
@@ -44,12 +48,23 @@ fn expect_semicolon(tokens: &mut impl Iterator<Item = TokenTree>) {
 }
 
 /// Generates trait satisfaction checks for a given type.
-fn generate_satisfaction_checks(target_type: &Ident, tokens: impl Iterator<Item = TokenTree>) -> Vec<proc_macro2::TokenStream> {
+fn generate_satisfaction_checks(
+	target_type: &Ident,
+	tokens: impl Iterator<Item = TokenTree>,
+) -> Vec<proc_macro2::TokenStream> {
 	tokens.filter_map(|token| {
 		match token {
 			TokenTree::Ident(ident) => {
-				let target_trait = Ident::new(&ident.to_string(), Span::call_site());
-				let satisfy_trait = format_ident!("Satisfy{}", target_trait);
+				let target_trait =
+					Ident::new(
+						&ident.to_string(),
+						Span::call_site(),
+					);
+				let satisfy_trait =
+					format_ident!(
+						"Satisfy{}",
+						target_trait,
+					);
 
 				Some(quote! {
 					const _: () = {
@@ -69,7 +84,11 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 	let mut tokens = input.into_iter();
 	let target_type = parse_target_type(&mut tokens);
 	expect_semicolon(&mut tokens);
-	let implementations = generate_satisfaction_checks(&target_type, tokens);
+	let implementations =
+		generate_satisfaction_checks(
+			&target_type,
+			tokens,
+		);
 
 	let expanded = quote! {
 		pub use crate::__hidden::*;
@@ -80,25 +99,32 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 }
 
 /// Macro to enforce trait satisfaction for a struct using an attribute.
-pub fn satisfies(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn satisfies(
+	attr: TokenStream,
+	item: TokenStream,
+) -> TokenStream {
 	let input = parse_macro_input!(item as ItemStruct);
 	let struct_name = &input.ident;
 
 	// Parse the attribute arguments
 	type AttrsType = Punctuated<syn::Path, syn::Token![,]>;
-	let attr_parsed = AttrsType::parse_terminated.parse(attr).unwrap();
+	let attr_parsed = AttrsType::parse_terminated
+		.parse(attr)
+		.unwrap();
 
-	let implementations = attr_parsed.iter().map(|arg| {
-		let target_trait = &arg.segments.last().unwrap().ident;
-		let satisfy_trait = format_ident!("Satisfy{}", target_trait);
+	let implementations = attr_parsed
+		.iter()
+		.map(|arg| {
+			let target_trait = &arg.segments.last().unwrap().ident;
+			let satisfy_trait = format_ident!("Satisfy{}", target_trait);
 
-		quote! {
-			const _: () = {
-				let _ = { struct _Check<T: #target_trait>(T); };
-			};
-			impl #satisfy_trait for #struct_name {}
-		}
-	});
+			quote! {
+				const _: () = {
+					let _ = { struct _Check<T: #target_trait>(T); };
+				};
+				impl #satisfy_trait for #struct_name {}
+			}
+		});
 
 	let expanded = quote! {
 		#input
@@ -108,4 +134,3 @@ pub fn satisfies(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 	TokenStream::from(expanded)
 }
-

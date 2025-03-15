@@ -45,7 +45,12 @@ fn find_modules_rec(
 ) {
 	if let Ok(entries) = fs::read_dir(path) {
 		for entry in entries.flatten() {
-			process_directory_entry(&entry.path(), prefix, modules, regex);
+			process_directory_entry(
+				&entry.path(),
+				prefix,
+				modules,
+				regex,
+			);
 		}
 	}
 }
@@ -86,15 +91,17 @@ pub(crate) fn find_modules() -> Vec<proc_macro2::TokenStream> {
 	let lib_rs_path = crate_root.join("src/lib.rs");
 	let mut modules = Vec::new();
 
-	let regex = Regex::new(
-		r"(?m)^\s*pub(?:\s*\(crate\))?\s*mod\s+(\w+);",
-	).unwrap();
+	let regex =
+		Regex::new(
+			r"(?m)^\s*pub(?:\s*\(crate\))?\s*mod\s+(\w+);",
+		).unwrap();
 
 	if lib_rs_path.exists() {
-		let public_modules = parse_public_modules_from_file(
-			&lib_rs_path,
-			&regex,
-		);
+		let public_modules =
+			parse_public_modules_from_file(
+				&lib_rs_path,
+				&regex,
+			);
 		for module_name in public_modules {
 			let module_path = format!("crate::{module_name}");
 			modules.push(module_path.clone());
@@ -115,4 +122,3 @@ pub(crate) fn find_modules() -> Vec<proc_macro2::TokenStream> {
 		})
 		.collect()
 }
-

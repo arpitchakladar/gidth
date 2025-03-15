@@ -10,14 +10,32 @@ use quote::quote;
 
 use crate::register_trait::METHOD_REGISTRY;
 
+// TODO: Make it work with traits with generics and lifetimes
+
 // Formats function parameters into strings
 fn format_fn_arg(arg: &FnArg) -> String {
 	match arg {
 		FnArg::Receiver(receiver) => {
-			let reference_prefix = if receiver.reference.is_some() { "&" } else { "" };
-			let mutability = if receiver.mutability.is_some() { "mut " } else { "" };
+			let reference_prefix = {
+				if receiver.reference.is_some() {
+					"&"
+				} else {
+					""
+				}
+			};
+			let mutability = {
+				if receiver.mutability.is_some() {
+					"mut "
+				} else {
+					""
+				}
+			};
 
-			format!("{}{}self", reference_prefix, mutability)
+			format!(
+				"{}{}self",
+				reference_prefix,
+				mutability,
+			)
 		}
 		FnArg::Typed(pat_type) => format!("{}", quote! { #pat_type }),
 	}
@@ -32,7 +50,9 @@ fn format_return_type(return_type: &ReturnType) -> String {
 }
 
 // Extracts base trait names from the given trait definition.
-pub(crate) fn extract_base_traits(trait_def: &ItemTrait) -> Vec<String> {
+pub(crate) fn extract_base_traits(
+	trait_def: &ItemTrait,
+) -> Vec<String> {
 	let method_registry = METHOD_REGISTRY.lock().unwrap();
 	trait_def.supertraits
 		.iter()
@@ -55,7 +75,9 @@ pub(crate) fn extract_base_traits(trait_def: &ItemTrait) -> Vec<String> {
 }
 
 // Extracts method signatures from the given trait definition.
-pub(crate) fn extract_method_signatures(trait_def: &ItemTrait) -> Vec<String> {
+pub(crate) fn extract_method_signatures(
+	trait_def: &ItemTrait,
+) -> Vec<String> {
 	trait_def
 		.items
 		.iter()
@@ -68,7 +90,10 @@ pub(crate) fn extract_method_signatures(trait_def: &ItemTrait) -> Vec<String> {
 					.iter()
 					.map(format_fn_arg)
 					.collect();
-				let return_type = format_return_type(&method.sig.output);
+				let return_type =
+					format_return_type(
+						&method.sig.output,
+					);
 
 				Some(
 					format!(
