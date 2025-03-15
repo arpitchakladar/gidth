@@ -1,95 +1,82 @@
 use std::str::FromStr;
 use proc_macro::TokenStream;
-use quote::{
-	quote,
-	format_ident,
-};
-use syn::{
-	FnArg,
-	parse_str,
-	TraitItemFn,
-};
+use quote::{quote, format_ident};
+use syn::{FnArg, parse_str, TraitItemFn};
 
 use crate::find_modules::find_modules;
 use crate::siphon_traits::DERIVED_TRAIT_REGISTRY;
 use crate::register_trait::METHOD_REGISTRY;
 
-pub fn place_hidden(_item: TokenStream) -> TokenStream {
-	let modules = find_modules();
+pub fn place_hidden(_input: TokenStream) -> TokenStream {
+	let module_paths = find_modules();
 
-	let derived_trait_registry = DERIVED_TRAIT_REGISTRY
-		.lock()
-		.unwrap();
+	let trait_registry = DERIVED_TRAIT_REGISTRY.lock().unwrap();
 	let method_registry = METHOD_REGISTRY.lock().unwrap();
-	let trait_definitions: Vec<_> = derived_trait_registry
+
+	let generated_traits: Vec<_> = trait_registry
 		.iter()
-		.map(|(trait_name, (supertraits, method_signatures, x))| {
-			let trait_name = format_ident!("{}", trait_name);
-			let satisfy_trait_ident = format_ident!("Satisfy{}", &trait_name);
-			let mut method_impls = Vec::new();
-			let mut x_method_signatures = method_signatures
+		.map(|(trait_name, (supertraits, method_signatures, supertraits_tokens))| {
+			let trait_ident = format_ident!("{}", trait_name);
+			let satisfy_trait_ident = format_ident!("Satisfy{}", trait_ident);
+			let mut method_implementations = Vec::new();
+			let mut trait_method_signatures: Vec<_> = method_signatures
 				.iter()
-				.map(|method_signature| {
-					let parsed_str = parse_str::<TraitItemFn>(&method_signature)
-						.expect("Failed to parse method signature");
-					quote! { #parsed_str }
-				})
-				.collect::<Vec<_>>();
-			for trait_ident in supertraits.iter() {
-				let method_signatures = method_registry
-					.get(trait_ident)
+				.filter_map(|signature| parse_str::<TraitItemFn>(signature).ok())
+				.map(|parsed_signature| quote! { #parsed_signature })
+				.collect();
+
+			for supertrait_name in supertraits.iter() {
+				let inherited_method_signatures = method_registry
+					.get(supertrait_name)
 					.cloned()
 					.unwrap_or_default();
-				let trait_ident = format_ident!("{}", trait_ident);
+				let supertrait_ident = format_ident!("{}", supertrait_name);
 
-				for method_signature in method_signatures.iter() {
-					let parsed_fn: TraitItemFn = parse_str(method_signature)
-						.expect("Failed to parse method signature");
+				for method_signature in inherited_method_signatures.iter() {
+					if let Ok(parsed_method) = parse_str::<TraitItemFn>(method_signature) {
+						let method_name = &parsed_method.sig.ident;
+						let method_params = &parsed_method.sig.inputs;
+						let return_type = &parsed_method.sig.output;
 
-					let method_name = &parsed_fn.sig.ident;
-					let inputs = &parsed_fn.sig.inputs;
-					let output = &parsed_fn.sig.output;
-
-					// Extract parameter names
-					let param_names: Vec<_> = inputs
-						.iter()
-						.map(|arg| {
-							match arg {
-								// Handle `self` properly
-								FnArg::Receiver(_) => quote!{ self },
-								FnArg::Typed(pat_type) => {
-									let pat = &pat_type.pat;
-									quote! { #pat }
+						// Extract parameter names for delegation
+						let parameter_names: Vec<_> = method_params
+							.iter()
+							.map(|param| match param {
+								FnArg::Receiver(_) => quote! { self },
+								FnArg::Typed(pattern) => {
+									let param_name = &pattern.pat;
+									quote! { #param_name }
 								}
+							})
+							.collect();
+
+						// Generate method delegation dynamically
+						method_implementations.push(quote! {
+							#[inline(always)]
+							fn #method_name(#method_params) #return_type {
+								#supertrait_ident::#method_name(#(#parameter_names),*)
 							}
-						}).collect();
+						});
 
-					// TODO: Avoid reimplmenting conflicting methods
-					// Generate method delegation dynamically
-					method_impls.push(quote! {
-						#[inline(always)]
-						fn #method_name(#inputs) #output {
-							#trait_ident::#method_name(#(#param_names),*)
-						}
-					});
-
-					x_method_signatures.push(
-						quote! {
-							fn #method_name(#inputs) #output;
-						}
-					);
+						// Add the method signature to the trait
+						trait_method_signatures.push(quote! {
+							fn #method_name(#method_params) #return_type;
+						});
+					}
 				}
 			}
 
-			let supertraits = proc_macro2::TokenStream::from_str(x).unwrap();
+			let supertraits_tokens = proc_macro2::TokenStream::from_str(
+				supertraits_tokens,
+			).unwrap();
 
 			quote! {
 				pub trait #satisfy_trait_ident {}
-				pub trait #trait_name: #supertraits {
-					#(#x_method_signatures)*
+				pub trait #trait_ident: #supertraits_tokens {
+					#(#trait_method_signatures)*
 				}
-				impl<T: #satisfy_trait_ident + #supertraits> #trait_name for T {
-					#(#method_impls)*
+				impl<T: #satisfy_trait_ident + #supertraits_tokens> #trait_ident for T {
+					#(#method_implementations)*
 				}
 			}
 		})
@@ -97,8 +84,8 @@ pub fn place_hidden(_item: TokenStream) -> TokenStream {
 
 	let expanded = quote! {
 		pub mod __hidden {
-			#(use #modules::*;)*
-			#(#trait_definitions)*
+			#(use #module_paths::*;)*
+			#(#generated_traits)*
 		}
 	};
 

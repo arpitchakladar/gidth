@@ -5,6 +5,7 @@ mod place_hidden;
 mod register_trait;
 mod satisfy;
 mod siphon_traits;
+mod trait_analysis;
 
 #[proc_macro_attribute]
 pub fn register_trait(

@@ -1,64 +1,118 @@
-use std::str::FromStr;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::str::FromStr;
+use regex::Regex;
+use cargo_metadata::MetadataCommand;
 
-fn is_public_module(file_path: &Path, module_name: &str) -> bool {
-	if let Ok(content) = fs::read_to_string(file_path) {
-		let pub_mod_decl = format!("pub mod {}", module_name);
-		let pub_crate_mod_decl = format!("pub(crate) mod {}", module_name);
-		content.contains(&pub_mod_decl) || content.contains(&pub_crate_mod_decl)
-	} else {
-		false
+// Retrieves the root path of the crate using `cargo_metadata`.
+fn get_crate_root() -> PathBuf {
+	MetadataCommand::new()
+		.exec()
+		.map(|metadata| PathBuf::from(metadata.workspace_root))
+		// Fallback to "src" if metadata fails
+		.unwrap_or_else(|_| PathBuf::from("src"))
+}
+
+// Checks if a module is public in the given file.
+fn is_public_module(file_path: &Path, regex: &Regex) -> bool {
+	fs::read_to_string(file_path)
+		.map(|content| regex.is_match(&content))
+		.unwrap_or(false)
+}
+
+// Extracts public module names from a file using regex.
+fn parse_public_modules_from_file(
+	file_path: &Path,
+	regex: &Regex,
+) -> Vec<String> {
+	fs::read_to_string(file_path)
+		.map(|content| {
+			content
+				.lines()
+				.filter_map(|line| regex.captures(line))
+				.map(|cap| cap[1].to_string())
+				.collect()
+		})
+		.unwrap_or_default()
+}
+
+// Recursively finds public modules in the given directory.
+fn find_modules_rec(
+	path: &Path,
+	prefix: &str,
+	modules: &mut Vec<String>,
+	regex: &Regex,
+) {
+	if let Ok(entries) = fs::read_dir(path) {
+		for entry in entries.flatten() {
+			process_directory_entry(&entry.path(), prefix, modules, regex);
+		}
 	}
 }
 
-/// Recursively finds modules, checking if they are public
-fn find_modules_rec(path: &Path, prefix: &str, modules: &mut Vec<String>) {
-	if let Ok(entries) = fs::read_dir(path) {
-		for entry in entries.flatten() {
-			let path = entry.path();
-			let file_name = path.file_stem().unwrap().to_string_lossy().to_string();
-
-			if path.is_dir() {
-				let mod_rs_path = path.join("mod.rs");
-				if mod_rs_path.exists() && is_public_module(&mod_rs_path, &file_name) {
-					let mod_path = format!("{}::{}", prefix, file_name);
-					modules.push(mod_path.clone());
-					find_modules_rec(&path, &mod_path, modules);
-				}
-			} else if path.extension().map(|e| e == "rs").unwrap_or(false) {
-				if file_name != "mod" {
-					let parent_mod_rs = path.parent().unwrap().join("mod.rs");
-					if !parent_mod_rs.exists() || is_public_module(&parent_mod_rs, &file_name) {
-						modules.push(format!("{}::{}", prefix, file_name));
-					}
-				}
+// Processes a directory entry and determines if it's a public module.
+fn process_directory_entry(
+	path: &Path,
+	prefix: &str,
+	modules: &mut Vec<String>,
+	regex: &Regex,
+) {
+	if let Some(file_stem) = path.file_stem().and_then(|s| s.to_str()) {
+		if path.is_dir() {
+			let mod_rs_path = path.join("mod.rs");
+			if mod_rs_path.exists() && is_public_module(&mod_rs_path, regex) {
+				let mod_path = format!("{prefix}::{file_stem}");
+				modules.push(mod_path.clone());
+				find_modules_rec(&path, &mod_path, modules, regex);
+			}
+		} else if path.extension().and_then(|ext| ext.to_str()) == Some("rs") &&
+			file_stem != "mod"
+		{
+			let parent_mod_rs = path.parent().map(|p| p.join("mod.rs"));
+			if parent_mod_rs.as_ref().map(|p| !p.exists()).unwrap_or(true) ||
+				parent_mod_rs.as_ref()
+					.map_or(false, |p| is_public_module(p, regex))
+			{
+				modules.push(format!("{prefix}::{file_stem}"));
 			}
 		}
 	}
 }
 
+// Finds public modules in the crate root (not just "src/lib.rs").
 pub(crate) fn find_modules() -> Vec<proc_macro2::TokenStream> {
+	let crate_root = get_crate_root();
+	// Assume "src/lib.rs" as the main entry point
+	let lib_rs_path = crate_root.join("src/lib.rs");
 	let mut modules = Vec::new();
-	let lib_rs_path = Path::new("src/lib.rs");
+
+	let regex = Regex::new(
+		r"(?m)^\s*pub(?:\s*\(crate\))?\s*mod\s+(\w+);",
+	).unwrap();
+
 	if lib_rs_path.exists() {
-		if let Ok(content) = fs::read_to_string(lib_rs_path) {
-			for line in content.lines() {
-				if let Some(start) = line.find("pub mod ") {
-					let end = line[start + 8..].find(';');
-					if let Some(end) = end {
-						let module_name = &line[start + 8..start + 8 + end];
-						let module_path = format!("crate::{}", module_name);
-						modules.push(module_path.clone());
-						find_modules_rec(&Path::new("src").join(module_name), &module_path, &mut modules);
-					}
-				}
-			}
+		let public_modules = parse_public_modules_from_file(
+			&lib_rs_path,
+			&regex,
+		);
+		for module_name in public_modules {
+			let module_path = format!("crate::{module_name}");
+			modules.push(module_path.clone());
+			find_modules_rec(
+				&crate_root.join("src")
+					.join(&module_name),
+				&module_path,
+				&mut modules,
+				&regex,
+			);
 		}
 	}
 
 	modules
 		.iter()
-		.map(|x| proc_macro2::TokenStream::from_str(x).unwrap())
-		.collect::<Vec<_>>()
+		.filter_map(|module| {
+			proc_macro2::TokenStream::from_str(module).ok()
+		})
+		.collect()
 }
+
