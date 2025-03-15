@@ -26,6 +26,43 @@ use syn::{
 };
 use std::sync::Mutex;
 use lazy_static::lazy_static;
+use std::fs;
+use std::path::{Path, PathBuf};
+
+fn is_public_module(file_path: &Path, module_name: &str) -> bool {
+	if let Ok(content) = fs::read_to_string(file_path) {
+		let pub_mod_decl = format!("pub mod {}", module_name);
+		let pub_crate_mod_decl = format!("pub(crate) mod {}", module_name);
+		return content.contains(&pub_mod_decl) || content.contains(&pub_crate_mod_decl);
+	}
+	false
+}
+
+/// Recursively finds modules, checking if they are public
+fn find_modules(path: &Path, prefix: &str, modules: &mut Vec<String>) {
+	if let Ok(entries) = fs::read_dir(path) {
+		for entry in entries.flatten() {
+			let path = entry.path();
+			let file_name = path.file_stem().unwrap().to_string_lossy().to_string();
+
+			if path.is_dir() {
+				let mod_rs_path = path.join("mod.rs");
+				if mod_rs_path.exists() && is_public_module(&mod_rs_path, &file_name) {
+					let mod_path = format!("{}::{}", prefix, file_name);
+					modules.push(mod_path.clone());
+					find_modules(&path, &mod_path, modules);
+				}
+			} else if path.extension().map(|e| e == "rs").unwrap_or(false) {
+				if file_name != "mod" {
+					let parent_mod_rs = path.parent().unwrap().join("mod.rs");
+					if !parent_mod_rs.exists() || is_public_module(&parent_mod_rs, &file_name) {
+						modules.push(format!("{}::{}", prefix, file_name));
+					}
+				}
+			}
+		}
+	}
+}
 
 lazy_static! {
 	static ref METHOD_REGISTRY: Mutex<HashMap<String, Vec<String>>> =
@@ -203,6 +240,28 @@ pub fn siphon_traits(
 
 #[proc_macro]
 pub fn place_hidden(_item: TokenStream) -> TokenStream {
+	let mut modules = Vec::new();
+	let lib_rs_path = Path::new("src/lib.rs");
+	if lib_rs_path.exists() {
+		if let Ok(content) = fs::read_to_string(lib_rs_path) {
+			for line in content.lines() {
+				if let Some(start) = line.find("pub mod ") {
+					let end = line[start + 8..].find(';');
+					if let Some(end) = end {
+						let module_name = &line[start + 8..start + 8 + end];
+						let module_path = format!("crate::{}", module_name);
+						modules.push(module_path.clone());
+						find_modules(&Path::new("src").join(module_name), &module_path, &mut modules);
+					}
+				}
+			}
+		}
+	}
+	let modules = modules
+		.iter()
+		.map(|x| proc_macro2::TokenStream::from_str(x).unwrap())
+		.collect::<Vec<_>>();
+
 	let derived_trait_registry = DERIVED_TRAIT_REGISTRY
 		.lock()
 		.unwrap();
@@ -270,7 +329,6 @@ pub fn place_hidden(_item: TokenStream) -> TokenStream {
 			let supertraits = proc_macro2::TokenStream::from_str(x).unwrap();
 
 			quote! {
-				use crate::number::*;
 				pub trait #satisfy_trait_ident {}
 				pub trait #trait_name: #supertraits {
 					#(#x_method_signatures)*
@@ -284,6 +342,7 @@ pub fn place_hidden(_item: TokenStream) -> TokenStream {
 
 	let expanded = quote! {
 		pub mod __hidden {
+			#(use #modules::*;)*
 			#(#trait_definitions)*
 		}
 	};
