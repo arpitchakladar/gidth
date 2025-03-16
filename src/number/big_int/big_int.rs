@@ -1,5 +1,7 @@
 use inherent::inherent;
 
+use gidth_macros::satisfies;
+
 use crate::number::{
 	Int,
 	Zero,
@@ -7,6 +9,7 @@ use crate::number::{
 };
 
 #[derive(Clone)]
+#[satisfies(Int)]
 pub struct BigInt {
 	pub(crate) positive: bool,
 	pub(crate) limbs: Vec<u32>,
@@ -65,5 +68,3 @@ impl One for BigInt {
 			.any(|x| x != 0)
 	}
 }
-
-impl Int for BigInt {}

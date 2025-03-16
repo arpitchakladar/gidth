@@ -1,5 +1,7 @@
 use inherent::inherent;
 
+use gidth_macros::satisfies;
+
 use crate::number::{
 	Zero,
 	Real,
@@ -7,6 +9,7 @@ use crate::number::{
 };
 
 #[derive(Clone, Debug)]
+#[satisfies(Real)]
 pub struct BigDecimal {
 	pub(crate) positive: bool,
 	pub(crate) limbs: Vec<u32>,
@@ -71,5 +74,3 @@ impl One for BigDecimal {
 			.any(|x| x != 0)
 	}
 }
-
-impl Real for BigDecimal {}

@@ -1,0 +1,15 @@
+[package]
+name = "gidth_macros"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+cargo_metadata = "0.19.2"
+lazy_static = "1.5.0"
+proc-macro2 = "1.0.94"
+quote = "1.0.40"
+regex = "1.11.1"
+syn = { version = "2.0.100", features = ["full"] }
