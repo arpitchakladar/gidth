@@ -1,4 +1,4 @@
-use gidth::number::{Int};
+use gidth::number::{Int,BigDecimal};
 // use gidth_macros::auto_wrap_ints;
 
 // #[test]
@@ -112,9 +112,14 @@ use gidth::number::{Int};
 // 	// println!("{}", x4);
 // }
 
+// #[test]
+// fn testing() {
+// 	let x: i32 = 69;
+// 	println!("{:?}", x.sq());
+// }
+//
 #[test]
-// #[auto_wrap_ints]
-fn testing() {
-	let x: i32 = 69;
-	println!("{:?}", x.sq());
+fn test_powf() {
+	let ln1p5 = 1.5f64;
+	println!("{}", BigDecimal::ln(ln1p5));
 }
