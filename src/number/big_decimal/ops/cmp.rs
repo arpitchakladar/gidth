@@ -58,7 +58,7 @@ impl Ord for BigDecimal {
 }
 
 impl BigDecimal {
-	pub(crate) fn u_gt(&self, rhs: &BigDecimal) -> bool {
+	pub fn u_gt(&self, rhs: &BigDecimal) -> bool {
 		match self.order().cmp(&rhs.order()) {
 			std::cmp::Ordering::Greater => true,
 			std::cmp::Ordering::Less => false,
@@ -69,7 +69,13 @@ impl BigDecimal {
 					.zip(rhs.limbs.iter().rev())
 					.find(|(left, right)| left != right)
 					.map(|(left, right)| left > right)
-					.unwrap_or(false),
+					.unwrap_or_else(|| {
+						self.limbs.len() > rhs.limbs.len() &&
+						self.limbs[rhs.limbs.len()..]
+							.iter()
+							.copied()
+							.any(|limb| limb != 0)
+					}),
 		}
 	}
 }
