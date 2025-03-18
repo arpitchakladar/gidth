@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use lazy_static::lazy_static;
 use proc_macro::TokenStream;
+use proc_macro_error::abort_call_site;
 use syn::{
 	parse_macro_input,
 	ItemTrait,
@@ -29,9 +30,27 @@ pub(crate) fn register_trait(
 		);
 
 	// Store method signatures in the registry
-	if let Ok(mut registry) = METHOD_REGISTRY.lock() {
-		registry.insert(trait_name, method_signatures);
-	}
+	let mut method_registry = METHOD_REGISTRY
+		.lock()
+		.unwrap_or_else(|e| {
+			abort_call_site!(
+				"Failed to lock access METHOD_REGISTRY: {}",
+				e,
+			)
+		});
+	method_registry
+		.insert(
+			trait_name.clone(),
+			method_signatures,
+		)
+		// if the a trait with same name already exists
+		// then abort
+		.map(|_| {
+			abort_call_site!(
+				"Duplicate traits with name \"{}\" already exists in METHOD_REGISTRY.",
+				&trait_name,
+			)
+		});
 
 	TokenStream::from(
 		quote! {
