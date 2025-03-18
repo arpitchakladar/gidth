@@ -60,3 +60,42 @@ pub(crate) fn mul_by_small_int(
 		lhs.push(carry as u32);
 	}
 }
+
+pub(crate) fn adjusted_guess_for_div(
+	reg: &[u32],
+	rhs_limbs: &[u32],
+	num_limbs: &[u32],
+) -> u32 {
+	let l_rhs = rhs_limbs.len();
+	let (num_limb, sig_reg, sig_rhs) = {
+		match (num_limbs.len(), reg.len()) {
+			(num_len, reg_len) if num_len > reg_len => (
+				((num_limbs[num_len - 1] as u64) << 32) +
+					num_limbs[num_len - 2] as u64,
+				reg[reg_len - 1] as u64,
+				rhs_limbs[l_rhs - 1] as u64,
+			),
+			(num_len, reg_len) if reg_len > 1 => (
+				((num_limbs[num_len - 1] as u64) << 32) +
+					num_limbs[num_len - 2] as u64,
+				((reg[reg_len - 1] as u64) << 32) +
+					reg[reg_len - 2] as u64,
+				((rhs_limbs[l_rhs - 1] as u64) << 32) +
+					rhs_limbs[l_rhs - 2] as u64,
+			),
+			(num_len, reg_len) => (
+				num_limbs[num_len - 1] as u64,
+				reg[reg_len - 1] as u64,
+				rhs_limbs[l_rhs - 1] as u64,
+			),
+		}
+	};
+
+	std::cmp::max(
+		// If we are close only decrement by 1
+		1u32,
+		// Calcualte if the guess way too far off
+		// The 2 is to make sure we don't overshoot it
+		((num_limb - sig_reg) / (sig_rhs * 2)) as u32,
+	)
+}

@@ -3,6 +3,7 @@ use crate::number::utils::{
 	sub_from_slice,
 	cmp_limb_arrays,
 	mul_by_small_int,
+	adjusted_guess_for_div,
 };
 
 impl BigDecimal {
@@ -51,38 +52,12 @@ impl BigDecimal {
 						start = end.saturating_sub(l_rhs);
 						break;
 					} else {
-						let guess_adjustment = {
-							let (num_limb, sig_reg, sig_rhs) = {
-								match (num_limbs.len(), reg.len()) {
-									(num_len, reg_len) if num_len > reg_len => (
-										((num_limbs[num_len - 1] as u64) << 32) +
-											num_limbs[num_len - 2] as u64,
-										reg[reg_len - 1] as u64,
-										rhs.limbs[l_rhs - 1] as u64,
-									),
-									(num_len, reg_len) if reg_len > 1 => (
-										((num_limbs[num_len - 1] as u64) << 32) +
-											num_limbs[num_len - 2] as u64,
-										((reg[reg_len - 1] as u64) << 32) +
-											reg[reg_len - 2] as u64,
-										((rhs.limbs[l_rhs - 1] as u64) << 32) +
-											rhs.limbs[l_rhs - 2] as u64,
-									),
-									(num_len, reg_len) => (
-										num_limbs[num_len - 1] as u64,
-										reg[reg_len - 1] as u64,
-										rhs.limbs[l_rhs - 1] as u64,
-									),
-								}
-							};
-
-							// Calcualte if the guess way too far off
-							// The 2 is to make sure we don't overshoot it
-							((num_limb - sig_reg) / (sig_rhs * 2)) as u32
-						};
-
-						// Only decrement by 1 if we are somewhat close
-						guess -= std::cmp::max(1, guess_adjustment);
+						guess -=
+							adjusted_guess_for_div(
+								reg,
+								&rhs.limbs[..],
+								&num_limbs[..],
+							);
 					}
 				}
 			} else if end >= start + rhs.limbs.len() {
