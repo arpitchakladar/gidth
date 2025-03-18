@@ -27,36 +27,75 @@ macro_rules! bigint_division {
 			let mut end = l_lhs;
 
 			loop {
-				let reg = &mut $self.limbs[start..end];
-				if cmp_limb_arrays(reg, &$rhs.limbs) {
-					let sig: u64 = if reg.len() == l_rhs {
-						reg[reg.len() - 1] as u64
-					} else {
-						((reg[reg.len() - 1] as u64) << 32) +
-						reg[reg.len() - 2] as u64
-					};
-					let min = (sig / sig_rhs) as u32;
-					let max = ((sig + sig_rhs - 1) / sig_rhs) as u32;
-
-					for i in (min..=max).rev() {
-						let mut num = $rhs.clone();
-						mul_by_small_int(&mut num.limbs, i);
-						if cmp_limb_arrays(reg, &num.limbs) {
-							if $has_quotient {
-								$quotient.limbs.push(i);
-							}
-							let offset = sub_from_slice(reg, &num.limbs);
-							end -= offset;
-							start = end.saturating_sub(l_rhs);
-							break;
-						}
-					}
-				} else if start > 0 {
-					start -= 1;
+			let reg = &mut $self.limbs[start..end];
+			if cmp_limb_arrays(reg, &$rhs.limbs) {
+				let sig: u64 = if reg.len() == l_rhs {
+					reg[reg.len() - 1] as u64
 				} else {
-					break;
+					((reg[reg.len() - 1] as u64) << 32) +
+					reg[reg.len() - 2] as u64
+				};
+				let mut guess = (sig / sig_rhs + 1) as u32;
+				let mut num_limbs =
+					Vec::with_capacity(
+						$rhs.limbs.len() + 1,
+					);
+
+				loop {
+					num_limbs.clear();
+					num_limbs.extend($rhs.limbs.iter());
+					mul_by_small_int(&mut num_limbs, guess);
+					if cmp_limb_arrays(reg, &num_limbs) {
+						$quotient.limbs.push(guess);
+						sub_from_slice(reg, &num_limbs);
+						end -= 1;
+						start = end.saturating_sub(l_rhs);
+						break;
+					} else {
+						let guess_adjustment = {
+							let (num_limb, sig_reg, sig_rhs) = {
+								match (num_limbs.len(), reg.len()) {
+									(num_len, reg_len) if num_len > reg_len => (
+										((num_limbs[num_len - 1] as u64) << 32) +
+											num_limbs[num_len - 2] as u64,
+										reg[reg_len - 1] as u64,
+										$rhs.limbs[l_rhs - 1] as u64,
+									),
+									(num_len, reg_len) if reg_len > 1 => (
+										((num_limbs[num_len - 1] as u64) << 32) +
+											num_limbs[num_len - 2] as u64,
+										((reg[reg_len - 1] as u64) << 32) +
+											reg[reg_len - 2] as u64,
+										(($rhs.limbs[l_rhs - 1] as u64) << 32) +
+											$rhs.limbs[l_rhs - 2] as u64,
+									),
+									(num_len, reg_len) => (
+										num_limbs[num_len - 1] as u64,
+										reg[reg_len - 1] as u64,
+										$rhs.limbs[l_rhs - 1] as u64,
+									),
+								}
+							};
+
+							// Calcualte if the guess way too far off
+							// The 2 is to make sure we don't overshoot it
+							((num_limb - sig_reg) / (sig_rhs * 2)) as u32
+						};
+
+						// Only decrement by 1 if we are somewhat close
+						guess -= std::cmp::max(1, guess_adjustment);
+					}
 				}
+			} else if end >= start + $rhs.limbs.len() {
+				start = start.saturating_sub(1);
+				if reg[reg.len() - 1] == 0 {
+					end -= 1;
+				}
+				$quotient.limbs.push(0u32);
+			} else {
+				break;
 			}
+		}
 
 			if $has_quotient {
 				$quotient.limbs.reverse();

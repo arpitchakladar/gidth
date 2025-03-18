@@ -1,7 +1,7 @@
 pub(crate) fn sub_from_slice(
 	lhs: &mut [u32],
 	rhs: &[u32],
-) -> usize {
+) {
 	let borrow = lhs
 		.iter_mut()
 		.zip(rhs.iter().copied())
@@ -20,11 +20,6 @@ pub(crate) fn sub_from_slice(
 			*last -= borrow as u32;
 		}
 	}
-	
-	lhs.iter()
-		.rposition(|&x| x != 0)
-		.map(|i| lhs.len() - i - 1)
-		.unwrap_or(lhs.len())
 }
 
 // checks if lhs >= rhs

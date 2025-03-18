@@ -8,7 +8,7 @@ use crate::number::{
 	One,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[satisfies(Int)]
 pub struct BigInt {
 	pub(crate) positive: bool,

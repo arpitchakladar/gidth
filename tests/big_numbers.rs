@@ -1,4 +1,4 @@
-use gidth::number::{Int,BigDecimal};
+use gidth::number::{Int, BigInt,BigDecimal};
 // use gidth_macros::auto_wrap_ints;
 
 // #[test]

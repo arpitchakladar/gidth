@@ -24,7 +24,6 @@ impl BigDecimal {
 		let mut decimal_pos = None;
 		loop {
 			let reg = &mut self.limbs[start..end];
-			println!("REG = {:?}, start = {}, end = {}", reg, start, end);
 			if decimal_pos.is_none() && self.decimal_pos > start {
 				decimal_pos = Some(quotient.limbs.len());
 			}
@@ -47,7 +46,7 @@ impl BigDecimal {
 					mul_by_small_int(&mut num_limbs, guess);
 					if cmp_limb_arrays(reg, &num_limbs) {
 						quotient.limbs.push(guess);
-						let offset = sub_from_slice(reg, &num_limbs);
+						sub_from_slice(reg, &num_limbs);
 						end -= 1;
 						start = end.saturating_sub(l_rhs);
 						break;
