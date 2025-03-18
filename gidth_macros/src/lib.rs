@@ -1,16 +1,9 @@
 use proc_macro::TokenStream;
 
-mod find_modules;
-mod place_hidden;
 mod register_trait;
 mod satisfy;
 mod siphon_traits;
 mod trait_analysis;
-
-#[proc_macro]
-pub fn place_hidden(item: TokenStream) -> TokenStream {
-	place_hidden::place_hidden(item)
-}
 
 #[proc_macro]
 pub fn satisfy(input: TokenStream) -> TokenStream {

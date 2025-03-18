@@ -27,6 +27,7 @@ impl BigDecimal {
 		}
 	}
 
+	// Removes unecessary zeros from start and end
 	pub fn trim(&mut self) {
 		while self.limbs.last() == Some(&0) {
 			self.limbs.pop();

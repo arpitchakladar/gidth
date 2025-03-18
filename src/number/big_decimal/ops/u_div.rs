@@ -1,8 +1,9 @@
 use crate::number::BigDecimal;
-use crate::number::utils::{
+use crate::number::utils::ops::div::{
 	sub_from_slice,
 	cmp_limb_arrays,
 	mul_by_small_int,
+	adj_guess_for_div,
 };
 
 impl BigDecimal {
@@ -21,8 +22,12 @@ impl BigDecimal {
 		let mut start = l_lhs - l_rhs;
 		let mut end = l_lhs;
 
+		let mut decimal_pos = None;
 		loop {
 			let reg = &mut self.limbs[start..end];
+			if decimal_pos.is_none() && self.decimal_pos > start {
+				decimal_pos = Some(quotient.limbs.len());
+			}
 			if cmp_limb_arrays(reg, &rhs.limbs) {
 				let sig: u64 = if reg.len() == l_rhs {
 					reg[reg.len() - 1] as u64
@@ -30,28 +35,45 @@ impl BigDecimal {
 					((reg[reg.len() - 1] as u64) << 32) +
 					reg[reg.len() - 2] as u64
 				};
-				let min = (sig / sig_rhs) as u32;
-				let max = ((sig + sig_rhs - 1) / sig_rhs) as u32;
+				let mut guess = (sig / sig_rhs + 1) as u32;
+				let mut num_limbs =
+					Vec::with_capacity(
+						rhs.limbs.len() + 1,
+					);
 
-				for i in (min..=max).rev() {
-					let mut num = rhs.clone();
-					mul_by_small_int(&mut num.limbs, i);
-					if cmp_limb_arrays(reg, &num.limbs) {
-						quotient.limbs.push(i);
-						let offset = sub_from_slice(reg, &num.limbs);
-						end -= offset;
+				loop {
+					num_limbs.clear();
+					num_limbs.extend(rhs.limbs.iter());
+					mul_by_small_int(&mut num_limbs, guess);
+					if cmp_limb_arrays(reg, &num_limbs) {
+						quotient.limbs.push(guess);
+						sub_from_slice(reg, &num_limbs);
+						end -= 1;
 						start = end.saturating_sub(l_rhs);
 						break;
+					} else {
+						guess -=
+							adj_guess_for_div(
+								reg,
+								&rhs.limbs[..],
+								&num_limbs[..],
+							);
 					}
 				}
-			} else if start > 0 {
-				start -= 1;
+			} else if end >= start + rhs.limbs.len() {
+				start = start.saturating_sub(1);
+				if reg[reg.len() - 1] == 0 {
+					end -= 1;
+				}
+				quotient.limbs.push(0u32);
 			} else {
 				break;
 			}
 		}
 
 		quotient.limbs.reverse();
-		quotient.decimal_pos = self.decimal_pos;
+		quotient.decimal_pos = decimal_pos
+			.map(|decimal_pos| quotient.limbs.len() - decimal_pos)
+			.unwrap_or(0);
 	}
 }

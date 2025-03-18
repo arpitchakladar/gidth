@@ -4,12 +4,13 @@ use gidth_macros::satisfies;
 
 use crate::number::{
 	Int,
+	Real,
 	Zero,
 	One,
 };
 
-#[derive(Clone)]
-#[satisfies(Int)]
+#[derive(Clone, Debug)]
+#[satisfies(Real, Int)]
 pub struct BigInt {
 	pub(crate) positive: bool,
 	pub(crate) limbs: Vec<u32>,

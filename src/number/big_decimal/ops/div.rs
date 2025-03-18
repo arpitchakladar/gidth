@@ -17,7 +17,7 @@ impl std::ops::Div for &BigDecimal {
 		remainder.limbs.resize(precision, 0u32);
 		remainder.limbs.extend(&self.limbs);
 		// This is used as the precision for the result
-		remainder.decimal_pos = precision;
+		remainder.decimal_pos = precision + self.decimal_pos - rhs.decimal_pos;
 		BigDecimal::u_div_in(&mut remainder, &rhs, &mut quotient);
 
 		quotient
