@@ -85,8 +85,8 @@ use gidth::number::{Int, BigInt,BigDecimal};
 // }
 #[test]
 fn big_decimal_div() {
-	let x1 = BigInt::from(vec![u32::MAX, u32::MAX, 2]);
-	let x2 = BigInt::from(vec![u32::MAX, 2]);
+	let x1 = BigDecimal::from(vec![u32::MAX, u32::MAX, u32::MAX, 2]);
+	let x2 = BigDecimal::from(vec![u32::MAX, 2]);
 
 	let ans = &x1 / &x2;
 	println!("{:?}", ans);

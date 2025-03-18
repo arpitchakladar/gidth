@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::sync::Mutex;
 use lazy_static::lazy_static;
 use proc_macro::TokenStream;
@@ -21,7 +22,7 @@ use crate::trait_analysis::{
 use crate::register_trait::METHOD_REGISTRY;
 
 lazy_static! {
-	pub(crate) static ref DERIVED_TRAIT_REGISTRY: Mutex<Vec<String>> = Mutex::new(Vec::new());
+	pub(crate) static ref DERIVED_TRAIT_REGISTRY: Mutex<HashMap<String, Vec<(String, String)>>> = Mutex::new(HashMap::new());
 }
 
 // TODO: Make it work with traits with generics and lifetimes
@@ -32,9 +33,6 @@ pub fn siphon_traits(
 	let parsed_trait = parse_macro_input!(trait_item as ItemTrait);
 	let trait_ident = &parsed_trait.ident;
 	let trait_name = trait_ident.to_string();
-	if let Ok(mut derived_trait_registry) = DERIVED_TRAIT_REGISTRY.lock() {
-		derived_trait_registry.push(trait_name.clone());
-	}
 	let base_traits = extract_base_traits(&parsed_trait);
 	let current_trait_methods = extract_method_signatures(&parsed_trait);
 	let method_registry = METHOD_REGISTRY.lock().unwrap();
@@ -74,19 +72,33 @@ pub fn siphon_traits(
 								.collect();
 
 							// Generate method delegation dynamically
-							let method_implementation = quote! {
+							let method_implementation_trait = quote! {
 								#[inline(always)]
 								fn #method_name(#method_params) #return_type {
 									#trait_ident::#method_name(#(#parameter_names),*)
 								}
-							};
+							}.to_string();
+							let method_implementation_self = quote! {
+								#[inline(always)]
+								fn #method_name(#method_params) #return_type {
+									Self::#method_name(#(#parameter_names),*)
+								}
+							}.to_string();
 
 							// Add the method signature to the trait
 							let trait_method_signature = quote! {
 								fn #method_name(#method_params) #return_type;
 							};
 
-							Some((trait_method_signature, method_implementation))
+							Some(
+								(
+									trait_method_signature,
+									(
+										method_implementation_self,
+										method_implementation_trait,
+									),
+								)
+							)
 						},
 						Err(_) => None,
 					}
@@ -105,18 +117,19 @@ pub fn siphon_traits(
 		})
 		.collect::<Vec<_>>();
 
-	let satisfy_trait = format_ident!("Satisfy{}", trait_name);
+	DERIVED_TRAIT_REGISTRY.lock()
+		.unwrap()
+		.insert(
+			trait_name.to_string(),
+			method_implementations.clone(),
+		);
+
 	let supertraits = &parsed_trait.supertraits;
 
 	let expanded = quote! {
-		use crate::__hidden::#satisfy_trait;
 		pub trait #trait_ident: #supertraits {
 			#(#trait_method_signatures)*
 			#(#trait_defined_method_signature)*
-		}
-
-		impl<T: #satisfy_trait + #supertraits> #trait_ident for T {
-			#(#method_implementations)*
 		}
 	};
 

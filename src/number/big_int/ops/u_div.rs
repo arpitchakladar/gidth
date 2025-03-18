@@ -1,9 +1,9 @@
 use crate::number::BigInt;
-use crate::number::utils::{
+use crate::number::utils::ops::div::{
 	sub_from_slice,
 	cmp_limb_arrays,
 	mul_by_small_int,
-	adjusted_guess_for_div,
+	adj_guess_for_div,
 };
 
 // Using macro for better removal of dead code
@@ -54,7 +54,7 @@ macro_rules! bigint_division {
 							break;
 						} else {
 							guess -=
-								adjusted_guess_for_div(
+								adj_guess_for_div(
 									reg,
 									&$rhs.limbs[..],
 									&num_limbs[..],

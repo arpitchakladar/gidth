@@ -61,7 +61,7 @@ pub(crate) fn mul_by_small_int(
 	}
 }
 
-pub(crate) fn adjusted_guess_for_div(
+pub(crate) fn adj_guess_for_div(
 	reg: &[u32],
 	rhs_limbs: &[u32],
 	num_limbs: &[u32],

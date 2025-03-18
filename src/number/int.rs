@@ -103,7 +103,7 @@ macro_rules! impl_integer {
 			}
 
 			// Make all primitive integers satisfy Int and Real
-			satisfy!($t; Int, Real);
+			satisfy!($t; Real, Int);
 		)*
 	};
 }
