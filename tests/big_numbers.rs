@@ -83,17 +83,17 @@ use gidth::number::{Int,BigDecimal};
 // 	let x2 = BigDecimal::from(8904238.000000001f64);
 // 	println!("{}", &x1 * &x2);
 // }
-// #[test]
-// fn big_decimal_div() {
-// 	let x1 = BigDecimal::from(2342323423269.32097985340f64);
-// 	let x2 = BigDecimal::from(8904238.000000001f64);
-// 	let y = 2342323423269.32097985340f64 / 8904238.000000001f64;
-//
-// 	println!("Answer = {}        {:?}", y, BigDecimal::from(y));
-// 	println!("{}", x1 / x2);
-// 	println!("{}", BigDecimal::from(8723498) / BigDecimal::from(94923));
-// 	// println!("{}", x4);
-// }
+#[test]
+fn big_decimal_div() {
+	let x1 = BigDecimal::from(vec![u32::MAX, u32::MAX, 2]);
+	let x2 = BigDecimal::from(vec![u32::MAX, 2]);
+
+	let ans = &x1 / &x2;
+	println!("{:?}", ans);
+
+	println!("{} / {} = {}", &x1, &x2, &ans);
+	// println!("{}", x4);
+}
 
 // #[test]
 // fn big_decimal_sq() {
@@ -118,8 +118,8 @@ use gidth::number::{Int,BigDecimal};
 // 	println!("{:?}", x.sq());
 // }
 //
-#[test]
-fn test_powf() {
-	let ln1p5 = 1.5f64;
-	println!("{}", BigDecimal::ln(ln1p5));
-}
+// #[test]
+// fn test_powf() {
+// 	let ln1p5 = 1.5f64;
+// 	println!("{}", BigDecimal::ln(ln1p5));
+// }

@@ -60,13 +60,7 @@ impl BigInt {
 					.zip(rhs.limbs.iter().rev())
 					.find(|(left, right)| left != right)
 					.map(|(left, right)| left > right)
-					.unwrap_or_else(|| {
-						self.limbs.len() > rhs.limbs.len() &&
-						self.limbs[rhs.limbs.len()..]
-							.iter()
-							.copied()
-							.any(|limb| limb != 0)
-					}),
+					.unwrap_or(false),
 		}
 	}
 }

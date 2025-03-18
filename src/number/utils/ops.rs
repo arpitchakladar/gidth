@@ -27,6 +27,7 @@ pub(crate) fn sub_from_slice(
 		.unwrap_or(lhs.len())
 }
 
+// checks if lhs >= rhs
 pub(crate) fn cmp_limb_arrays(
 	lhs: &[u32],
 	rhs: &[u32],
@@ -34,12 +35,13 @@ pub(crate) fn cmp_limb_arrays(
 	match lhs.len().cmp(&rhs.len()) {
 		std::cmp::Ordering::Greater => return true,
 		std::cmp::Ordering::Less => return false,
-		_ =>
-			lhs.iter()
+		std::cmp::Ordering::Equal =>
+			lhs
+				.iter()
 				.rev()
 				.zip(rhs.iter().rev())
-				.find(|(l, r)| l != r)
-				.map(|(l, r)| l > r)
+				.find(|(left, right)| left != right)
+				.map(|(left, right)| left > right)
 				.unwrap_or(true),
 	}
 }
