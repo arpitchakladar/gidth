@@ -2,6 +2,10 @@ use proc_macro::{
 	TokenStream,
 	TokenTree,
 };
+use proc_macro_error::{
+	abort_call_site,
+	abort,
+};
 use proc_macro2::{
 	Span,
 	TokenStream as TokenStream2,
@@ -30,9 +34,18 @@ fn parse_target_type(
 					group
 						.stream(),
 				),
-			).expect("Expected an identifier inside the group")
+			).unwrap_or_else(|e| {
+				abort_call_site!(
+					"Expected the first attribute to be the type name: {}",
+					e,
+				)
+			})
 		}
-		_ => panic!("Expected an identifier as the first parameter"),
+		_ => {
+			abort_call_site!(
+				"Expected the first attribute to be the type name.",
+			)
+		},
 	}
 }
 
@@ -41,9 +54,14 @@ fn parse_target_type(
 fn expect_semicolon(
 	tokens: &mut impl Iterator<Item = TokenTree>,
 ) {
-	match tokens.next() {
-		Some(TokenTree::Punct(p)) if p.as_char() == ';' => {}
-		_ => panic!("Expected a semicolon `;` after the first parameter"),
+	let current_token = tokens.next();
+	match current_token {
+		Some(TokenTree::Punct(token)) if token.as_char() == ';' => {},
+		_ => {
+			abort_call_site!(
+				"Expected a semicolon `;` after the first parameter",
+			)
+		},
 	}
 }
 
@@ -56,18 +74,37 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 		tokens.filter_map(|token| {
 			match token {
 				TokenTree::Ident(target_trait) => {
+					let trait_name = target_trait.to_string();
 					let target_trait =
 						Ident::new(
-							&target_trait.to_string(),
+							&trait_name,
 							Span::call_site(),
 						);
-					let impls = DERIVED_TRAIT_REGISTRY.lock().unwrap()
+					let impls = DERIVED_TRAIT_REGISTRY
+						.lock()
+						.unwrap_or_else(|e| {
+							abort_call_site!(
+								"Failed to lock access DERIVED_TRAIT_REGISTRY: {}",
+								e,
+							)
+						})
 						.get(&target_trait.to_string())
-						.unwrap()
+						.unwrap_or_else(|| {
+							abort!(
+								&target_trait,
+								"Failed to get trait named \"{}\" in DERIVED_TRAIT_REGISTRY. Maybe the this module was loader before the trait was siphoned.",
+								&trait_name,
+							)
+						})
 						.iter()
 						.map(|(_, implt)| {
 							parse_str::<TokenStream2>(implt)
-								.unwrap()
+								.unwrap_or_else(|e| {
+									abort_call_site!(
+										"Failed to parse implementation: {}",
+										e,
+									)
+								})
 						})
 						.collect::<Vec<_>>();
 
@@ -78,7 +115,9 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 					})
 				},
 				TokenTree::Punct(p) if p.as_char() == ',' => None, // Ignore commas
-				_ => panic!("Unexpected token in type list"),
+				_ => abort_call_site!(
+					"Failed to parse token meant for trait name.",
+				),
 			}
 		})
 		.collect::<Vec<_>>();
@@ -102,21 +141,46 @@ pub fn satisfies(
 	type AttrsType = Punctuated<syn::Path, syn::Token![,]>;
 	let attr_parsed = AttrsType::parse_terminated
 		.parse(attr)
-		.unwrap();
+		.unwrap_or_else(|e| {
+			abort_call_site!(
+				"Failed to parse attributes: {}",
+				e,
+			)
+		});
 
-	let derived_trait_registry = DERIVED_TRAIT_REGISTRY.lock().unwrap();
+	let derived_trait_registry = DERIVED_TRAIT_REGISTRY.lock()
+		.unwrap_or_else(|e| {
+			abort_call_site!(
+				"Failed to lock access DERIVED_TRAIT_REGISTRY: {}",
+				e,
+			)
+		});
 
 	let implementations = attr_parsed
 		.iter()
 		.map(|arg| {
-			let target_trait = &arg.segments.last().unwrap().ident;
+			let target_trait = &arg.segments
+				.last()
+				.unwrap_or_else(|| {
+					abort!(
+						&arg,
+						"Failed to parse trait name \"{}\".",
+						quote! { #arg }.to_string(),
+					)
+				})
+				.ident;
 			let target_trait_name = target_trait.to_string();
 			if let Some(impls) = derived_trait_registry.get(&target_trait_name) {
 				let impls = impls
 					.iter()
 					.map(|(implt, _)| {
 						parse_str::<TokenStream2>(implt)
-							.unwrap()
+							.unwrap_or_else(|e| {
+								abort_call_site!(
+									"Failed to parse implementation: {}",
+									e,
+								)
+							})
 					});
 
 				quote! {
@@ -125,7 +189,10 @@ pub fn satisfies(
 					}
 				}
 			} else {
-				panic!("Invalid trait name.")
+				abort_call_site!(
+					"Trait \"{}\" was not siphoned. Maybe this module was loaded before it.",
+					&target_trait_name,
+				)
 			}
 		})
 		.collect::<Vec<_>>();

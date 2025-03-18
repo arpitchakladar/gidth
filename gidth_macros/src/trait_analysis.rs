@@ -1,3 +1,7 @@
+use proc_macro_error::{
+	abort_call_site,
+	abort,
+};
 use syn::{
 	FnArg,
 	ReturnType,
@@ -53,18 +57,31 @@ fn format_return_type(return_type: &ReturnType) -> String {
 pub(crate) fn extract_base_traits(
 	trait_def: &ItemTrait,
 ) -> Vec<String> {
-	let method_registry = METHOD_REGISTRY.lock().unwrap();
+	let method_registry = METHOD_REGISTRY
+		.lock()
+		.unwrap_or_else(|e| {
+			abort_call_site!(
+				"Failed to lock access METHOD_REGISTRY: {}",
+				e,
+			)
+		});
 	trait_def.supertraits
 		.iter()
 		.filter_map(|supertrait| {
 			if let TypeParamBound::Trait(TraitBound { path, .. }) = supertrait {
 				let trait_ident = path.segments
 					.last()
-					.unwrap()
+					.unwrap_or_else(|| {
+						abort!(
+							supertrait,
+							"Failed to parse trait name of \"{}\".",
+							quote! { #supertrait }.to_string(),
+						)
+					})
 					.ident.to_string();
 				let method_signatures = method_registry
 					.get(&trait_ident);
-				if let Some(_) = &method_signatures {
+				if method_signatures.is_some() {
 					return Some(trait_ident.clone());
 				}
 			}

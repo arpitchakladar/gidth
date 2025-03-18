@@ -9,6 +9,7 @@ proc-macro = true
 [dependencies]
 cargo_metadata = "0.19.2"
 lazy_static = "1.5.0"
+proc-macro-error = "1.0.4"
 proc-macro2 = "1.0.94"
 quote = "1.0.40"
 regex = "1.11.1"
