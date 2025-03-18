@@ -20,6 +20,8 @@ impl std::ops::Div for &BigDecimal {
 		remainder.decimal_pos = precision + self.decimal_pos - rhs.decimal_pos;
 		BigDecimal::u_div_in(&mut remainder, &rhs, &mut quotient);
 
+		quotient.positive = self.positive == rhs.positive;
+
 		quotient
 	}
 }

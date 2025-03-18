@@ -5,6 +5,7 @@ mod cmp;
 mod div;
 mod pow;
 mod mul;
+mod neg;
 mod sq;
 mod sub;
 mod u_addiv;

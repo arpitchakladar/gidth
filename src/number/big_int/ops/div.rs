@@ -12,6 +12,7 @@ impl std::ops::Div for &BigInt {
 		let mut remainder = self.clone();
 		BigInt::u_div_in(&mut remainder, &rhs, &mut quotient);
 
+		quotient.positive = self.positive == rhs.positive;
 
 		quotient
 	}
