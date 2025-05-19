@@ -1,4 +1,4 @@
-use gidth::number::{Int, BigInt,BigDecimal};
+use gidth::linear::Matrix;
 // use gidth_macros::auto_wrap_ints;
 
 // #[test]
@@ -83,17 +83,17 @@ use gidth::number::{Int, BigInt,BigDecimal};
 // 	let x2 = BigDecimal::from(8904238.000000001f64);
 // 	println!("{}", &x1 * &x2);
 // }
-#[test]
-fn big_decimal_div() {
-	let x1 = -BigDecimal::from(vec![u32::MAX, u32::MAX, u32::MAX, 2]);
-	let x2 = BigDecimal::from(vec![u32::MAX, 2]);
-
-	let ans = &x1 / &x2;
-	println!("{:?}", ans);
-
-	println!("{} / {} = {}", &x1, &x2, &ans);
-	// println!("{}", x4);
-}
+// #[test]
+// fn big_decimal_div() {
+// 	let x1 = -BigDecimal::from(vec![u32::MAX, u32::MAX, u32::MAX, 2]);
+// 	let x2 = BigDecimal::from(vec![u32::MAX, 2]);
+//
+// 	let ans = &x1 / &x2;
+// 	println!("{:?}", ans);
+//
+// 	println!("{} / {} = {}", &x1, &x2, &ans);
+// 	// println!("{}", x4);
+// }
 
 // #[test]
 // fn big_decimal_sq() {
@@ -123,3 +123,7 @@ fn big_decimal_div() {
 // 	let ln1p5 = 1.5f64;
 // 	println!("{}", BigDecimal::ln(ln1p5));
 // }
+#[test]
+fn test_matrix() {
+	println!("{:?}", Matrix::new([[12, 11], [32, 41]]) * Matrix::new([[12, 11], [32, 41]]));
+}

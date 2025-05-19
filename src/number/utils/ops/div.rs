@@ -22,7 +22,7 @@ pub(crate) fn sub_from_slice(
 	}
 }
 
-// checks if lhs >= rhs
+// checks if absolute value lhs >= rhs
 pub(crate) fn cmp_limb_arrays(
 	lhs: &[u32],
 	rhs: &[u32],
