@@ -135,5 +135,5 @@ fn test_matrix() {
 		[-38, 41, -34],
 		[27, -29, 24],
 	]);
-	println!("{}", a * a_inv);
+	println!("{}", &a - &a_inv);
 }

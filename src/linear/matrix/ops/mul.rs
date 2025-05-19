@@ -6,11 +6,11 @@ use crate::{
 
 // remove + Clone
 impl<T: Real + Clone, const R: usize, const C: usize, const K: usize>
-	Mul<Matrix<T, C, K>> for Matrix<T, R, C>
+	Mul<&Matrix<T, C, K>> for &Matrix<T, R, C>
 {
 	type Output = Matrix<T, R, K>;
 
-	fn mul(self, rhs: Matrix<T, C, K>) -> Self::Output {
+	fn mul(self, rhs: &Matrix<T, C, K>) -> Self::Output {
 		Matrix::new(
 			std::array::from_fn(|i|
 				std::array::from_fn(|j|
