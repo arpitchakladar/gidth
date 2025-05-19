@@ -125,5 +125,15 @@ use gidth::linear::Matrix;
 // }
 #[test]
 fn test_matrix() {
-	println!("{:?}", Matrix::new([[12, 11], [32, 41]]) * Matrix::new([[12, 11], [32, 41]]));
+	let a = Matrix::new([
+		[2, 5, 7],
+		[6, 3, 4],
+		[5, -2, -3],
+	]);
+	let a_inv = Matrix::new([
+		[1,  -1, 1],
+		[-38, 41, -34],
+		[27, -29, 24],
+	]);
+	println!("{}", a * a_inv);
 }

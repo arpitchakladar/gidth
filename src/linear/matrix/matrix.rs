@@ -1,6 +1,6 @@
 use crate::number::Real;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Matrix<T: Real, const ROWS: usize, const COLS: usize> {
 	pub(crate) data: [[T; COLS]; ROWS],
 }

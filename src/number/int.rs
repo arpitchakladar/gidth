@@ -25,6 +25,11 @@ pub trait Int:
 	std::ops::Mul<Output = Self> +
 	std::ops::Div<Output = Self> +
 	std::ops::Rem<Output = Self> +
+	for<'a> std::ops::Add<&'a Self, Output = Self> +
+	for<'a> std::ops::Sub<&'a Self, Output = Self> +
+	for<'a> std::ops::Mul<&'a Self, Output = Self> +
+	for<'a> std::ops::Div<&'a Self, Output = Self> +
+	for<'a> std::ops::Rem<&'a Self, Output = Self> +
 	DivMod<Self> +
 	Zero +
 	One +
