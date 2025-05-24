@@ -130,6 +130,7 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 }
 
 // Macro to enforce trait satisfaction for a struct using an attribute.
+// TODO: Make sure this handles generics on structs properly
 pub fn satisfies(
 	attr: TokenStream,
 	item: TokenStream,

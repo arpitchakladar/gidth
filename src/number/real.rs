@@ -19,6 +19,7 @@ pub trait Real:
 	for<'a> std::ops::Sub<&'a Self, Output = Self> +
 	for<'a> std::ops::Div<&'a Self, Output = Self> +
 	for<'a, 'b> std::ops::Mul<&'a Self, Output = Self> +
+	std::cmp::PartialEq +
 	Zero +
 	One +
 	Abs +
