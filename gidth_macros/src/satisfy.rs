@@ -130,13 +130,14 @@ pub fn satisfy(input: TokenStream) -> TokenStream {
 }
 
 // Macro to enforce trait satisfaction for a struct using an attribute.
-// TODO: Make sure this handles generics on structs properly
 pub fn satisfies(
 	attr: TokenStream,
 	item: TokenStream,
 ) -> TokenStream {
 	let input = parse_macro_input!(item as ItemStruct);
 	let struct_name = &input.ident;
+	let generics = &input.generics;
+	let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
 	// Parse the attribute arguments
 	type AttrsType = Punctuated<syn::Path, syn::Token![,]>;
@@ -185,7 +186,7 @@ pub fn satisfies(
 					});
 
 				quote! {
-					impl #target_trait for #struct_name {
+					impl #impl_generics #target_trait for #struct_name #ty_generics #where_clause {
 						#(#impls)*
 					}
 				}
@@ -205,3 +206,4 @@ pub fn satisfies(
 
 	TokenStream::from(expanded)
 }
+
