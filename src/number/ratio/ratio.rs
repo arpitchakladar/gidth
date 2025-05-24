@@ -34,6 +34,10 @@ impl<T: Int> Ratio<T> {
 	{
 		self.num.into() / self.den.into()
 	}
+
+	pub fn floor(&self) -> T {
+		self.num.clone() / &self.den
+	}
 }
 
 #[inherent]

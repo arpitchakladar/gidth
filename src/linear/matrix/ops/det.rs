@@ -12,6 +12,7 @@ use crate::{
 // NOTE: Works for decimal types only
 impl<T: Decimal + Clone + std::ops::Neg<Output = T>, const D: usize> Matrix<T, D, D> {
 	pub fn det(&self) -> T {
+		// Upper triangular matrix
 		let mut u = self.data.clone();
 		let mut det: T = One::one();
 		let mut sign_flip = false;
@@ -53,4 +54,3 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T>, const D: usize> Matrix<T, D
 		det
 	}
 }
-
