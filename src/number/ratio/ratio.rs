@@ -6,6 +6,7 @@ use crate::number::{
 	Int,
 	Zero,
 	One,
+	Abs,
 };
 
 #[derive(Clone, Debug)]
@@ -15,11 +16,12 @@ pub struct Ratio<T: Int> {
 	pub(crate) den: T,
 }
 
+// denominator is always positive
 impl<T: Int> Ratio<T> {
 	pub fn new(num: T, den: T) -> Self {
 		Self {
 			num,
-			den,
+			den: Abs::abs(den),
 		}
 	}
 }
