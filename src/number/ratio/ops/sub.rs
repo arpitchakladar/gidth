@@ -22,4 +22,4 @@ impl<T: Int + Clone + std::cmp::PartialEq> std::ops::Sub for &Ratio<T> {
 	}
 }
 
-impl_ratio_binop_variants!(Sub, sub, +);
+impl_ratio_binop_variants!(Sub, sub, -);

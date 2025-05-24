@@ -16,4 +16,4 @@ impl<T: Int + Clone> std::ops::Div for &Ratio<T> {
 }
 
 
-impl_ratio_binop_variants!(Div, div, +);
+impl_ratio_binop_variants!(Div, div, /);

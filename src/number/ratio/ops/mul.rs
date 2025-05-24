@@ -15,4 +15,4 @@ impl<T: Int + Clone> std::ops::Mul for &Ratio<T> {
 	}
 }
 
-impl_ratio_binop_variants!(Mul, mul, +);
+impl_ratio_binop_variants!(Mul, mul, *);

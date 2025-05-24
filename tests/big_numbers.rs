@@ -137,6 +137,7 @@ fn test_matrix_det() {
 		[27.0, -29.0, 24.0],
 	]);
 	println!("{}", a.det());
+	println!("{}", Ratio::from(232)*Ratio::from(331));
 }
 //
 // #[test]
