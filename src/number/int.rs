@@ -31,6 +31,7 @@ pub trait Int:
 	for<'a> std::ops::Div<&'a Self, Output = Self> +
 	for<'a> std::ops::Rem<&'a Self, Output = Self> +
 	std::cmp::PartialEq +
+	std::cmp::PartialOrd +
 	DivMod<Self> +
 	Zero +
 	One +

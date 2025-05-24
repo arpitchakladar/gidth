@@ -1,4 +1,5 @@
 use gidth::number::Ratio;
+use gidth::linear::Matrix;
 // use gidth_macros::auto_wrap_ints;
 
 // #[test]
@@ -123,22 +124,22 @@ use gidth::number::Ratio;
 // 	let ln1p5 = 1.5f64;
 // 	println!("{}", BigDecimal::ln(ln1p5));
 // }
-// #[test]
-// fn test_matrix() {
-// 	let a = Matrix::new([
-// 		[2, 5, 7],
-// 		[6, 3, 4],
-// 		[5, -2, -3],
-// 	]);
-// 	let a_inv = Matrix::new([
-// 		[1,  -1, 1],
-// 		[-38, 41, -34],
-// 		[27, -29, 24],
-// 	]);
-// 	println!("{}", &a - &a_inv);
-// }
-//
 #[test]
-fn test_ratio() {
-	println!("{}", Ratio::new(23432, 4534322342342i128) - &Ratio::new(23432, 4534322342342i128));
+fn test_matrix_det() {
+	let a = Matrix::new([
+		[2.0, 10.0, 7.0],
+		[6.0, 3.0, 4.0],
+		[5.0, -2.0, -3.0],
+	]);
+	let a_inv = Matrix::new([
+		[1.0,  -1.0, 1.0],
+		[-38.0, 41.0, -34.0],
+		[27.0, -29.0, 24.0],
+	]);
+	println!("{}", a.det());
 }
+//
+// #[test]
+// fn test_ratio() {
+// 	println!("{}", Ratio::new(23432, 4534322342342i128) - &Ratio::new(23432, 4534322342342i128));
+// }
