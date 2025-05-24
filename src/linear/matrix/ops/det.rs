@@ -2,7 +2,7 @@ use crate::{
 	linear::Matrix,
 	number::{
 		Abs,
-		Real,
+		Decimal,
 		One,
 		Zero,
 	}
@@ -10,7 +10,7 @@ use crate::{
 
 // remove + Clone
 // NOTE: Works for decimal types only
-impl<T: Real + Clone + std::ops::Neg<Output = T>, const D: usize> Matrix<T, D, D> {
+impl<T: Decimal + Clone + std::ops::Neg<Output = T>, const D: usize> Matrix<T, D, D> {
 	pub fn det(&self) -> T {
 		let mut u = self.data.clone();
 		let mut det: T = One::one();

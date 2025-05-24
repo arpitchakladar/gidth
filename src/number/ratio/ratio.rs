@@ -26,6 +26,14 @@ impl<T: Int> Ratio<T> {
 			den: Abs::abs(den),
 		}
 	}
+
+	pub fn as_decimal<U: Decimal>(&self) -> U
+	where
+		T: Into<U> + Copy,
+		U: std::ops::Div<Output = U>,
+	{
+		self.num.into() / self.den.into()
+	}
 }
 
 #[inherent]
