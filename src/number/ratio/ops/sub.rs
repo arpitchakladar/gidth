@@ -4,7 +4,7 @@ use crate::number::{
 	Ratio,
 };
 
-impl<T: Int + Clone> std::ops::Sub for &Ratio<T> {
+impl<T: Int + Clone + std::cmp::PartialEq> std::ops::Sub for &Ratio<T> {
 	type Output = Ratio<T>;
 
 	fn sub(self, rhs: Self) -> Self::Output {

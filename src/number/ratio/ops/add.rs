@@ -4,7 +4,7 @@ use crate::number::{
 	Ratio,
 };
 
-impl<T: Int + Clone> std::ops::Add for &Ratio<T> {
+impl<T: Int + Clone + std::cmp::PartialEq> std::ops::Add for &Ratio<T> {
 	type Output = Ratio<T>;
 
 	fn add(self, rhs: Self) -> Self::Output {

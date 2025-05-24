@@ -1,8 +1,10 @@
 use inherent::inherent;
 
-// use gidth_macros::satisfies;
+use gidth_macros::satisfies;
 
 use crate::number::{
+	Real,
+	Decimal,
 	Int,
 	Zero,
 	One,
@@ -10,7 +12,7 @@ use crate::number::{
 };
 
 #[derive(Clone, Debug)]
-// #[satisfies(Real)]
+#[satisfies(Real, Decimal)]
 pub struct Ratio<T: Int> {
 	pub(crate) num: T,
 	pub(crate) den: T,

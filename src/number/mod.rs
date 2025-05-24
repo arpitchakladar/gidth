@@ -1,5 +1,6 @@
 mod number;
 mod real;
+mod decimal;
 mod int;
 
 mod big_decimal;
@@ -12,6 +13,7 @@ pub use big_decimal::BigDecimal;
 pub use big_int::BigInt;
 pub use ratio::Ratio;
 pub use real::Real;
+pub use decimal::Decimal;
 pub use int::{
 	Int,
 	DivMod,

@@ -5,11 +5,12 @@ use gidth_macros::satisfies;
 use crate::number::{
 	Zero,
 	Real,
+	Decimal,
 	One,
 };
 
 #[derive(Clone, Debug)]
-#[satisfies(Real)]
+#[satisfies(Real, Decimal)]
 pub struct BigDecimal {
 	pub(crate) positive: bool,
 	pub(crate) limbs: Vec<u32>,
