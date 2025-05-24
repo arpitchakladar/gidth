@@ -30,6 +30,7 @@ pub trait Int:
 	for<'a> std::ops::Mul<&'a Self, Output = Self> +
 	for<'a> std::ops::Div<&'a Self, Output = Self> +
 	for<'a> std::ops::Rem<&'a Self, Output = Self> +
+	std::cmp::PartialEq +
 	DivMod<Self> +
 	Zero +
 	One +

@@ -136,6 +136,8 @@ pub fn satisfies(
 ) -> TokenStream {
 	let input = parse_macro_input!(item as ItemStruct);
 	let struct_name = &input.ident;
+	let generics = &input.generics;
+	let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
 	// Parse the attribute arguments
 	type AttrsType = Punctuated<syn::Path, syn::Token![,]>;
@@ -184,7 +186,7 @@ pub fn satisfies(
 					});
 
 				quote! {
-					impl #target_trait for #struct_name {
+					impl #impl_generics #target_trait for #struct_name #ty_generics #where_clause {
 						#(#impls)*
 					}
 				}
@@ -204,3 +206,4 @@ pub fn satisfies(
 
 	TokenStream::from(expanded)
 }
+
