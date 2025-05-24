@@ -4,7 +4,6 @@ use inherent::inherent;
 
 use crate::number::{
 	Int,
-	Real,
 	Zero,
 	One,
 };
