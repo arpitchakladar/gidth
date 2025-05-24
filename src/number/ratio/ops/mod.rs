@@ -1,5 +1,6 @@
 mod abs;
 mod add;
+mod bin_op;
 mod cmp;
 mod div;
 mod mul;

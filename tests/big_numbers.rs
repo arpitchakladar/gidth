@@ -140,5 +140,5 @@ use gidth::number::Ratio;
 //
 #[test]
 fn test_ratio() {
-	println!("{}", Ratio::new(-23432, 4534322342342i128) < Ratio::new(23432, 4534322342342i128));
+	println!("{}", Ratio::new(23432, 4534322342342i128) - &Ratio::new(23432, 4534322342342i128));
 }
