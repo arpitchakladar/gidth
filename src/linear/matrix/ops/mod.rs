@@ -4,5 +4,6 @@ mod det;
 mod inv;
 mod mul;
 mod neg;
+mod rat;
 mod sub;
 mod tp;
