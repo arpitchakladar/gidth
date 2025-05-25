@@ -46,37 +46,37 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D
 		}
 
 		// Solve LUx = Pb for each column of the identity matrix
-		let mut inv: Matrix<T, D, D> = Matrix::null();
+		let mut inv = Matrix::null();
 		for col in 0..D {
 			// Get column from permuted identity: Pb
-			let mut b: [T; D] = std::array::from_fn(|_| Zero::zero());
+			let mut b = Matrix::<T, D, 1>::null();
 			for i in 0..D {
-				b[i] = p.data[i][col].clone();
+				b.data[i][0] = p.data[i][col].clone();
 			}
 
 			// Forward substitution: solve L y = Pb
-			let mut y: [T; D] = std::array::from_fn(|_| Zero::zero());
+			let mut y = Matrix::<T, D, 1>::null();
 			for i in 0..D {
-				let mut sum = b[i].clone();
+				let mut sum = b.data[i][0].clone();
 				for j in 0..i {
-					sum = sum - l.data[i][j].clone() * y[j].clone();
+					sum = sum - l.data[i][j].clone() * y.data[j][0].clone();
 				}
-				y[i] = sum;
+				y.data[i][0] = sum;
 			}
 
 			// Backward substitution: solve U x = y
-			let mut x: [T; D] = std::array::from_fn(|_| Zero::zero());
+			let mut x = Matrix::<T, D, 1>::null();
 			for i in (0..D).rev() {
-				let mut sum = y[i].clone();
+				let mut sum = y.data[i][0].clone();
 				for j in (i + 1)..D {
-					sum = sum - u.data[i][j].clone() * x[j].clone();
+					sum = sum - u.data[i][j].clone() * x.data[j][0].clone();
 				}
-				x[i] = sum / u.data[i][i].clone();
+				x.data[i][0] = sum / u.data[i][i].clone();
 			}
 
 			// Set column in inverse matrix
 			for i in 0..D {
-				inv.data[i][col] = x[i].clone();
+				inv.data[i][col] = x.data[i][0].clone();
 			}
 		}
 
@@ -125,34 +125,34 @@ impl<T: Int + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D: us
 		let mut inv = Matrix::null();
 		for col in 0..D {
 			// Get column from permuted identity: Pb
-			let mut b: [Ratio<T>; D] = std::array::from_fn(|_| Zero::zero());
+			let mut b = Matrix::<Ratio<T>, D, 1>::null();
 			for i in 0..D {
-				b[i] = p.data[i][col].clone();
+				b.data[i][0] = p.data[i][col].clone();
 			}
 
 			// Forward substitution: solve L y = Pb
-			let mut y: [Ratio<T>; D] = std::array::from_fn(|_| Zero::zero());
+			let mut y = Matrix::<Ratio<T>, D, 1>::null();
 			for i in 0..D {
-				let mut sum = b[i].clone();
+				let mut sum = b.data[i][0].clone();
 				for j in 0..i {
-					sum = sum - l.data[i][j].clone() * y[j].clone();
+					sum = sum - l.data[i][j].clone() * y.data[j][0].clone();
 				}
-				y[i] = sum;
+				y.data[i][0] = sum;
 			}
 
 			// Backward substitution: solve U x = y
-			let mut x: [Ratio<T>; D] = std::array::from_fn(|_| Zero::zero());
+			let mut x = Matrix::<Ratio<T>, D, 1>::null();
 			for i in (0..D).rev() {
-				let mut sum = y[i].clone();
+				let mut sum = y.data[i][0].clone();
 				for j in (i + 1)..D {
-					sum = sum - u.data[i][j].clone() * x[j].clone();
+					sum = sum - u.data[i][j].clone() * x.data[j][0].clone();
 				}
-				x[i] = sum / u.data[i][i].clone();
+				x.data[i][0] = sum / u.data[i][i].clone();
 			}
 
 			// Set column in inverse matrix
 			for i in 0..D {
-				inv.data[i][col] = x[i].clone();
+				inv.data[i][col] = x.data[i][0].clone();
 			}
 		}
 

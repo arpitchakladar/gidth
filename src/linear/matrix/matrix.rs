@@ -9,6 +9,18 @@ pub struct Matrix<T: Real, const ROWS: usize, const COLS: usize> {
 	pub(crate) data: [[T; COLS]; ROWS],
 }
 
+impl<T: Real, const ROWS: usize, const COLS: usize> Matrix<T, ROWS, COLS> {
+	pub fn null() -> Self {
+		Self {
+			data: std::array::from_fn(
+				|_| std::array::from_fn(
+					|_| Zero::zero()
+				),
+			)
+		}
+	}
+}
+
 impl<T: Real, const D: usize> Matrix<T, D, D> {
 	pub fn id() -> Self {
 		Self {
@@ -19,16 +31,6 @@ impl<T: Real, const D: usize> Matrix<T, D, D> {
 					} else {
 						Zero::zero()
 					}
-				),
-			)
-		}
-	}
-
-	pub fn null() -> Self {
-		Self {
-			data: std::array::from_fn(
-				|_| std::array::from_fn(
-					|_| Zero::zero()
 				),
 			)
 		}

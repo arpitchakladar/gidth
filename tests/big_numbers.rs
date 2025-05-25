@@ -135,7 +135,7 @@ fn test_matrix_det() {
 		[4.0, 7.0],
 	]);
 	println!("{}", &a_inv);
-	println!("{}", &a * &a.inv_det().unwrap());
+	println!("{}", &a * &a.inv().unwrap());
 	println!("{}", Ratio::from(232)/Ratio::from(331));
 }
 //
