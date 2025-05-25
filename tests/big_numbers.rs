@@ -126,17 +126,16 @@ use gidth::linear::Matrix;
 // }
 #[test]
 fn test_matrix_det() {
-	let a = Matrix::new([
+	let a = Matrix::from([
 		[2, 10, 7],
 		[6, 3, 4],
 		[5, -2, -3],
 	]);
-	let a_inv = Matrix::new([
-		[1.0,  -1.0, 1.0],
-		[-38.0, 41.0, -34.0],
-		[27.0, -29.0, 24.0],
+	let a_inv = Matrix::from([
+		[2.0,  3.0],
+		[4.0, 7.0],
 	]);
-	println!("{}", a.det_int());
+	println!("{:?}", a_inv.inv());
 	println!("{}", Ratio::from(232)/Ratio::from(331));
 }
 //

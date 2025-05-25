@@ -11,7 +11,7 @@ impl<T: Real + Clone, const R: usize, const C: usize, const K: usize>
 	type Output = Matrix<T, R, K>;
 
 	fn mul(self, rhs: &Matrix<T, C, K>) -> Self::Output {
-		Matrix::new(
+		Matrix::from(
 			std::array::from_fn(|i|
 				std::array::from_fn(|j|
 					(0..C)
