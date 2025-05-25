@@ -2,11 +2,7 @@ use crate::{
 	linear::Matrix,
 	number::{
 		Abs,
-		Real,
 		Decimal,
-		Ratio,
-		Int,
-		One,
 		Zero,
 	}
 };
@@ -14,34 +10,33 @@ use crate::{
 // remove + Clone
 // NOTE: Works for decimal types only
 impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D: usize> Matrix<T, D, D> {
-	pub fn inv(&self) -> Option<Self> {
-		let mut u = self.clone();
+	pub fn inv(mut self) -> Option<Self> {
 		let mut l: Matrix<T, D, D> = Matrix::id();
 		let mut p: Matrix<T, D, D> = Matrix::id();
 
 		for i in 0..D {
 			let mut max_row = i;
 			for r in (i + 1)..D {
-				if Abs::abs(u.data[r][i].clone()) > Abs::abs(u.data[max_row][i].clone()) {
+				if Abs::abs(self.data[r][i].clone()) > Abs::abs(self.data[max_row][i].clone()) {
 					max_row = r;
 				}
 			}
 
-			if Zero::is_zero(&u.data[max_row][i]) {
+			if Zero::is_zero(&self.data[max_row][i]) {
 				return None;
 			}
 
 			if max_row != i {
-				u.data.swap(i, max_row);
+				self.data.swap(i, max_row);
 				p.data.swap(i, max_row);
 			}
 
 			for j in (i + 1)..D {
-				let x = u.data[j][i].clone() / &u.data[i][i];
+				let x = self.data[j][i].clone() / &self.data[i][i];
 				l.data[j][i] = x.clone();
-				u.data[j][i] = Zero::zero();
+				self.data[j][i] = Zero::zero();
 				for k in (i + 1)..D {
-					u.data[j][k] = u.data[j][k].clone() - u.data[i][k].clone() * &x;
+					self.data[j][k] = self.data[j][k].clone() - self.data[i][k].clone() * &x;
 				}
 			}
 		}
@@ -70,9 +65,9 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D
 			for i in (0..D).rev() {
 				let mut sum = y.data[i][0].clone();
 				for j in (i + 1)..D {
-					sum = sum - u.data[i][j].clone() * x.data[j][0].clone();
+					sum = sum - self.data[i][j].clone() * x.data[j][0].clone();
 				}
-				x.data[i][0] = sum / u.data[i][i].clone();
+				x.data[i][0] = sum / self.data[i][i].clone();
 			}
 
 			// Set column in inverse matrix
