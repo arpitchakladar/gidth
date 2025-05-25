@@ -5,11 +5,11 @@ use crate::number::{
 };
 
 #[derive(Clone)]
-pub struct Matrix<T: Real, const ROWS: usize, const COLS: usize> {
-	pub(crate) data: [[T; COLS]; ROWS],
+pub struct Matrix<T: Real, const R: usize, const C: usize> {
+	pub(crate) data: [[T; C]; R],
 }
 
-impl<T: Real, const ROWS: usize, const COLS: usize> Matrix<T, ROWS, COLS> {
+impl<T: Real, const R: usize, const C: usize> Matrix<T, R, C> {
 	pub fn null() -> Self {
 		Self {
 			data: std::array::from_fn(

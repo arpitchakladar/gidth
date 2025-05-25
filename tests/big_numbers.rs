@@ -134,7 +134,7 @@ fn test_matrix_det() {
 		[2.0,  3.0],
 		[4.0, 7.0],
 	]);
-	println!("{}", a_inv.det());
+	println!("{:?}", a_inv[(0, 1)]);
 }
 //
 // #[test]

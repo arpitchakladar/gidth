@@ -1,6 +1,7 @@
 mod access;
 mod add;
 mod det;
+mod idx;
 mod inv;
 mod mul;
 mod neg;

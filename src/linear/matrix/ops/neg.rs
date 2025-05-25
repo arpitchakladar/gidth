@@ -3,8 +3,8 @@ use crate::{
 	number::Real,
 };
 
-impl<T: Real + std::ops::Neg<Output = T>, const ROWS: usize, const COLS: usize> std::ops::Neg for Matrix<T, ROWS, COLS> {
-	type Output = Matrix<T, ROWS, COLS>;
+impl<T: Real + std::ops::Neg<Output = T>, const R: usize, const C: usize> std::ops::Neg for Matrix<T, R, C> {
+	type Output = Matrix<T, R, C>;
 
 	fn neg(mut self) -> Self::Output {
 		for row in self.data.iter_mut() {
@@ -17,8 +17,8 @@ impl<T: Real + std::ops::Neg<Output = T>, const ROWS: usize, const COLS: usize> 
 	}
 }
 
-impl<T: Real + std::ops::Neg<Output = T>, const ROWS: usize, const COLS: usize> std::ops::Neg for &Matrix<T, ROWS, COLS> {
-	type Output = Matrix<T, ROWS, COLS>;
+impl<T: Real + std::ops::Neg<Output = T>, const R: usize, const C: usize> std::ops::Neg for &Matrix<T, R, C> {
+	type Output = Matrix<T, R, C>;
 
 	fn neg(self) -> Self::Output {
 		-self.clone()
