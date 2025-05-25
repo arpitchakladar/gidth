@@ -6,7 +6,8 @@ use crate::{
 	},
 };
 
-impl<T: Int + std::ops::Neg<Output = T>, const R: usize, const C: usize> Matrix<T, R, C> {
+// Rationalizes the integer matrix
+impl<T: Int, const R: usize, const C: usize> Matrix<T, R, C> {
 	pub fn rat(self) -> Matrix<Ratio<T>, R, C> {
 		Matrix::from(
 			std::array::from_fn(

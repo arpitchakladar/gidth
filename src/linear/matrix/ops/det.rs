@@ -10,7 +10,7 @@ use crate::{
 
 // remove + Clone
 // NOTE: Works for decimal types only
-impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D: usize> Matrix<T, D, D> {
+impl<T: Decimal + Clone + std::ops::Neg<Output = T>, const D: usize> Matrix<T, D, D> {
 	pub fn det(mut self) -> T {
 		let mut det: T = One::one();
 		let mut sign_flip = false;
@@ -28,7 +28,7 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D
 			}
 
 			if max_row != i {
-				self.data.swap(i, max_row);
+				self = self.swap_row(i, max_row);
 				sign_flip = !sign_flip;
 			}
 

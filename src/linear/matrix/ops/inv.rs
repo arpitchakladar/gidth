@@ -9,7 +9,7 @@ use crate::{
 
 // remove + Clone
 // NOTE: Works for decimal types only
-impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D: usize> Matrix<T, D, D> {
+impl<T: Decimal + Clone + std::ops::Neg<Output = T>, const D: usize> Matrix<T, D, D> {
 	pub fn inv(mut self) -> Option<Self> {
 		let mut l: Matrix<T, D, D> = Matrix::id();
 		let mut p: Matrix<T, D, D> = Matrix::id();
@@ -27,7 +27,7 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D
 			}
 
 			if max_row != i {
-				self.data.swap(i, max_row);
+				self = self.swap_row(i, max_row);
 				p.data.swap(i, max_row);
 			}
 
