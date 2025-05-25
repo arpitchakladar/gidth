@@ -23,4 +23,14 @@ impl<T: Real, const D: usize> Matrix<T, D, D> {
 			)
 		}
 	}
+
+	pub fn null() -> Self {
+		Self {
+			data: std::array::from_fn(
+				|_| std::array::from_fn(
+					|_| Zero::zero()
+				),
+			)
+		}
+	}
 }
