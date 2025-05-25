@@ -17,12 +17,12 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D
 		for i in 0..D {
 			let mut max_row = i;
 			for r in (i + 1)..D {
-				if Abs::abs(self.data[r][i].clone()) > Abs::abs(self.data[max_row][i].clone()) {
+				if Abs::abs(self[r][i].clone()) > Abs::abs(self[max_row][i].clone()) {
 					max_row = r;
 				}
 			}
 
-			if Zero::is_zero(&self.data[max_row][i]) {
+			if Zero::is_zero(&self[max_row][i]) {
 				return None;
 			}
 
@@ -32,11 +32,11 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D
 			}
 
 			for j in (i + 1)..D {
-				let x = self.data[j][i].clone() / &self.data[i][i];
-				l.data[j][i] = x.clone();
-				self.data[j][i] = Zero::zero();
+				let x = self[j][i].clone() / &self[i][i];
+				l[j][i] = x.clone();
+				self[j][i] = Zero::zero();
 				for k in (i + 1)..D {
-					self.data[j][k] = self.data[j][k].clone() - self.data[i][k].clone() * &x;
+					self[j][k] = self[j][k].clone() - self[i][k].clone() * &x;
 				}
 			}
 		}
@@ -47,32 +47,32 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D
 			// Get column from permuted identity: Pb
 			let mut b = Matrix::<T, D, 1>::null();
 			for i in 0..D {
-				b.data[i][0] = p.data[i][col].clone();
+				b[i][0] = p[i][col].clone();
 			}
 
 			// Forward substitution: solve L y = Pb
 			let mut y = Matrix::<T, D, 1>::null();
 			for i in 0..D {
-				let mut sum = b.data[i][0].clone();
+				let mut sum = b[i][0].clone();
 				for j in 0..i {
-					sum = sum - l.data[i][j].clone() * y.data[j][0].clone();
+					sum = sum - l[i][j].clone() * y[j][0].clone();
 				}
-				y.data[i][0] = sum;
+				y[i][0] = sum;
 			}
 
 			// Backward substitution: solve U x = y
 			let mut x = Matrix::<T, D, 1>::null();
 			for i in (0..D).rev() {
-				let mut sum = y.data[i][0].clone();
+				let mut sum = y[i][0].clone();
 				for j in (i + 1)..D {
-					sum = sum - self.data[i][j].clone() * x.data[j][0].clone();
+					sum = sum - self[i][j].clone() * x[j][0].clone();
 				}
-				x.data[i][0] = sum / self.data[i][i].clone();
+				x[i][0] = sum / self[i][i].clone();
 			}
 
 			// Set column in inverse matrix
 			for i in 0..D {
-				inv.data[i][col] = x.data[i][0].clone();
+				inv[i][col] = x[i][0].clone();
 			}
 		}
 

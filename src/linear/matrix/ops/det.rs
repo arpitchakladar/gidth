@@ -18,12 +18,12 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D
 		for i in 0..D {
 			let mut max_row = i;
 			for r in (i + 1)..D {
-				if Abs::abs(self.data[r][i].clone()) > Abs::abs(self.data[max_row][i].clone()) {
+				if Abs::abs(self[r][i].clone()) > Abs::abs(self[max_row][i].clone()) {
 					max_row = r;
 				}
 			}
 
-			if Zero::is_zero(&self.data[max_row][i]) {
+			if Zero::is_zero(&self[max_row][i]) {
 				return Zero::zero();
 			}
 
@@ -33,16 +33,16 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T> + std::fmt::Display, const D
 			}
 
 			for j in (i + 1)..D {
-				let x = self.data[j][i].clone() / &self.data[i][i];
-				self.data[j][i] = Zero::zero();
+				let x = self[j][i].clone() / &self[i][i];
+				self[j][i] = Zero::zero();
 				for k in (i + 1)..D {
-					self.data[j][k] = self.data[j][k].clone() - self.data[i][k].clone() * &x;
+					self[j][k] = self[j][k].clone() - self[i][k].clone() * &x;
 				}
 			}
 		}
 
 		for i in 0..D {
-			det = det.clone() * &self.data[i][i];
+			det = det.clone() * &self[i][i];
 		}
 
 		if sign_flip {
