@@ -12,14 +12,10 @@ use crate::{
 impl<T, const D: usize> Matrix<T, D, D>
 where
 	T: Decimal + Clone + std::fmt::Display + std::ops::Neg<Output = T>,
-	for<'a> &'a T: std::ops::Add<&'a T, Output = T>,
-	for<'a> &'a T: std::ops::Sub<&'a T, Output = T>,
 	for<'a> &'a T: std::ops::Mul<&'a T, Output = T>,
 	for<'a> &'a T: std::ops::Div<&'a T, Output = T>,
-	for<'a> &'a T: std::ops::Add<T, Output = T>,
-	for<'a> &'a T: std::ops::Sub<T, Output = T>,
-	for<'a> &'a T: std::ops::Mul<T, Output = T>,
-	for<'a> &'a T: std::ops::Div<T, Output = T>,
+	T: std::ops::SubAssign<T>,
+	T: std::ops::MulAssign<T>,
 {
 	pub fn inv(self) -> Option<Self> {
 		let mut u = self;
@@ -48,7 +44,8 @@ where
 				l[j][i] = x.clone();
 				u[j][i] = Zero::zero();
 				for k in (i + 1)..D {
-					u[j][k] = &u[j][k] - &u[i][k] * &x;
+					let x = &u[i][k] * &x;
+					u[j][k] -= x;
 				}
 			}
 		}
@@ -61,7 +58,7 @@ where
 			for i in 0..D {
 				let mut sum = p[i][col].clone();
 				for j in 0..i {
-					sum = sum - &l[i][j] * &y[j][0];
+					sum -= &l[i][j] * &y[j][0];
 				}
 				y[i][0] = sum;
 			}
@@ -71,7 +68,7 @@ where
 			for i in (0..D).rev() {
 				let mut sum = y[i][0].clone();
 				for j in (i + 1)..D {
-					sum = sum - &u[i][j] * &x[j][0];
+					sum -= &u[i][j] * &x[j][0];
 				}
 				x[i][0] = sum / &u[i][i];
 			}

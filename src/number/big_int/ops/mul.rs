@@ -76,4 +76,10 @@ impl MulAssign<&BigInt> for BigInt {
 	}
 }
 
+impl MulAssign<BigInt> for BigInt {
+	fn mul_assign(&mut self, rhs: BigInt) {
+		*self = &*self * rhs;
+	}
+}
+
 impl_big_int_binop_variants!(Mul, mul, *);

@@ -36,4 +36,10 @@ impl AddAssign<&BigInt> for BigInt {
 	}
 }
 
+impl AddAssign<BigInt> for BigInt {
+	fn add_assign(&mut self, rhs: BigInt) {
+		*self = &*self + rhs;
+	}
+}
+
 impl_big_int_binop_variants!(Add, add, +);

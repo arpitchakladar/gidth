@@ -13,14 +13,10 @@ use crate::{
 impl<T, const D: usize> Matrix<T, D, D>
 where
 	T: Decimal + Clone + std::fmt::Display + std::ops::Neg<Output = T>,
-	for<'a> &'a T: std::ops::Add<&'a T, Output = T>,
-	for<'a> &'a T: std::ops::Sub<&'a T, Output = T>,
 	for<'a> &'a T: std::ops::Mul<&'a T, Output = T>,
 	for<'a> &'a T: std::ops::Div<&'a T, Output = T>,
-	for<'a> &'a T: std::ops::Add<T, Output = T>,
-	for<'a> &'a T: std::ops::Sub<T, Output = T>,
-	for<'a> &'a T: std::ops::Mul<T, Output = T>,
-	for<'a> &'a T: std::ops::Div<T, Output = T>,
+	T: std::ops::SubAssign<T>,
+	for<'a> T: std::ops::MulAssign<&'a T>,
 {
 	pub fn det(self) -> T {
 		let mut u = self;
@@ -48,19 +44,20 @@ where
 				let x = &u[j][i] / &u[i][i];
 				u[j][i] = Zero::zero();
 				for k in (i + 1)..D {
-					u[j][k] = &u[j][k] - &u[i][k] * &x;
+					let x = &u[i][k] * &x;
+					u[j][k] -= x;
 				}
 			}
 		}
 
 		for i in 0..D {
-			det = &det * &u[i][i];
+			det *= &u[i][i];
 		}
 
 		if sign_flip {
-			det = -det;
+			-det
+		} else {
+			det
 		}
-
-		det
 	}
 }

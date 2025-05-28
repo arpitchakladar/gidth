@@ -35,4 +35,10 @@ impl SubAssign<&BigInt> for BigInt {
 	}
 }
 
+impl SubAssign<BigInt> for BigInt {
+	fn sub_assign(&mut self, rhs: BigInt) {
+		*self = &*self - rhs;
+	}
+}
+
 impl_big_int_binop_variants!(Sub, sub, -);
