@@ -127,14 +127,14 @@ use gidth::linear::Matrix;
 #[test]
 fn test_matrix_det() {
 	let a = Matrix::from([
-		[2.0, 10.0],
-		[6.0, 3.0],
+		[Ratio::from(1), Ratio::new(234, 23423)],
+		[Ratio::from(1), Ratio::from(1)],
 	]);
 	let a_inv = Matrix::from([
-		[2.0,  3.0],
-		[4.0, 7.0],
+		[2.0,  3.0, 0.0],
+		[4.0, 7.0, 2.0],
 	]);
-	println!("{:?}", a_inv[(0, 1)]);
+	println!("{}", a_inv);
 }
 //
 // #[test]

@@ -11,8 +11,8 @@ use crate::{
 // NOTE: Works for decimal types only
 impl<T: Decimal + Clone + std::ops::Neg<Output = T>, const D: usize> Matrix<T, D, D> {
 	pub fn inv(mut self) -> Option<Self> {
-		let mut l: Matrix<T, D, D> = Matrix::id();
-		let mut p: Matrix<T, D, D> = Matrix::id();
+		let mut l: Matrix<T, D, D> = Matrix::one();
+		let mut p: Matrix<T, D, D> = Matrix::one();
 
 		for i in 0..D {
 			let mut max_row = i;
@@ -41,17 +41,17 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T>, const D: usize> Matrix<T, D
 			}
 		}
 
-		// Solve LUx = Pb for each column of the identity matrix
-		let mut inv = Matrix::null();
+		// Solve LUx = Pb for each column of the oneentity matrix
+		let mut inv = Matrix::zero();
 		for col in 0..D {
-			// Get column from permuted identity: Pb
-			let mut b = Matrix::<T, D, 1>::null();
+			// Get column from permuted oneentity: Pb
+			let mut b = Matrix::<T, D, 1>::zero();
 			for i in 0..D {
 				b[i][0] = p[i][col].clone();
 			}
 
 			// Forward substitution: solve L y = Pb
-			let mut y = Matrix::<T, D, 1>::null();
+			let mut y = Matrix::<T, D, 1>::zero();
 			for i in 0..D {
 				let mut sum = b[i][0].clone();
 				for j in 0..i {
@@ -61,7 +61,7 @@ impl<T: Decimal + Clone + std::ops::Neg<Output = T>, const D: usize> Matrix<T, D
 			}
 
 			// Backward substitution: solve U x = y
-			let mut x = Matrix::<T, D, 1>::null();
+			let mut x = Matrix::<T, D, 1>::zero();
 			for i in (0..D).rev() {
 				let mut sum = y[i][0].clone();
 				for j in (i + 1)..D {

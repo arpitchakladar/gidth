@@ -10,7 +10,7 @@ pub struct Matrix<T: Real, const R: usize, const C: usize> {
 }
 
 impl<T: Real, const R: usize, const C: usize> Matrix<T, R, C> {
-	pub fn null() -> Self {
+	pub fn zero() -> Self {
 		Self {
 			data: std::array::from_fn(
 				|_| std::array::from_fn(
@@ -22,7 +22,7 @@ impl<T: Real, const R: usize, const C: usize> Matrix<T, R, C> {
 }
 
 impl<T: Real, const D: usize> Matrix<T, D, D> {
-	pub fn id() -> Self {
+	pub fn one() -> Self {
 		Self {
 			data: std::array::from_fn(
 				|i| std::array::from_fn(
