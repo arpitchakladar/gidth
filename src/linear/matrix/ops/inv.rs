@@ -1,5 +1,4 @@
 use crate::{
-	ref_op_bounds,
 	linear::Matrix,
 	number::{
 		Abs,

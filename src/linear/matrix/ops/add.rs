@@ -1,4 +1,7 @@
-use std::ops::Add;
+use std::ops::{
+	Add,
+	AddAssign,
+};
 use crate::{
 	linear::Matrix,
 	number::Real,
@@ -7,7 +10,7 @@ use crate::{
 impl<T: Real + Clone, const R: usize, const C: usize> Add<&Matrix<T, R, C>> for Matrix<T, R, C>
 where
 	T: Real + Clone,
-	for<'a> &'a T: Add<&'a T, Output = T>
+	for<'a> T: AddAssign<&'a T>
 {
 	type Output = Matrix<T, R, C>;
 
@@ -15,7 +18,7 @@ where
 		let mut lhs = self;
 		for i in 0..R {
 			for j in 0..C {
-				lhs[i][j] = &lhs[i][j] + &rhs.data[i][j];
+				lhs[i][j] += &rhs.data[i][j];
 			}
 		}
 		lhs

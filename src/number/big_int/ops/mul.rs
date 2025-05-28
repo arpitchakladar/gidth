@@ -1,3 +1,7 @@
+use std::ops::{
+	Mul,
+	MulAssign,
+};
 use crate::number::BigInt;
 use crate::impl_big_int_binop_variants;
 
@@ -48,7 +52,7 @@ impl BigInt {
 	}
 }
 
-impl std::ops::Mul for &BigInt {
+impl Mul for &BigInt {
 	type Output = BigInt;
 
 	fn mul(self, other: Self) -> Self::Output {
@@ -63,6 +67,12 @@ impl std::ops::Mul for &BigInt {
 		result.positive = self.positive == other.positive;
 
 		result
+	}
+}
+
+impl MulAssign<&BigInt> for BigInt {
+	fn mul_assign(&mut self, rhs: &BigInt) {
+		*self = &*self * rhs;
 	}
 }
 

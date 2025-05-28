@@ -1,7 +1,11 @@
+use std::ops::{
+	Sub,
+	SubAssign,
+};
 use crate::number::BigInt;
 use crate::impl_big_int_binop_variants;
 
-impl std::ops::Sub for &BigInt {
+impl Sub for &BigInt {
 	type Output = BigInt;
 
 	fn sub(self, rhs: Self) -> Self::Output {
@@ -22,6 +26,12 @@ impl std::ops::Sub for &BigInt {
 		}
 
 		result
+	}
+}
+
+impl SubAssign<&BigInt> for BigInt {
+	fn sub_assign(&mut self, rhs: &BigInt) {
+		*self = &*self - rhs;
 	}
 }
 
