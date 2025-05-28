@@ -17,6 +17,7 @@ use quote::{
 
 use crate::trait_analysis::{
 	extract_base_traits,
+	extract_full_where_clause,
 	extract_method_signatures,
 };
 
@@ -35,6 +36,7 @@ pub fn siphon_traits(
 	let trait_ident = &parsed_trait.ident;
 	let trait_name = trait_ident.to_string();
 	let base_traits = extract_base_traits(&parsed_trait);
+	let where_clause = extract_full_where_clause(&parsed_trait);
 	let current_trait_methods = extract_method_signatures(&parsed_trait);
 	let method_registry = METHOD_REGISTRY
 		.lock()
@@ -143,7 +145,7 @@ pub fn siphon_traits(
 	let supertraits = &parsed_trait.supertraits;
 
 	let expanded = quote! {
-		pub trait #trait_ident: #supertraits {
+		pub trait #trait_ident: #supertraits #where_clause {
 			#(#trait_method_signatures)*
 			#(#trait_defined_method_signature)*
 		}

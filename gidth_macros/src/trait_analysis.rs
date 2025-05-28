@@ -10,7 +10,11 @@ use syn::{
 	TraitBound,
 	TypeParamBound,
 };
-use quote::quote;
+use quote::{
+	quote,
+	TokenStreamExt,
+};
+use proc_macro2::TokenStream;
 
 use crate::register_trait::METHOD_REGISTRY;
 
@@ -89,6 +93,17 @@ pub(crate) fn extract_base_traits(
 			None
 		})
 		.collect::<Vec<_>>()
+}
+
+// Extracts the full `where` clause from a trait definition as a `String`.
+pub(crate) fn extract_full_where_clause(trait_def: &ItemTrait) -> TokenStream  {
+	if let Some(where_clause) = &trait_def.generics.where_clause {
+		let mut tokens = TokenStream::new();
+		tokens.append_all(quote! { #where_clause });
+		tokens
+	} else {
+		TokenStream::new()
+	}
 }
 
 // Extracts method signatures from the given trait definition.
