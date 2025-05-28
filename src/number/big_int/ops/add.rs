@@ -5,41 +5,36 @@ use std::ops::{
 use crate::number::BigInt;
 use crate::impl_big_int_binop_variants;
 
-impl Add for &BigInt {
+impl Add<&BigInt> for BigInt {
 	type Output = BigInt;
 
 	fn add(self, rhs: &BigInt) -> Self::Output {
-		let mut result = BigInt::with_capacity(
-			std::cmp::max(
-				self.limbs.len(),
-				rhs.limbs.len(),
-			) + 1,
-		);
+		let mut lhs = self;
 
-		match (self.positive, rhs.positive) {
-			(true, true) => BigInt::u_add_in(self, rhs, &mut result),
-			(true, false) => BigInt::u_sub_in(self, rhs, &mut result),
-			(false, true) => BigInt::u_sub_in(rhs, self, &mut result),
+		match (lhs.positive, rhs.positive) {
+			(true, true) => BigInt::u_add_assign(&mut lhs, rhs),
+			(true, false) => {return 0.into();},
+			(false, true) => {return 0.into();},
 			(false, false) => {
-				BigInt::u_add_in(self, rhs, &mut result);
-				result.positive = false;
+				BigInt::u_add_assign(&mut lhs, rhs);
+				lhs.positive = false;
 			},
 		}
 
-		result
+		lhs
 	}
 }
 
 impl AddAssign<&BigInt> for BigInt {
 	fn add_assign(&mut self, rhs: &BigInt) {
-		*self = &*self + rhs;
+		*self = self.clone() + rhs;
 	}
 }
 
 impl AddAssign<BigInt> for BigInt {
 	fn add_assign(&mut self, rhs: BigInt) {
-		*self = &*self + rhs;
+		*self = self.clone() + &rhs;
 	}
 }
 
-impl_big_int_binop_variants!(Add, add, +);
+// impl_big_int_binop_variants!(Add, add, +);

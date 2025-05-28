@@ -10,7 +10,7 @@ use crate::number::{
 };
 
 #[derive(Clone, Debug)]
-#[satisfies(Real, Int)]
+// #[satisfies(Real, Int)]
 pub struct BigInt {
 	pub(crate) positive: bool,
 	pub(crate) limbs: Vec<u32>,

@@ -17,11 +17,8 @@ impl Sub for &BigInt {
 		);
 		match (self.positive, rhs.positive) {
 			(true, true) => BigInt::u_sub_in(self, rhs, &mut result),
-			(true, false) => BigInt::u_add_in(self, rhs, &mut result),
-			(false, true) => {
-				BigInt::u_add_in(self, rhs, &mut result);
-				result.positive = false;
-			},
+			(true, false) => {return 0.into();},
+			(false, true) => {return 0.into();},
 			(false, false) => BigInt::u_sub_in(rhs, self, &mut result),
 		}
 

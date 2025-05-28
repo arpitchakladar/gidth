@@ -1,15 +1,16 @@
-use gidth::number::Ratio;
+use gidth::number::BigInt;
 use gidth::linear::Matrix;
 // use gidth_macros::auto_wrap_ints;
 
-// #[test]
-// fn big_int_sum() {
-// 	let x = BigInt::from("102276255580139097615819404275666350670467982146909786100732684133793143719564593097353327");
-// 	let z = BigInt::from("-102276255580139097615819404275666350670467982146909786100732684133793143719564593097343327");
-// 	let my_int = &x + &z + BigInt::from("22222222222222");
-// 	println!("{}", my_int);
-// 	println!("{}", my_int.sq());
-// }
+#[test]
+fn big_int_sum() {
+	let x = BigInt::from("102276255580139097615819404275666350670467982146909786100732684133793143719564593097353327");
+	let z = BigInt::from("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+	println!("{}", &x);
+	let my_int = x + &z;
+	println!("{}", &z);
+	println!("{}", my_int);
+}
 //
 // #[test]
 // fn big_int_multiply() {
@@ -124,19 +125,19 @@ use gidth::linear::Matrix;
 // 	let ln1p5 = 1.5f64;
 // 	println!("{}", BigDecimal::ln(ln1p5));
 // }
-#[test]
-fn test_matrix_det() {
-	let a = Matrix::from([
-		[Ratio::from(1), Ratio::new(234, 23423)],
-		[Ratio::from(1), Ratio::from(1)],
-	]);
-	let a_inv = Matrix::from([
-		[2.0,  3.0, 0.0],
-		[4.0, 7.0, 2.0],
-		[5.0, 7.0, 2.0],
-	]);
-	println!("{}", &a_inv.clone() * &a_inv.inv().unwrap());
-}
+// #[test]
+// fn test_matrix_det() {
+// 	let a = Matrix::from([
+// 		[Ratio::from(1), Ratio::new(234, 23423)],
+// 		[Ratio::from(1), Ratio::from(1)],
+// 	]);
+// 	let a_inv = Matrix::from([
+// 		[2.0,  3.0, 0.0],
+// 		[4.0, 7.0, 2.0],
+// 		[5.0, 7.0, 2.0],
+// 	]);
+// 	println!("{}", &a_inv.clone() * &a_inv.inv().unwrap());
+// }
 //
 // #[test]
 // fn test_ratio() {
