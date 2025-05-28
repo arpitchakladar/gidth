@@ -133,8 +133,9 @@ fn test_matrix_det() {
 	let a_inv = Matrix::from([
 		[2.0,  3.0, 0.0],
 		[4.0, 7.0, 2.0],
+		[5.0, 7.0, 2.0],
 	]);
-	println!("{}", a_inv);
+	println!("{}", &a_inv.clone() * &a_inv.inv().unwrap());
 }
 //
 // #[test]
