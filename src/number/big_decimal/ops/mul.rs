@@ -1,5 +1,8 @@
 use crate::number::BigDecimal;
-use crate::impl_big_decimal_binop_variants;
+use crate::{
+	impl_big_decimal_binop_variants,
+	impl_big_decimal_binop_assign_variants,
+};
 
 impl BigDecimal {
 	pub(crate) fn u_mul_in(
@@ -71,3 +74,4 @@ impl std::ops::Mul for &BigDecimal {
 }
 
 impl_big_decimal_binop_variants!(Mul, mul, *);
+impl_big_decimal_binop_assign_variants!(MulAssign, mul_assign, *);

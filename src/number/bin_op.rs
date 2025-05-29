@@ -29,3 +29,22 @@ macro_rules! impl_binop_variants {
 		}
 	};
 }
+
+#[macro_export]
+macro_rules! impl_binop_assign_variants {
+	($num_type:ident, $trait:ident, $method:ident, $op:tt) => {
+		impl std::ops::$trait<&$num_type> for $num_type {
+			#[inline]
+			fn $method(&mut self, other: &Self) {
+				*self = &*self $op other
+			}
+		}
+
+		impl std::ops::$trait<$num_type> for $num_type {
+			#[inline]
+			fn $method(&mut self, other: Self) {
+				*self = &*self $op &other
+			}
+		}
+	};
+}

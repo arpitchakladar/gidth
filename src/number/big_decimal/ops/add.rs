@@ -1,10 +1,13 @@
 use crate::number::BigDecimal;
-use crate::impl_big_decimal_binop_variants;
+use crate::{
+	impl_big_decimal_binop_variants,
+	impl_big_decimal_binop_assign_variants,
+};
 
 impl std::ops::Add for &BigDecimal {
 	type Output = BigDecimal;
 
-	fn add(self, other: Self) -> Self::Output {
+	fn add(self, other: &BigDecimal) -> Self::Output {
 		let mut result = BigDecimal::with_capacity(
 			(self.order() - other.order()).abs() as usize
 		);
@@ -23,3 +26,4 @@ impl std::ops::Add for &BigDecimal {
 }
 
 impl_big_decimal_binop_variants!(Add, add, +);
+impl_big_decimal_binop_assign_variants!(AddAssign, add_assign, +);
