@@ -5,37 +5,73 @@ use std::ops::{
 use crate::number::BigInt;
 use crate::impl_big_int_binop_variants;
 
-impl Sub for &BigInt {
+impl Sub<&BigInt> for BigInt {
 	type Output = BigInt;
 
-	fn sub(self, rhs: Self) -> Self::Output {
-		let mut result = BigInt::with_capacity(
-			std::cmp::max(
-				self.limbs.len(),
-				rhs.limbs.len(),
-			) + 1,
+	fn sub(self, rhs: &BigInt) -> Self::Output {
+		let mut lhs = self;
+		lhs -= rhs;
+
+		lhs
+	}
+}
+
+impl Sub<BigInt> for BigInt {
+	type Output = BigInt;
+
+	fn sub(self, rhs: BigInt) -> Self::Output {
+		self - &rhs
+	}
+}
+
+impl Sub<BigInt> for &BigInt {
+	type Output = BigInt;
+
+	fn sub(self, rhs: BigInt) -> Self::Output {
+		let mut rhs = rhs;
+		rhs -= self;
+		rhs.positive = !rhs.positive;
+		rhs
+	}
+}
+
+impl Sub<&BigInt> for &BigInt {
+	type Output = BigInt;
+
+	fn sub(self, rhs: &BigInt) -> Self::Output {
+		let mut res = BigInt::with_capacity(
+			self.limbs.len().max(rhs.limbs.len())
 		);
 		match (self.positive, rhs.positive) {
-			(true, true) => BigInt::u_sub_in(self, rhs, &mut result),
-			(true, false) => {return 0.into();},
-			(false, true) => {return 0.into();},
-			(false, false) => BigInt::u_sub_in(rhs, self, &mut result),
+			(true, true) => BigInt::u_sub_in_place(self, rhs, &mut res),
+			(true, false) => BigInt::u_add_in_place(self, rhs, &mut res),
+			(false, true) => {
+				BigInt::u_add_in_place(self, rhs, &mut res);
+				res.positive = false;
+			},
+			(false, false) => BigInt::u_sub_in_place(rhs, self, &mut res),
 		}
 
-		result
+		res
 	}
 }
 
 impl SubAssign<&BigInt> for BigInt {
 	fn sub_assign(&mut self, rhs: &BigInt) {
-		*self = &*self - rhs;
+		match (self.positive, rhs.positive) {
+			(true, true) => BigInt::u_sub_assign(self, rhs),
+			(true, false) => BigInt::u_add_assign(self, rhs),
+			(false, true) => BigInt::u_add_assign(self, rhs),
+			(false, false) => {
+				BigInt::u_sub_assign(self, rhs);
+				self.positive = !self.positive;
+			},
+		}
 	}
 }
 
 impl SubAssign<BigInt> for BigInt {
 	fn sub_assign(&mut self, rhs: BigInt) {
-		*self = &*self - rhs;
+		*self -= &rhs;
 	}
 }
-
-impl_big_int_binop_variants!(Sub, sub, -);

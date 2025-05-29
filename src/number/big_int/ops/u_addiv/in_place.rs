@@ -1,50 +1,57 @@
 use crate::number::BigInt;
 
 impl BigInt {
-	pub(crate) fn u_add_assign(
-		&mut self,
+	pub(crate) fn u_add_in_place(
+		&self,
 		rhs: &BigInt,
+		result: &mut BigInt,
 	) {
-		let (s_len, no_inv) = {
+		let (larger, smaller) = {
 			if self.limbs.len() > rhs.limbs.len() {
-				(rhs.limbs.len(), true)
+				(self, rhs)
 			} else {
-				(self.limbs.len(), false)
+				(rhs, self)
 			}
 		};
-		let mut carry = 0;
-		let mut i = 0;
-		while i < s_len {
-			let sum = self.limbs[i] as u64 + rhs.limbs[i] as u64 + carry;
-			self.limbs[i] = sum as u32;
-			carry = sum >> 32;
-			i += 1;
-		}
-		if no_inv {
-			while i < self.limbs.len() && carry != 0 {
-				let sum = self.limbs[i] as u64 + carry;
-				self.limbs[i] = sum as u32;
-				carry = sum >> 32;
-				i += 1;
-			}
-		} else {
-			while i < rhs.limbs.len() && carry != 0 {
-				let sum = rhs.limbs[i] as u64 + carry;
-				self.limbs.push(sum as u32);
-				carry = sum >> 32;
-				i += 1;
-			}
-			while i < rhs.limbs.len() {
-				self.limbs.push(rhs.limbs[i]);
-				i += 1;
-			}
-		}
+
+		let carry = larger.limbs
+			.iter()
+			.copied()
+			.zip(
+				smaller.limbs
+					.iter()
+					.copied(),
+			)
+			.fold(
+				0u64,
+				|carry, (left_limb, right_limb)| {
+					let sum = left_limb as u64 + right_limb as u64;
+					let total_sum = sum + carry;
+					result.limbs.push(total_sum as u32);
+
+					total_sum >> 32
+				},
+			);
+
+		let carry = larger.limbs[smaller.limbs.len()..]
+			.iter()
+			.copied()
+			.fold(
+				carry,
+				|carry, limb| {
+					let sum = limb as u64 + carry;
+					result.limbs.push(sum as u32);
+
+					sum >> 32
+				},
+			);
+
 		if carry != 0 {
-			self.limbs.push(carry as u32);
+			result.limbs.push(carry as u32);
 		}
 	}
 
-	pub(crate) fn u_sub_in(
+	pub(crate) fn u_sub_in_place(
 		&self,
 		rhs: &BigInt,
 		result: &mut BigInt,

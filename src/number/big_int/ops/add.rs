@@ -3,38 +3,76 @@ use std::ops::{
 	AddAssign,
 };
 use crate::number::BigInt;
-use crate::impl_big_int_binop_variants;
+// use crate::impl_big_in_placet_binop_variants;
 
 impl Add<&BigInt> for BigInt {
 	type Output = BigInt;
 
 	fn add(self, rhs: &BigInt) -> Self::Output {
 		let mut lhs = self;
+		lhs += rhs;
+		lhs
+	}
+}
 
-		match (lhs.positive, rhs.positive) {
-			(true, true) => BigInt::u_add_assign(&mut lhs, rhs),
-			(true, false) => {return 0.into();},
-			(false, true) => {return 0.into();},
+impl Add<BigInt> for BigInt {
+	type Output = BigInt;
+
+	fn add(self, rhs: BigInt) -> Self::Output {
+		self + &rhs
+	}
+}
+
+impl Add<BigInt> for &BigInt {
+	type Output = BigInt;
+
+	fn add(self, rhs: BigInt) -> Self::Output {
+		rhs + self
+	}
+}
+
+impl Add<&BigInt> for &BigInt {
+	type Output = BigInt;
+
+	fn add(self, rhs: &BigInt) -> Self::Output {
+		let mut res = BigInt::with_capacity(
+			self.limbs.len().max(rhs.limbs.len()) + 1
+		);
+		match (self.positive, rhs.positive) {
+			(true, true) => BigInt::u_add_in_place(self, rhs, &mut res),
+			(true, false) => BigInt::u_sub_in_place(self, rhs, &mut res),
+			(false, true) => BigInt::u_sub_in_place(rhs, self, &mut res),
 			(false, false) => {
-				BigInt::u_add_assign(&mut lhs, rhs);
-				lhs.positive = false;
+				BigInt::u_add_in_place(self, rhs, &mut res);
+				res.positive = false;
 			},
 		}
 
-		lhs
+		res
 	}
 }
 
 impl AddAssign<&BigInt> for BigInt {
 	fn add_assign(&mut self, rhs: &BigInt) {
-		*self = self.clone() + rhs;
+		match (self.positive, rhs.positive) {
+			(true, true) => BigInt::u_add_assign(self, rhs),
+			(true, false) => BigInt::u_sub_assign(self, rhs),
+			(false, true) => {
+				BigInt::u_sub_assign(self, rhs);
+				self.positive = !self.positive;
+			},
+			(false, false) => {
+				BigInt::u_add_assign(self, rhs);
+				self.positive = false;
+			},
+		}
 	}
 }
 
 impl AddAssign<BigInt> for BigInt {
 	fn add_assign(&mut self, rhs: BigInt) {
-		*self = self.clone() + &rhs;
+		*self += &rhs;
 	}
 }
 
-// impl_big_int_binop_variants!(Add, add, +);
+// impl_big_in_placet_binop_variants!(Add, add, +);
