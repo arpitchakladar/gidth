@@ -1,3 +1,21 @@
+use std::ops::{
+	Add,
+	Sub,
+	Mul,
+	Div,
+	Rem,
+	AddAssign,
+	SubAssign,
+	MulAssign,
+	DivAssign,
+	RemAssign,
+};
+use std::cmp::{
+	PartialEq,
+	PartialOrd,
+	Eq,
+	Ord,
+};
 use crate::number::{
 	Abs,
 	Square,
@@ -21,20 +39,30 @@ where
 pub trait Int:
 	Clone +
 	Real +
-	std::ops::Add<Output = Self> +
-	std::ops::Sub<Output = Self> +
-	std::ops::Mul<Output = Self> +
-	std::ops::Div<Output = Self> +
-	std::ops::Rem<Output = Self> +
-	for<'a> std::ops::Add<&'a Self, Output = Self> +
-	for<'a> std::ops::Sub<&'a Self, Output = Self> +
-	for<'a> std::ops::Mul<&'a Self, Output = Self> +
-	for<'a> std::ops::Div<&'a Self, Output = Self> +
-	for<'a> std::ops::Rem<&'a Self, Output = Self> +
-	std::cmp::PartialEq +
-	std::cmp::Eq +
-	std::cmp::PartialOrd +
-	std::cmp::Ord +
+	Add<Output = Self> +
+	Sub<Output = Self> +
+	Mul<Output = Self> +
+	Div<Output = Self> +
+	Rem<Output = Self> +
+	for<'a> Add<&'a Self, Output = Self> +
+	for<'a> Sub<&'a Self, Output = Self> +
+	for<'a> Mul<&'a Self, Output = Self> +
+	for<'a> Div<&'a Self, Output = Self> +
+	for<'a> Rem<&'a Self, Output = Self> +
+	AddAssign<Self> +
+	SubAssign<Self> +
+	MulAssign<Self> +
+	DivAssign<Self> +
+	RemAssign<Self> +
+	for<'a> AddAssign<&'a Self> +
+	for<'a> SubAssign<&'a Self> +
+	for<'a> MulAssign<&'a Self> +
+	for<'a> DivAssign<&'a Self> +
+	for<'a> RemAssign<&'a Self> +
+	PartialEq +
+	Eq +
+	PartialOrd +
+	Ord +
 	DivMod<Self> +
 	Zero +
 	One +

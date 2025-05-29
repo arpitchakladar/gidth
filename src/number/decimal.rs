@@ -27,7 +27,6 @@ use gidth_macros::{
 #[siphon_traits]
 pub trait Decimal:
 	Real +
-	Clone +
 	Add<Output = Self> +
 	Sub<Output = Self> +
 	Mul<Output = Self> +
@@ -42,8 +41,8 @@ pub trait Decimal:
 	DivAssign<Self> +
 	for<'a> AddAssign<&'a Self> +
 	for<'a> SubAssign<&'a Self> +
-	for<'a> DivAssign<&'a Self> +
 	for<'a> MulAssign<&'a Self> +
+	for<'a> DivAssign<&'a Self> +
 	PartialEq +
 	PartialOrd +
 	Zero +

@@ -37,8 +37,8 @@ pub trait Real:
 	DivAssign<Self> +
 	for<'a> AddAssign<&'a Self> +
 	for<'a> SubAssign<&'a Self> +
-	for<'a> DivAssign<&'a Self> +
 	for<'a> MulAssign<&'a Self> +
+	for<'a> DivAssign<&'a Self> +
 	PartialEq +
 	PartialOrd +
 	Zero +

@@ -3,7 +3,10 @@ use std::ops::{
 	MulAssign,
 };
 use crate::number::BigInt;
-use crate::impl_big_int_binop_variants;
+use crate::{
+	impl_big_int_binop_variants,
+	impl_big_int_binop_assign_variants,
+};
 
 impl BigInt {
 	/// Multiplies two unsigned `BigInt` numbers and stores the result in `result`.
@@ -70,16 +73,5 @@ impl Mul for &BigInt {
 	}
 }
 
-impl MulAssign<&BigInt> for BigInt {
-	fn mul_assign(&mut self, rhs: &BigInt) {
-		*self = &*self * rhs;
-	}
-}
-
-impl MulAssign<BigInt> for BigInt {
-	fn mul_assign(&mut self, rhs: BigInt) {
-		*self = &*self * rhs;
-	}
-}
-
 impl_big_int_binop_variants!(Mul, mul, *);
+impl_big_int_binop_assign_variants!(MulAssign, mul_assign, *);
