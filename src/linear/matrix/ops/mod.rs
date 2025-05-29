@@ -3,6 +3,7 @@ mod add;
 mod det;
 mod idx;
 mod inv;
+mod lu;
 mod mul;
 mod neg;
 mod rat;

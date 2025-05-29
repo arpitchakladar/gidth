@@ -1,3 +1,17 @@
+use std::ops::{
+	Add,
+	Sub,
+	Mul,
+	Div,
+	AddAssign,
+	SubAssign,
+	MulAssign,
+	DivAssign,
+};
+use std::cmp::{
+	PartialEq,
+	PartialOrd,
+};
 use crate::number::{
 	Abs,
 	Square,
@@ -12,18 +26,25 @@ use gidth_macros::{
 
 #[siphon_traits]
 pub trait Decimal:
-	Clone +
 	Real +
-	std::ops::Add<Output = Self> +
-	std::ops::Sub<Output = Self> +
-	std::ops::Mul<Output = Self> +
-	std::ops::Div<Output = Self> +
-	for<'a> std::ops::Add<&'a Self, Output = Self> +
-	for<'a> std::ops::Sub<&'a Self, Output = Self> +
-	for<'a> std::ops::Mul<&'a Self, Output = Self> +
-	for<'a> std::ops::Div<&'a Self, Output = Self> +
-	std::cmp::PartialEq +
-	std::cmp::PartialOrd +
+	Add<Output = Self> +
+	Sub<Output = Self> +
+	Mul<Output = Self> +
+	Div<Output = Self> +
+	for<'a> Add<&'a Self, Output = Self> +
+	for<'a> Sub<&'a Self, Output = Self> +
+	for<'a> Div<&'a Self, Output = Self> +
+	for<'a> Mul<&'a Self, Output = Self> +
+	AddAssign<Self> +
+	SubAssign<Self> +
+	MulAssign<Self> +
+	DivAssign<Self> +
+	for<'a> AddAssign<&'a Self> +
+	for<'a> SubAssign<&'a Self> +
+	for<'a> MulAssign<&'a Self> +
+	for<'a> DivAssign<&'a Self> +
+	PartialEq +
+	PartialOrd +
 	Zero +
 	One +
 	Abs +

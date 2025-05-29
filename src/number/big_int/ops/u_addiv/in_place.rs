@@ -1,7 +1,7 @@
 use crate::number::BigInt;
 
 impl BigInt {
-	pub(crate) fn u_add_in(
+	pub(crate) fn u_add_in_place(
 		&self,
 		rhs: &BigInt,
 		result: &mut BigInt,
@@ -51,7 +51,7 @@ impl BigInt {
 		}
 	}
 
-	pub(crate) fn u_sub_in(
+	pub(crate) fn u_sub_in_place(
 		&self,
 		rhs: &BigInt,
 		result: &mut BigInt,

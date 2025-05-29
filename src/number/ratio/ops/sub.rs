@@ -1,13 +1,20 @@
-use crate::impl_ratio_binop_variants;
+use std::ops::{
+	Sub,
+	SubAssign,
+};
+use crate::{
+	impl_ratio_binop_variants,
+	impl_ratio_binop_assign_variants,
+};
 use crate::number::{
 	Int,
 	Ratio,
 };
 
-impl<T: Int + Clone + std::cmp::PartialEq> std::ops::Sub for &Ratio<T> {
+impl<T: Int + Clone> Sub<&Ratio<T>> for &Ratio<T> {
 	type Output = Ratio<T>;
 
-	fn sub(self, rhs: Self) -> Self::Output {
+	fn sub(self, rhs: &Ratio<T>) -> Self::Output {
 		if self.den == rhs.den {
 			Ratio {
 				num: self.num.clone() - &rhs.num,
@@ -23,3 +30,4 @@ impl<T: Int + Clone + std::cmp::PartialEq> std::ops::Sub for &Ratio<T> {
 }
 
 impl_ratio_binop_variants!(Sub, sub, -);
+impl_ratio_binop_assign_variants!(SubAssign, sub_assign, -);

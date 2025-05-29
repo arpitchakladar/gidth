@@ -1,7 +1,14 @@
+use std::ops::{
+	Div,
+	DivAssign,
+};
 use crate::number::BigDecimal;
-use crate::impl_big_decimal_binop_variants;
+use crate::{
+	impl_big_decimal_binop_variants,
+	impl_big_decimal_binop_assign_variants,
+};
 
-impl std::ops::Div for &BigDecimal {
+impl Div for &BigDecimal {
 	type Output = BigDecimal;
 
 	fn div(self, rhs: Self) -> Self::Output {
@@ -27,3 +34,4 @@ impl std::ops::Div for &BigDecimal {
 }
 
 impl_big_decimal_binop_variants!(Div, div, /);
+impl_big_decimal_binop_assign_variants!(DivAssign, div_assign, /);

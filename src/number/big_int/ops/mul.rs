@@ -1,5 +1,12 @@
+use std::ops::{
+	Mul,
+	MulAssign,
+};
 use crate::number::BigInt;
-use crate::impl_big_int_binop_variants;
+use crate::{
+	impl_big_int_binop_variants,
+	impl_big_int_binop_assign_variants,
+};
 
 impl BigInt {
 	/// Multiplies two unsigned `BigInt` numbers and stores the result in `result`.
@@ -48,7 +55,7 @@ impl BigInt {
 	}
 }
 
-impl std::ops::Mul for &BigInt {
+impl Mul for &BigInt {
 	type Output = BigInt;
 
 	fn mul(self, other: Self) -> Self::Output {
@@ -67,3 +74,4 @@ impl std::ops::Mul for &BigInt {
 }
 
 impl_big_int_binop_variants!(Mul, mul, *);
+impl_big_int_binop_assign_variants!(MulAssign, mul_assign, *);
