@@ -1,4 +1,7 @@
-use crate::impl_ratio_binop_variants;
+use crate::{
+	impl_ratio_binop_variants,
+	impl_ratio_binop_assign_variants,
+};
 use crate::number::{
 	Int,
 	Ratio,
@@ -23,3 +26,4 @@ impl<T: Int + Clone + std::cmp::PartialEq> std::ops::Add for &Ratio<T> {
 }
 
 impl_ratio_binop_variants!(Add, add, +);
+impl_ratio_binop_assign_variants!(AddAssign, add_assign, +);

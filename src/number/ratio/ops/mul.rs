@@ -1,4 +1,7 @@
-use crate::impl_ratio_binop_variants;
+use crate::{
+	impl_ratio_binop_variants,
+	impl_ratio_binop_assign_variants,
+};
 use crate::number::{
 	Int,
 	Ratio,
@@ -16,3 +19,4 @@ impl<T: Int + Clone> std::ops::Mul for &Ratio<T> {
 }
 
 impl_ratio_binop_variants!(Mul, mul, *);
+impl_ratio_binop_assign_variants!(MulAssign, mul_assign, *);

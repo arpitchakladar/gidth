@@ -3,6 +3,10 @@ use std::ops::{
 	Sub,
 	Mul,
 	Div,
+	AddAssign,
+	SubAssign,
+	MulAssign,
+	DivAssign,
 };
 use std::cmp::{
 	PartialEq,
@@ -27,6 +31,14 @@ pub trait Real:
 	for<'a> Sub<&'a Self, Output = Self> +
 	for<'a> Div<&'a Self, Output = Self> +
 	for<'a> Mul<&'a Self, Output = Self> +
+	AddAssign<Self> +
+	SubAssign<Self> +
+	MulAssign<Self> +
+	DivAssign<Self> +
+	for<'a> AddAssign<&'a Self> +
+	for<'a> SubAssign<&'a Self> +
+	for<'a> DivAssign<&'a Self> +
+	for<'a> MulAssign<&'a Self> +
 	PartialEq +
 	PartialOrd +
 	Zero +
