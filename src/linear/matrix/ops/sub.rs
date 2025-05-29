@@ -7,7 +7,7 @@ use crate::{
 	number::Real,
 };
 
-impl<T: Real + Clone, const R: usize, const C: usize> Sub<&Matrix<T, R, C>> for Matrix<T, R, C>
+impl<T: Real, const R: usize, const C: usize> Sub<&Matrix<T, R, C>> for Matrix<T, R, C>
 where
 	T: Real + Clone,
 	for<'a> T: SubAssign<&'a T>

@@ -3,7 +3,6 @@ use crate::{
 	number::{
 		Abs,
 		Decimal,
-		One,
 		Zero,
 	}
 };
@@ -16,10 +15,13 @@ where
 	for<'a> &'a T: std::ops::Mul<&'a T, Output = T>,
 	for<'a> &'a T: std::ops::Div<&'a T, Output = T>,
 {
-	pub fn det(self) -> T {
+	// LU factorization with partial pivoting
+	// Returns the upper and lower trinagular matrices and the
+	// permutation matrix
+	pub fn lu(self) -> Option<(Matrix<T, D, D>, Matrix<T, D, D>, Matrix<T, D, D>)> {
 		let mut u = self;
-		let mut det: T = One::one();
-		let mut sign_flip = false;
+		let mut l: Matrix<T, D, D> = Matrix::one();
+		let mut p: Matrix<T, D, D> = Matrix::one();
 
 		for i in 0..D {
 			let mut max_row = i;
@@ -30,16 +32,17 @@ where
 			}
 
 			if Zero::is_zero(&u[max_row][i]) {
-				return Zero::zero();
+				return None;
 			}
 
 			if max_row != i {
 				u = u.swap_rows(i, max_row);
-				sign_flip = !sign_flip;
+				p = p.swap_rows(i, max_row);
 			}
 
 			for j in (i + 1)..D {
 				let x = &u[j][i] / &u[i][i];
+				l[j][i] = x.clone();
 				u[j][i] = Zero::zero();
 				for k in (i + 1)..D {
 					let x = &u[i][k] * &x;
@@ -48,14 +51,6 @@ where
 			}
 		}
 
-		for i in 0..D {
-			det *= &u[i][i];
-		}
-
-		if sign_flip {
-			-det
-		} else {
-			det
-		}
+		Some((l, u, p))
 	}
 }
