@@ -1,4 +1,7 @@
-use std::ops::Div;
+use std::ops::{
+	Div,
+	DivAssign,
+};
 use crate::number::BigInt;
 use crate::{
 	impl_big_int_binop_variants,

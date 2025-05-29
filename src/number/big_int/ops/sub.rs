@@ -3,7 +3,6 @@ use std::ops::{
 	SubAssign,
 };
 use crate::number::BigInt;
-use crate::impl_big_int_binop_variants;
 
 impl Sub<&BigInt> for BigInt {
 	type Output = BigInt;

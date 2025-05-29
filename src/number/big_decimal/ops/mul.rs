@@ -1,3 +1,7 @@
+use std::ops::{
+	Mul,
+	MulAssign,
+};
 use crate::number::BigDecimal;
 use crate::{
 	impl_big_decimal_binop_variants,
@@ -55,7 +59,7 @@ impl BigDecimal {
 	}
 }
 
-impl std::ops::Mul for &BigDecimal {
+impl Mul for &BigDecimal {
 	type Output = BigDecimal;
 
 	fn mul(self, other: Self) -> Self::Output {

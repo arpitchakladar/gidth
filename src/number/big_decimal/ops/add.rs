@@ -1,10 +1,14 @@
+use std::ops::{
+	Add,
+	AddAssign,
+};
 use crate::number::BigDecimal;
 use crate::{
 	impl_big_decimal_binop_variants,
 	impl_big_decimal_binop_assign_variants,
 };
 
-impl std::ops::Add for &BigDecimal {
+impl Add for &BigDecimal {
 	type Output = BigDecimal;
 
 	fn add(self, other: &BigDecimal) -> Self::Output {

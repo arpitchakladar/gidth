@@ -1,3 +1,10 @@
+use std::cmp::{
+	PartialOrd,
+	PartialEq,
+	Ord,
+	Eq,
+	Ordering,
+};
 use crate::number::BigDecimal;
 
 impl PartialEq for BigDecimal {
@@ -14,10 +21,10 @@ impl PartialOrd for BigDecimal {
 	fn partial_cmp(
 		&self,
 		rhs: &Self,
-	) -> Option<std::cmp::Ordering> {
+	) -> Option<Ordering> {
 		let ord = {
 			if self.positive != rhs.positive {
-				std::cmp::Ordering::Greater
+				Ordering::Greater
 			} else {
 				let lhs_order = self.order();
 				let rhs_order = rhs.order();
@@ -32,11 +39,11 @@ impl PartialOrd for BigDecimal {
 						.zip(rhs.limbs.iter().rev())
 						.find_map(|(left, right)|
 							match left.cmp(right) {
-								std::cmp::Ordering::Equal => None,
+								Ordering::Equal => None,
 								ord => Some(ord),
 							}
 						)
-						.unwrap_or(std::cmp::Ordering::Equal)
+						.unwrap_or(Ordering::Equal)
 				}
 			}
 		};
@@ -52,7 +59,7 @@ impl PartialOrd for BigDecimal {
 }
 
 impl Ord for BigDecimal {
-	fn cmp(&self, rhs: &Self) -> std::cmp::Ordering {
+	fn cmp(&self, rhs: &Self) -> Ordering {
 		self.partial_cmp(rhs).unwrap()
 	}
 }
@@ -60,9 +67,9 @@ impl Ord for BigDecimal {
 impl BigDecimal {
 	pub fn u_gt(&self, rhs: &BigDecimal) -> bool {
 		match self.order().cmp(&rhs.order()) {
-			std::cmp::Ordering::Greater => true,
-			std::cmp::Ordering::Less => false,
-			std::cmp::Ordering::Equal =>
+			Ordering::Greater => true,
+			Ordering::Less => false,
+			Ordering::Equal =>
 				self.limbs
 					.iter()
 					.rev()
